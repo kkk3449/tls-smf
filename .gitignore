@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Virtualenv (8.5 GB — recreate from requirements.txt)
+.venv/
+venv/
+env/
+
+# Model weights (9.6 GB — download via scripts, see README)
+weights/
+
+# Generated outputs (objects, classifications, previews)
+outputs/
+
+# Install / download logs
+*.log
+
+# Third-party source is cloned, not vendored. Reproduce it with patches/README.md
+# (pins the upstream commit + applies our no-CUDA FPS patch).
+third_party/

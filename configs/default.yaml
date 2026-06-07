@@ -1,0 +1,30 @@
+# blk360_seg default config
+preprocess:
+  voxel_size_m: 0.03        # downsample leaf size (BLK is dense; 3 cm keeps detail)
+  normalize: true           # center XY, put floor near z=0
+
+# Stage A: extract object instances (-> Stage B Uni3D classification).
+remove_structure: true      # auto RANSAC-remove floor/walls first (no-op if already removed)
+objects:
+  cluster_eps_m: 0.30       # DBSCAN radius for grouping points into objects
+                            # (0.30 tuned on testroom_no_wall: clutter 56%->27%,
+                            #  coverage 92K->121K pts vs the old 0.15 -- bigger eps
+                            #  merges over-segmented fragments into whole objects)
+  min_points: 100           # drop clusters smaller than this
+
+segmenter:
+  backend: baseline         # baseline | dl
+  baseline:
+    floor_distance_m: 0.04   # RANSAC plane inlier threshold
+    cluster_eps_m: 0.10      # Euclidean clustering radius (DBSCAN eps)
+    cluster_min_points: 50
+  dl:
+    framework: pointcept     # placeholder
+    weights: ""              # path to pretrained checkpoint
+    device: cuda             # cuda | cpu
+
+postprocess:
+  instance_eps_m: 0.12       # per-class DBSCAN for instances
+  instance_min_points: 40
+
+classes: s3dis               # s3dis | scannet | custom (see classes.py)

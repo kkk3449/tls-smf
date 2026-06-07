@@ -1,0 +1,11 @@
+# Core (CPU) — enough to run the geometric baseline end-to-end.
+numpy
+open3d
+pandas
+pyyaml
+pye57            # only needed for .e57 input
+
+# Deep-learning backend (install when wiring DLSegmenter; pick the CUDA build
+# that matches your driver). Listed here for reference, not required for baseline.
+# torch
+# Pointcept (https://github.com/Pointcept/Pointcept) + its deps (spconv, etc.)
