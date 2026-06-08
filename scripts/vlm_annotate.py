@@ -84,7 +84,7 @@ def main():
         vb.apply_symbolic(o, s)
         im = vlm.infer_implicit(o["type"], paths)
         vb.apply_implicit(o, im)
-        flag = "" if s["matches"] else f"  (was '{before}')"
+        flag = f"  (was '{before}')" if s.get("changed") else ""
         print(f"  [{i}] {o['name']:<22} type={o['type']:<14} conf={o['confidence']:.2f}{flag} "
               f"| key={o['properties']['isKeyObject']} movable={o['properties']['isMovable']}")
 

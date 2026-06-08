@@ -16,20 +16,21 @@ import re
 
 SYMBOLIC_TOOL = {
     "name": "report_symbolic",
-    "description": "Report whether the candidate type matches the object, and correct it if wrong.",
+    "description": "Choose the object's final type: a preferred candidate if one fits better, else keep the original Uni3D label.",
     "input_schema": {
         "type": "object",
         "properties": {
-            "matches": {"type": "boolean",
-                        "description": "True if the candidate type already matches the object."},
             "corrected_type": {"type": "string",
-                               "description": "The correct object class (= candidate if it was right)."},
+                               "description": "Final type: a candidate if one matches the object better, "
+                                              "otherwise the original uni3d_type unchanged."},
+            "changed": {"type": "boolean",
+                        "description": "True if corrected_type differs from the original uni3d_type."},
             "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0,
                            "description": "Confidence in corrected_type, 0..1."},
             "reason": {"type": "string",
-                       "description": "<=1 sentence: the visual feature that decided it."},
+                       "description": "<=1 sentence: why this type (and why switched/kept)."},
         },
-        "required": ["matches", "corrected_type", "confidence", "reason"],
+        "required": ["corrected_type", "changed", "confidence", "reason"],
     },
 }
 
@@ -55,18 +56,25 @@ IMPLICIT_TOOL = {
 
 _SYS_SYMBOLIC = (
     "You are a semantic-mapping verifier for an indoor mobile robot (AGV). You are "
-    "shown rendered multi-view images of ONE segmented 3D object (a point cloud with "
-    "a red 3D bounding box) plus a candidate JSON record from an automatic 3D "
-    "classifier.\n\n"
-    "Your ONLY job: judge whether the candidate `type` matches what is visibly the "
-    "object, and correct it if wrong.\n"
-    "RULES:\n"
-    "- The geometric fields (poseX/Y, poseTheta, dimensions) are physically measured. "
-    "Never change or question them; use them only as size context.\n"
-    "- The classifier is known to confuse chairs with 'stair'/'machine'. Look for "
-    "seat+backrest+legs before trusting the candidate.\n"
-    "- If the object is ambiguous or only partially scanned, keep the candidate type "
-    "but lower the confidence.\n"
+    "shown rendered image(s) of ONE segmented 3D object (a point cloud with a red 3D "
+    "bounding box), the original label from an automatic 3D classifier "
+    "(`uni3d_type`), and an OPTIONAL list of user-preferred candidate classes.\n\n"
+    "DECISION RULE (follow exactly):\n"
+    "1. If one of the candidate classes matches the object in the image BETTER than "
+    "`uni3d_type`, set corrected_type to that candidate (changed=true).\n"
+    "2. Otherwise KEEP `uni3d_type` unchanged (changed=false).\n"
+    "When candidates are provided, corrected_type MUST be either one of the "
+    "candidates or exactly `uni3d_type` — never 'unknown' and never any other "
+    "label. (If NO candidates are provided, instead correct `uni3d_type` to the most "
+    "accurate common-noun label you can, open-vocabulary.)\n"
+    "- The classifier is known to confuse chairs with 'stair'/'machine'; look for "
+    "seat+backrest+legs before deciding.\n"
+    "- SIZE SANITY CHECK: the measured `dimensions` (metres, length x width x "
+    "height) are a HARD constraint. Do NOT switch to a candidate whose typical "
+    "real-world size is incompatible with them (e.g. a single chair is roughly "
+    "0.4-0.9 m wide and under ~1.3 m tall; a 2 m+ wide object is not one chair, it "
+    "is likely several merged objects or a different class). If every candidate's "
+    "real size contradicts the dimensions, keep `uni3d_type`.\n"
     "- Respond ONLY via the report_symbolic tool."
 )
 
@@ -116,19 +124,22 @@ class SemanticVLM:
         raise RuntimeError("no tool_use in response")
 
     def build_symbolic_request(self, obj, image_paths, allowed_types=None):
-        candidate = {k: obj[k] for k in ("type", "name") if k in obj}
-        candidate["dimensions"] = obj.get("dimensions")
-        vocab = (f"`corrected_type` MUST be exactly one of: {allowed_types} "
-                 "(or 'unknown' if none clearly fit)."
-                 if allowed_types else
-                 "Use a concise common-noun class for `corrected_type`.")
+        ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}
+        if allowed_types:
+            vocab = (f"Preferred candidate classes: {allowed_types}\n"
+                     f"If one of these fits the object better than uni3d_type "
+                     f"('{obj.get('type')}'), switch to it; otherwise keep "
+                     f"'{obj.get('type')}'.")
+        else:
+            vocab = ("No candidates given — correct uni3d_type to the most accurate "
+                     "label if it is wrong, else keep it.")
         n = len(image_paths)
         imgdesc = ("The image shows the object." if n == 1 else
                    f"The {n} images are the SAME object from azimuths around it.")
-        text = (f"Candidate record (geometry is measured, do not change):\n"
-                f"{json.dumps(candidate, ensure_ascii=False)}\n\n"
+        text = (f"Object context (geometry is measured, do not change):\n"
+                f"{json.dumps(ctx, ensure_ascii=False)}\n\n"
                 f"{vocab}\n"
-                f"{imgdesc} Does `type` match? Correct if needed.")
+                f"{imgdesc} Decide corrected_type per the rule.")
         content = [_img_block(p) for p in image_paths] + [{"type": "text", "text": text}]
         return content
 
