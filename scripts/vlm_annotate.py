@@ -31,12 +31,20 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--model", default="claude-sonnet-4-6")
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--select", default=None,
+                    help="comma-sep names/ids/imageFiles to process only (e.g. stair_008,obj_0001.ply)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
     msg = json.load(open(args.input))
     objs = msg["semanticObjects"]
     allowed = msg.get("allowedTypes")
+    if args.select:
+        want = {s.strip() for s in args.select.split(",") if s.strip()}
+        objs = [o for o in objs
+                if want & {o.get("name"), o.get("id"),
+                           o.get("properties", {}).get("imageFile")}]
+        print(f"[B] selected {len(objs)} objects matching {want}")
     if args.limit:
         objs = objs[:args.limit]
     print(f"[B] {len(objs)} objects | allowedTypes={allowed or '(open-vocab)'} | model={args.model}")
