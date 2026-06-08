@@ -33,6 +33,9 @@ def main():
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--select", default=None,
                     help="comma-sep names/ids/imageFiles to process only (e.g. stair_008,obj_0001.ply)")
+    ap.add_argument("--num-views", type=int, default=1,
+                    help="how many of the rendered views to send per object "
+                         "(1 for preliminary/예심, 4 for final/본심). Default 1.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -50,7 +53,7 @@ def main():
     print(f"[B] {len(objs)} objects | allowedTypes={allowed or '(open-vocab)'} | model={args.model}")
 
     def img_paths(obj):
-        views = obj.get("properties", {}).get("imageViews", [])
+        views = obj.get("properties", {}).get("imageViews", [])[:args.num_views]
         return [os.path.join(args.objects_dir, v) for v in views]
 
     if args.dry_run:

@@ -122,11 +122,13 @@ class SemanticVLM:
                  "(or 'unknown' if none clearly fit)."
                  if allowed_types else
                  "Use a concise common-noun class for `corrected_type`.")
+        n = len(image_paths)
+        imgdesc = ("The image shows the object." if n == 1 else
+                   f"The {n} images are the SAME object from azimuths around it.")
         text = (f"Candidate record (geometry is measured, do not change):\n"
                 f"{json.dumps(candidate, ensure_ascii=False)}\n\n"
                 f"{vocab}\n"
-                f"The {len(image_paths)} images are the SAME object from "
-                f"azimuths around it. Does `type` match? Correct if needed.")
+                f"{imgdesc} Does `type` match? Correct if needed.")
         content = [_img_block(p) for p in image_paths] + [{"type": "text", "text": text}]
         return content
 
@@ -135,9 +137,11 @@ class SemanticVLM:
         return self._call(_SYS_SYMBOLIC, content, SYMBOLIC_TOOL)
 
     def infer_implicit(self, obj_type, image_paths):
+        n = len(image_paths)
+        imgdesc = ("The image shows the object." if n == 1 else
+                   f"The {n} images are the SAME object from several azimuths.")
         text = (f"Confirmed type: {obj_type}.\n"
-                f"The {len(image_paths)} images are the SAME object from several "
-                f"azimuths. Infer the implicit properties.")
+                f"{imgdesc} Infer the implicit properties.")
         content = [_img_block(p) for p in image_paths] + [{"type": "text", "text": text}]
         return self._call(_SYS_IMPLICIT, content, IMPLICIT_TOOL)
 
