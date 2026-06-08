@@ -21,10 +21,14 @@
 | **DBSCAN** (geometric)  | ✅ run — primary arm             | ✅ run (collapsed, see §4)           |
 | **SPFormer** (ScanNet closed-set, AAAI'23) | ✅ run — closed-set arm | — (not run; PCv2 already shown degenerate) |
 
+Plus a **semantic-only** arm — **PTv3** (Point Transformer v3, CVPR'24) ScanNet-
+pretrained — reported separately in §3b (per-point class, no instances, so it does
+not feed Stage-B classification).
+
 Dropped: **Mask3D / Part2Object** — both require MinkowskiEngine (CUDA 11.3 /
 torch 1.x), fundamentally incompatible with Blackwell sm_120 (requires
 cu128/torch 2.x). SPFormer (spconv-based, same query-mask-transformer paradigm)
-is the substitute. **PTv3** optional (semantic-only).
+is the substitute.
 
 ---
 
@@ -65,6 +69,37 @@ A room full of **chairs and tables** — there are none. The model is forced to
 project industrial geometry onto its 18 indoor-furniture classes. This is the
 thesis in one line: **a methodological SOTA, trained closed-set on indoor rooms,
 hallucinates furniture on industrial objects and recovers only half the scene.**
+
+---
+
+## 3b. PTv3 semantic segmentation — the same failure, even more stark
+
+**PTv3** (Point Transformer v3, CVPR'24, Pointcept) is a *semantic* segmenter
+(per-point class among 20 ScanNet classes — no instances), the current SOTA
+backbone for indoor semantic segmentation. We ran the authors' ScanNet-pretrained
+weights on the **wall/floor-removed** scene (122,738 pts, grid 0.02 m). Per-point
+class distribution:
+
+| ScanNet class | points | share | mean conf |
+|---------------|-------:|------:|----------:|
+| **wall** | 56,894 | **46.4 %** | 0.49 |
+| **refrigerator** | 23,999 | 19.6 % | 0.38 |
+| cabinet | 12,024 | 9.8 % | 0.30 |
+| counter | 8,285 | 6.8 % | 0.57 |
+| bathtub | 5,263 | 4.3 % | 0.33 |
+| bookshelf | 4,679 | 3.8 % | 0.34 |
+| shower curtain | 4,562 | 3.7 % | 0.31 |
+| door / bed / chair / … | rest | <3 % each | 0.2–0.3 |
+
+*(17 of 20 classes fire; mean confidence 0.43.)*
+
+The single most damning number: **46 % of the points are labeled `wall` on a scene
+where the walls were already removed.** Nearly 20 % become `refrigerator`, and the
+rest scatter across bathroom/kitchen fixtures (counter, bathtub, shower curtain).
+PTv3 has no concept of pipes, valves, frames, or cable trays, so it forces every
+industrial surface onto the nearest indoor-furniture prior — at low confidence.
+A semantic SOTA fails on this domain *even more visibly* than the instance SOTA:
+it cannot even abstain, it relabels empty industrial space as room structure.
 
 ---
 
