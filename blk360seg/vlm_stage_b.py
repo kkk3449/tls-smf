@@ -60,21 +60,24 @@ _SYS_SYMBOLIC = (
     "bounding box), the original label from an automatic 3D classifier "
     "(`uni3d_type`), and an OPTIONAL list of user-preferred candidate classes.\n\n"
     "DECISION RULE (follow exactly):\n"
-    "1. If one of the candidate classes matches the object in the image BETTER than "
-    "`uni3d_type`, set corrected_type to that candidate (changed=true).\n"
-    "2. Otherwise KEEP `uni3d_type` unchanged (changed=false).\n"
-    "When candidates are provided, corrected_type MUST be either one of the "
-    "candidates or exactly `uni3d_type` — never 'unknown' and never any other "
-    "label. (If NO candidates are provided, instead correct `uni3d_type` to the most "
-    "accurate common-noun label you can, open-vocabulary.)\n"
+    "1. If `uni3d_type` already correctly names the object in the image, KEEP it "
+    "unchanged (changed=false).\n"
+    "2. If `uni3d_type` is WRONG, replace it with a better label (changed=true), "
+    "picking the new label in THIS priority order:\n"
+    "   (a) FIRST prefer a class from the user candidate list, if one of them fits "
+    "the object;\n"
+    "   (b) if NO candidate fits, propose the single most accurate common-noun label "
+    "yourself (open-vocabulary).\n"
+    "Never output 'unknown'. If no candidates are provided at all, skip 2(a) and go "
+    "straight to open-vocabulary correction.\n"
     "- The classifier is known to confuse chairs with 'stair'/'machine'; look for "
     "seat+backrest+legs before deciding.\n"
     "- SIZE SANITY CHECK: the measured `dimensions` (metres, length x width x "
     "height) are a HARD constraint. Do NOT switch to a candidate whose typical "
     "real-world size is incompatible with them (e.g. a single chair is roughly "
     "0.4-0.9 m wide and under ~1.3 m tall; a 2 m+ wide object is not one chair, it "
-    "is likely several merged objects or a different class). If every candidate's "
-    "real size contradicts the dimensions, keep `uni3d_type`.\n"
+    "is likely several merged objects or a different class). Pick a label whose "
+    "typical real-world size is consistent with the measured dimensions.\n"
     "- Respond ONLY via the report_symbolic tool."
 )
 
@@ -126,13 +129,13 @@ class SemanticVLM:
     def build_symbolic_request(self, obj, image_paths, allowed_types=None):
         ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}
         if allowed_types:
-            vocab = (f"Preferred candidate classes: {allowed_types}\n"
-                     f"If one of these fits the object better than uni3d_type "
-                     f"('{obj.get('type')}'), switch to it; otherwise keep "
-                     f"'{obj.get('type')}'.")
+            vocab = (f"User candidate classes (try these FIRST): {allowed_types}\n"
+                     f"If uni3d_type ('{obj.get('type')}') is correct, keep it. "
+                     f"If it is wrong, prefer a candidate that fits; if none of the "
+                     f"candidates fit, propose your own open-vocabulary label.")
         else:
-            vocab = ("No candidates given — correct uni3d_type to the most accurate "
-                     "label if it is wrong, else keep it.")
+            vocab = ("No candidates given — if uni3d_type is wrong, correct it to the "
+                     "most accurate open-vocabulary label; else keep it.")
         n = len(image_paths)
         imgdesc = ("The image shows the object." if n == 1 else
                    f"The {n} images are the SAME object from azimuths around it.")

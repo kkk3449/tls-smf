@@ -11,6 +11,14 @@ objects:
                             #  coverage 92K->121K pts vs the old 0.15 -- bigger eps
                             #  merges over-segmented fragments into whole objects)
   min_points: 100           # drop clusters smaller than this
+  split_oversized: true     # re-split only clusters whose footprint is clearly
+                            # several merged objects (conservative giant-split):
+  split_footprint_m: 2.5    #   trigger re-cluster when foot (max x/y extent) > this
+  split_eps_m: 0.20         #   tighter DBSCAN eps used for the re-split
+  split_min_points: 100     #   each sub-cluster must keep >= this many points
+                            # (foot>2.5/eps0.20/min100: 30->45 objs, 97% coverage,
+                            #  breaks 8 m blobs to 5.7 m; adjacent-chair merges
+                            #  remain -- a fundamental DBSCAN-granularity limit)
 
 segmenter:
   backend: baseline         # baseline | dl

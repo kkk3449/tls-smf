@@ -48,8 +48,16 @@ def main():
               f"{n0:,} -> {len(xyz):,} points")
 
     oc = cfg["objects"]
-    inst = postprocess.cluster_all(xyz, eps_m=oc["cluster_eps_m"],
-                                   min_points=oc["min_points"])
+    if oc.get("split_oversized"):
+        inst, n_obj, n_split = postprocess.cluster_all_split(
+            xyz, eps_m=oc["cluster_eps_m"], min_points=oc["min_points"],
+            split_footprint_m=oc["split_footprint_m"],
+            split_eps_m=oc["split_eps_m"], split_min_points=oc["split_min_points"])
+        print(f"[A] clustered into {n_obj} objects "
+              f"(giant-split re-split {n_split} over-merged cluster(s))")
+    else:
+        inst = postprocess.cluster_all(xyz, eps_m=oc["cluster_eps_m"],
+                                       min_points=oc["min_points"])
     objs = objects.extract_objects(xyz, rgb, inst, min_points=oc["min_points"])
     manifest = objects.save_objects(objs, out_dir)
     print(f"[A] {len(objs)} objects -> {out_dir}/")
