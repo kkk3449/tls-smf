@@ -108,12 +108,24 @@ def _img_block(path):
             "source": {"type": "base64", "media_type": "image/png", "data": data}}
 
 
+# Claude Sonnet standard pricing (USD per million tokens). Override via
+# SemanticVLM(price_in=..., price_out=...) if the rate changes.
+_PRICE_IN_PER_MTOK = 3.0
+_PRICE_OUT_PER_MTOK = 15.0
+
+
 class SemanticVLM:
-    def __init__(self, model="claude-sonnet-4-6", api_key=None, max_tokens=512):
+    def __init__(self, model="claude-sonnet-4-6", api_key=None, max_tokens=512,
+                 price_in=_PRICE_IN_PER_MTOK, price_out=_PRICE_OUT_PER_MTOK):
         import anthropic
         self.client = anthropic.Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
         self.model = model
         self.max_tokens = max_tokens
+        self.price_in = price_in
+        self.price_out = price_out
+        # Cumulative token-usage accounting across every _call on this instance.
+        self.usage = {"calls": 0, "input_tokens": 0, "output_tokens": 0,
+                      "cache_read_tokens": 0, "cache_write_tokens": 0}
 
     def _call(self, system, content, tool):
         resp = self.client.messages.create(
@@ -121,10 +133,37 @@ class SemanticVLM:
             tools=[tool], tool_choice={"type": "tool", "name": tool["name"]},
             messages=[{"role": "user", "content": content}],
         )
+        u = getattr(resp, "usage", None)
+        if u is not None:
+            self.usage["calls"] += 1
+            self.usage["input_tokens"] += getattr(u, "input_tokens", 0) or 0
+            self.usage["output_tokens"] += getattr(u, "output_tokens", 0) or 0
+            self.usage["cache_read_tokens"] += \
+                getattr(u, "cache_read_input_tokens", 0) or 0
+            self.usage["cache_write_tokens"] += \
+                getattr(u, "cache_creation_input_tokens", 0) or 0
         for block in resp.content:
             if block.type == "tool_use":
                 return dict(block.input)
         raise RuntimeError("no tool_use in response")
+
+    def cost_usd(self):
+        """Estimated cost so far from accumulated usage (input + output only;
+        cache tokens are reported but not separately priced here)."""
+        return (self.usage["input_tokens"] / 1e6 * self.price_in
+                + self.usage["output_tokens"] / 1e6 * self.price_out)
+
+    def usage_summary(self):
+        """One-line dict of cumulative tokens, cost, and per-call/per-object cost.
+        (Two _call's per object: symbolic + implicit.)"""
+        calls = max(self.usage["calls"], 1)
+        cost = self.cost_usd()
+        return {
+            **self.usage,
+            "cost_usd": round(cost, 4),
+            "cost_per_call_usd": round(cost / calls, 4),
+            "cost_per_object_usd": round(cost / calls * 2, 4),
+        }
 
     def build_symbolic_request(self, obj, image_paths, allowed_types=None):
         ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}

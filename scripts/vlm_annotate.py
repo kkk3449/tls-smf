@@ -93,6 +93,18 @@ def main():
         json.dump(msg, f, indent=2, ensure_ascii=False)
     print(f"[B] wrote {out}")
 
+    # Token usage + estimated cost for this run.
+    summ = vlm.usage_summary()
+    print(f"[B] usage: {summ['calls']} calls "
+          f"({summ['input_tokens']} in / {summ['output_tokens']} out tok) "
+          f"= ${summ['cost_usd']:.4f}  "
+          f"(${summ['cost_per_object_usd']:.4f}/object)")
+    usage_path = out.replace(".json", ".usage.json")
+    with open(usage_path, "w") as f:
+        json.dump({"model": args.model, "num_views": args.num_views,
+                   "objects": len(objs), **summ}, f, indent=2)
+    print(f"[B] usage record -> {usage_path}")
+
 
 if __name__ == "__main__":
     main()
