@@ -99,9 +99,10 @@ def gen_queries(gt, trap_types=()):
     records and are known-wrong or unconfirmable. A trap query asks about
     such a type; asserting its presence is a hallucination, while abstaining
     or denying is correct. These queries measure the value of gating."""
-    # structure artifacts (ceiling-soffit remnants) are filtered at Stage A
-    # and are not in any condition's world model -> not queryable objects
-    objs = [o for o in gt["objects"] if not o.get("structure_artifact")]
+    # not queryable objects: structure artifacts (filtered at Stage A) and
+    # out-of-scope objects (outside the modeled room)
+    objs = [o for o in gt["objects"] if not o.get("structure_artifact")
+            and not o.get("out_of_scope")]
     rels = gt.get("relations", [])
     for o in objs:
         o.setdefault("type", o.get("gt_type"))
@@ -282,22 +283,27 @@ def ctx_llm_only(stage_a_records):
             + json.dumps(recs, ensure_ascii=False))
 
 
-def ctx_graph(graph, gated):
+def ctx_graph(graph, mode):
+    """mode: 'ungated' (all labels, no status) | 'gated' (unverified demoted
+    to unknown + failedCandidateType) | 'verified_only' (unverified records
+    dropped entirely)."""
     nodes = []
     for n in graph["nodes"]:
         if n.get("presence") == "absent":
             continue
+        if mode == "verified_only" and n["status"] == "unverified":
+            continue
         node = {"name": n["name"], "type": n["type"],
                 "pose": n["pose"], "dimensions": n["dimensions"],
                 "color": n.get("color"), **n.get("implicit", {})}
-        if gated:
+        if mode in ("gated", "verified_only"):
             node["verificationStatus"] = n["status"]
             node["confidence"] = n["confidence"]
-            if n["status"] == "unverified":
-                # gate by construction, not by exhortation: a label that
-                # failed verification is not exposed as the record's type
-                node["type"] = "unknown"
-                node["failedCandidateType"] = n["type"]
+        if mode == "gated" and n["status"] == "unverified":
+            # gate by construction, not by exhortation: a label that
+            # failed verification is not exposed as the record's type
+            node["type"] = "unknown"
+            node["failedCandidateType"] = n["type"]
         nodes.append(node)
     id2name = {n["id"]: n["name"] for n in graph["nodes"]}
     edges = [[id2name[e["subj"]], e["pred"], id2name[e["obj"]]]
@@ -306,7 +312,11 @@ def ctx_graph(graph, gated):
            + json.dumps(nodes, ensure_ascii=False)
            + "\nEdges (subject, predicate, object):\n"
            + json.dumps(edges, ensure_ascii=False))
-    return txt + (_GATED_NOTE if gated else "")
+    note = _GATED_NOTE if mode == "gated" else (
+        "\nNote: records carry verificationStatus; only records whose label "
+        "passed multi-view VLM verification are included in this context."
+        if mode == "verified_only" else "")
+    return txt + note
 
 
 def main():
@@ -317,7 +327,8 @@ def main():
     ap.add_argument("--graph", required=True, help="kg_upsert graph json")
     ap.add_argument("--out", required=True)
     ap.add_argument("--model", default="claude-sonnet-4-6")
-    ap.add_argument("--conditions", default="llm_only,ungated,gated")
+    ap.add_argument("--conditions",
+                    default="llm_only,ungated,verified_only,gated")
     ap.add_argument("--dry-run", action="store_true",
                     help="print the query set and exit (no API calls)")
     ap.add_argument("--trap-types", default=None,
@@ -346,8 +357,9 @@ def main():
     stage_a = d["semanticObjects"] if isinstance(d, dict) and \
         "semanticObjects" in d else d
     contexts = {"llm_only": ctx_llm_only(stage_a),
-                "ungated": ctx_graph(graph, gated=False),
-                "gated": ctx_graph(graph, gated=True)}
+                "ungated": ctx_graph(graph, "ungated"),
+                "verified_only": ctx_graph(graph, "verified_only"),
+                "gated": ctx_graph(graph, "gated")}
 
     from blk360seg.vlm_stage_b import SemanticVLM
     vlm = SemanticVLM(model=args.model, max_tokens=1024)

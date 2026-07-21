@@ -93,6 +93,20 @@ def main():
         print(f"[edit] move {mv['name']}: {len(idx):,} pts by "
               f"({mv.get('dx', 0)}, {mv.get('dy', 0)}, {mv.get('dz', 0)})")
 
+    for oc in edits.get("occlude", []):
+        # partial-visibility scenario: drop the fraction of the object's
+        # points on one side of its centroid along an axis (simulates a
+        # re-scan where something blocks part of the object)
+        idx = obj_indices(xyz, tree, ply_of(oc["name"]))
+        axis = {"x": 0, "y": 1, "z": 2}[oc.get("axis", "x")]
+        frac = float(oc.get("fraction", 0.4))
+        vals = xyz[idx, axis]
+        cut = np.quantile(vals, 1.0 - frac)
+        gone = idx[vals > cut]
+        drop[gone] = True
+        print(f"[edit] occlude {oc['name']}: hide {len(gone):,}/{len(idx):,} "
+              f"pts ({oc.get('axis', 'x')}>{cut:.2f})")
+
     for ins in edits.get("insert", []):
         idx = obj_indices(xyz, tree, ply_of(ins["copy_of"]))
         placed = xyz[idx] + np.array([ins.get("dx", 0.0), ins.get("dy", 0.0),
