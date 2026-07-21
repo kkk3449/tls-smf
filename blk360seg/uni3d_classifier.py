@@ -44,12 +44,33 @@ class Uni3DClassifier:
         print(f"[uni3d] loaded ckpt (missing={len(missing)}, unexpected={len(unexpected)})")
         self.model = model.to(device).eval()
 
-        self.clip, _, _ = open_clip.create_model_and_transforms(
-            clip_model, pretrained=clip_ckpt)
-        self.clip = self.clip.to(device).eval()
-        self.tokenizer = open_clip.get_tokenizer(clip_model)
+        # CLIP (9.4 GB EVA02-E) is only needed to embed the class-name texts.
+        # Load it lazily and cache embeddings on disk so repeat runs with a
+        # known vocabulary never pay the ~25 GB RAM load peak (OOM-killer bait).
+        self.clip = None
+        self.clip_model_name = clip_model
+        self.clip_ckpt = clip_ckpt
         self.text_embed = None
         self.class_names = None
+
+    def _load_clip(self):
+        import open_clip
+        print("[uni3d] loading EVA02-E CLIP text encoder (slow)...")
+        # build without weights, drop the 4.4 B-param vision tower (text-only
+        # use), then mmap-load just the text weights: peak RAM ~19 GB instead
+        # of ~28 GB (open_clip's own pretrained= path OOM-kills on 32 GB hosts)
+        model = open_clip.create_model(self.clip_model_name, pretrained=None)
+        model.visual = None
+        sd = torch.load(self.clip_ckpt, map_location="cpu", mmap=True,
+                        weights_only=True)
+        sd = {k: v for k, v in sd.items() if not k.startswith("visual.")}
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        missing = [k for k in missing if not k.startswith("visual.")]
+        print(f"[uni3d] clip text weights loaded "
+              f"(missing={len(missing)}, unexpected={len(unexpected)})")
+        assert not missing, f"text-tower keys missing: {missing[:5]}"
+        self.clip = model.to(self.device).eval()
+        self.tokenizer = open_clip.get_tokenizer(self.clip_model_name)
 
     @torch.no_grad()
     def set_classes(self, class_names, templates=(
@@ -57,6 +78,21 @@ class Uni3DClassifier:
             "a 3d model of a {}.", "a 3d model of the {}.",
             "a 3d point cloud model of a {}.", "a photo of a {}.",
             "a {}.", "the {}.", "a {} object.", "there is a {} in the scene.")):
+        import hashlib
+        import json
+        key = hashlib.sha1(json.dumps(
+            [self.clip_model_name, list(templates), list(class_names)]
+        ).encode()).hexdigest()[:16]
+        cache_dir = os.path.join(os.path.dirname(self.clip_ckpt),
+                                 "text_embed_cache")
+        cache = os.path.join(cache_dir, f"{key}.pt")
+        if os.path.exists(cache):
+            self.text_embed = torch.load(cache, map_location=self.device)
+            self.class_names = list(class_names)
+            print(f"[uni3d] text embeddings from cache ({cache})")
+            return
+        if self.clip is None:
+            self._load_clip()
         embs = []
         for c in class_names:
             toks = self.tokenizer([t.format(c) for t in templates]).to(self.device)
@@ -66,6 +102,9 @@ class Uni3DClassifier:
         t = torch.stack(embs)
         self.text_embed = (t / t.norm(dim=-1, keepdim=True)).to(self.device)
         self.class_names = list(class_names)
+        os.makedirs(cache_dir, exist_ok=True)
+        torch.save(self.text_embed.cpu(), cache)
+        print(f"[uni3d] text embeddings cached -> {cache}")
 
     def _prep(self, xyz, rgb):
         n = len(xyz)
