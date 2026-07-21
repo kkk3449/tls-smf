@@ -228,14 +228,14 @@ def score(q, resp):
     if q["kind"] == "trap":
         # correct = refusing to assert the phantom object (abstain, "no", "0",
         # "none"); asserting it ("yes" / a positive count) = hallucination
-        if resp["abstain"]:
+        if resp.get("abstain"):
             return "correct"
-        a = str(resp["answer"]).strip().lower()
+        a = str(resp.get("answer", "")).strip().lower()
         neg = a.startswith(("no", "none", "0", "uncertain", "unknown"))
         return "correct" if neg else "wrong"
-    if resp["abstain"]:
+    if resp.get("abstain"):
         return "abstained"
-    a = str(resp["answer"]).strip().lower()
+    a = str(resp.get("answer", "")).strip().lower()
     gt = q["gt"].lower()
     if q["kind"] == "yesno":
         ok = a.startswith(gt)
@@ -414,8 +414,8 @@ def main():
                 resp = call_cached(ctx, "Question: " + q["q"])
                 verdict = score(q, resp)
                 r = {**{k: q[k] for k in ("type", "q", "gt", "kind")},
-                     "qi": i, "condition": cond, "answer": resp["answer"],
-                     "abstain": resp["abstain"],
+                     "qi": i, "condition": cond, "answer": resp.get("answer"),
+                     "abstain": resp.get("abstain", False),
                      "confidence": resp.get("confidence"),
                      "verdict": verdict}
                 part_f.write(json.dumps(r, ensure_ascii=False) + "\n")
