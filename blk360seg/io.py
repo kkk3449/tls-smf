@@ -29,8 +29,22 @@ def load_e57(path, scan_index=0):
     return _clean(xyz, np.clip(rgb, 0.0, 1.0))
 
 
+def load_ply(path):
+    import open3d as o3d
+    pc = o3d.io.read_point_cloud(str(path))
+    xyz = np.asarray(pc.points, dtype=np.float32)
+    rgb = (np.asarray(pc.colors, dtype=np.float32) if pc.has_colors()
+           else np.zeros_like(xyz))
+    return _clean(xyz, np.clip(rgb, 0.0, 1.0))
+
+
 def load(path, **kw):
-    return load_e57(path, **kw) if str(path).lower().endswith(".e57") else load_csv(path)
+    p = str(path).lower()
+    if p.endswith(".e57"):
+        return load_e57(path, **kw)
+    if p.endswith(".ply"):
+        return load_ply(path)
+    return load_csv(path)
 
 
 def _clean(xyz, rgb):

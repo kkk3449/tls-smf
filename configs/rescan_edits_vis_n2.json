@@ -1,0 +1,3 @@
+{"remove": ["toolbox_013"],
+ "move":   [{"name": "chair_011", "dx": 1.5, "dy": -2.5}],
+ "insert": [{"copy_of": "clutter_012", "dx": 5.0, "dy": -2.0}]}

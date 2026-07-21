@@ -195,8 +195,23 @@ class SemanticVLM:
             "cost_per_object_usd": round(cost / calls * 2, 4),
         }
 
-    def build_symbolic_request(self, obj, image_paths, allowed_types=None):
+    def build_symbolic_request(self, obj, image_paths, allowed_types=None,
+                               floor_z=None):
         ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}
+        # Pose context: mounting height is strong evidence the isolated render
+        # cannot show (a dotted grid at 3.3 m is a ceiling light, never a
+        # keyboard). floor_z = scene floor height in the same frame.
+        if floor_z is not None:
+            z = obj.get("properties", {}).get("poseZ")
+            if z is not None:
+                h = obj.get("dimensions", {}).get("height", 0.0)
+                bottom = round(z - h / 2 - floor_z, 2)
+                ctx["mounting"] = {
+                    "bottom_above_floor_m": bottom,
+                    "note": ("mounted near the ceiling" if bottom > 2.0 else
+                             "elevated above the floor" if bottom > 0.5 else
+                             "on or near the floor"),
+                }
         if allowed_types:
             vocab = (f"User candidate classes (try these FIRST): {allowed_types}\n"
                      f"If uni3d_type ('{obj.get('type')}') is correct, keep it. "
@@ -217,8 +232,10 @@ class SemanticVLM:
         content = [_img_block(p) for p in image_paths] + [{"type": "text", "text": text}]
         return content
 
-    def verify_symbolic(self, obj, image_paths, allowed_types=None):
-        content = self.build_symbolic_request(obj, image_paths, allowed_types)
+    def verify_symbolic(self, obj, image_paths, allowed_types=None,
+                        floor_z=None):
+        content = self.build_symbolic_request(obj, image_paths, allowed_types,
+                                              floor_z=floor_z)
         return self._call(_SYS_SYMBOLIC, content, SYMBOLIC_TOOL)
 
     def infer_implicit(self, obj_type, image_paths):

@@ -42,7 +42,10 @@ def main():
     ap.add_argument("--device", default="cuda")
     args = ap.parse_args()
 
-    cls = classes.get_classes(args.classes)
+    # named set (s3dis|scannet|industrial) or a literal comma-separated list
+    # of user keywords ("chair,desk,monitor,...") — scene-curated vocabularies
+    cls = ([c.strip() for c in args.classes.split(",") if c.strip()]
+           if "," in args.classes else classes.get_classes(args.classes))
     print(f"[B] {len(cls)} classes: {cls}")
     print("[B] loading Uni3D + EVA02-E CLIP (first run is slow)...")
     clf = Uni3DClassifier(args.uni3d_ckpt, args.clip_ckpt, device=args.device)
