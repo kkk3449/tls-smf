@@ -306,8 +306,12 @@ def ctx_graph(graph, mode):
             node["failedCandidateType"] = n["type"]
         nodes.append(node)
     id2name = {n["id"]: n["name"] for n in graph["nodes"]}
+    kept = {n["name"] for n in nodes}
+    # only edges between exposed nodes: a dropped record must not leak its
+    # (type-bearing) name into the context via the edge list
     edges = [[id2name[e["subj"]], e["pred"], id2name[e["obj"]]]
-             for e in graph["edges"]]
+             for e in graph["edges"]
+             if id2name[e["subj"]] in kept and id2name[e["obj"]] in kept]
     txt = ("TOSM knowledge graph of the room.\nNodes:\n"
            + json.dumps(nodes, ensure_ascii=False)
            + "\nEdges (subject, predicate, object):\n"
