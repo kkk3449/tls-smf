@@ -39,6 +39,8 @@ def type_match(pred, gt):
     # vocabulary; the pairs mirror the audit's grading practice
     syn = [{"tv", "television", "display", "monitor", "screen"},
            {"mobile robot", "agv", "robot"},
+           # owner: mobile manipulator with occluded wheels — robot arm ok
+           {"mobile manipulator", "robot arm", "robotic arm", "robot"},
            {"control panel", "panel", "control cabinet"},
            {"cabinet", "locker"},
            {"junction box", "electrical box", "distribution box"}]
@@ -59,9 +61,10 @@ def main():
         "semanticObjects" in d else d
     gd = json.load(open(args.gt))
     glist = gd["objects"] if isinstance(gd, dict) and "objects" in gd else gd
-    # structure artifacts (e.g. ceiling-soffit remnants) are not semantic
-    # objects; they are filtered at Stage A and excluded from evaluation
-    gt = {str(g["id"]): g for g in glist if not g.get("structure_artifact")}
+    # excluded from evaluation: structure artifacts (not semantic objects)
+    # and out-of-scope objects (outside the modeled room)
+    gt = {str(g["id"]): g for g in glist
+          if not g.get("structure_artifact") and not g.get("out_of_scope")}
 
     rows = []
     for o in objs:
