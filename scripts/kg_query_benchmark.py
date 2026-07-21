@@ -69,14 +69,14 @@ _SYS = ("You answer questions about an indoor environment strictly from the "
 
 _GATED_NOTE = ("\nNote: records carry verificationStatus. 'verified' and "
                "'verified_escalated' labels passed multi-view VLM "
-               "verification. 'unverified' labels FAILED verification: the "
-               "object exists at that pose with the measured geometry, but "
-               "its TYPE LABEL is unreliable and often wrong. Rules: "
-               "(1) never assert the presence, count, or identity of an "
-               "object type when every record carrying that label is "
-               "'unverified' — abstain or answer negatively instead; "
-               "(2) geometry (pose, dimensions) of unverified records is "
-               "still trustworthy and may be used.")
+               "verification. Records with status 'unverified' expose "
+               "type='unknown': the object exists at that pose with the "
+               "measured geometry (trustworthy and usable), but its "
+               "semantic label FAILED verification. failedCandidateType is "
+               "the rejected label — it is often wrong and must NEVER be "
+               "treated as the object's type or counted when answering "
+               "presence/count/identity questions; abstain or answer "
+               "negatively instead.")
 
 
 # ---------------------------------------------------------------- queries ---
@@ -99,7 +99,9 @@ def gen_queries(gt, trap_types=()):
     records and are known-wrong or unconfirmable. A trap query asks about
     such a type; asserting its presence is a hallucination, while abstaining
     or denying is correct. These queries measure the value of gating."""
-    objs = gt["objects"]
+    # structure artifacts (ceiling-soffit remnants) are filtered at Stage A
+    # and are not in any condition's world model -> not queryable objects
+    objs = [o for o in gt["objects"] if not o.get("structure_artifact")]
     rels = gt.get("relations", [])
     for o in objs:
         o.setdefault("type", o.get("gt_type"))
@@ -291,6 +293,11 @@ def ctx_graph(graph, gated):
         if gated:
             node["verificationStatus"] = n["status"]
             node["confidence"] = n["confidence"]
+            if n["status"] == "unverified":
+                # gate by construction, not by exhortation: a label that
+                # failed verification is not exposed as the record's type
+                node["type"] = "unknown"
+                node["failedCandidateType"] = n["type"]
         nodes.append(node)
     id2name = {n["id"]: n["name"] for n in graph["nodes"]}
     edges = [[id2name[e["subj"]], e["pred"], id2name[e["obj"]]]
