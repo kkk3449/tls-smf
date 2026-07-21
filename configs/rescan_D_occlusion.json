@@ -1,0 +1,14 @@
+{
+ "occlude": [
+  {
+   "name": "chair_011",
+   "axis": "x",
+   "fraction": 0.4
+  },
+  {
+   "name": "clutter_012",
+   "axis": "y",
+   "fraction": 0.4
+  }
+ ]
+}
