@@ -98,12 +98,20 @@ def new_graph(map_id):
             "updates": []}
 
 
+# labels too generic to carry identity: two distinct piles of clutter with
+# similar extents are NOT evidence of the same object having moved
+# (cross-epoch experiment finding: clutter<->clutter "moves" of 2-5 m were
+# unverifiable, while fire-extinguisher/chair moves were credible)
+_GENERIC_TYPES = {"clutter", "unknown", "misc", "object"}
+
+
 def _same_object_moved(node, rec, max_move=6.0):
-    """Second-pass match for MOVED objects: same type, same extents (within
-    the _matches tolerance), different position. Conservative: only fires
-    when the node was about to go absent and the record was about to be a
-    fresh insert."""
-    if node["type"].strip().lower() != rec["type"].strip().lower():
+    """Second-pass match for MOVED objects: same specific type, same extents
+    (within the _matches tolerance), different position. Conservative: only
+    fires when the node was about to go absent and the record was about to
+    be a fresh insert, and never for generic type labels."""
+    t = node["type"].strip().lower()
+    if t != rec["type"].strip().lower() or t in _GENERIC_TYPES:
         return False
     nd, rd = node["dimensions"], rec["dimensions"]
     for k in ("length", "width", "height"):
