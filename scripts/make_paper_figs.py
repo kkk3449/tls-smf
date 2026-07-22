@@ -414,8 +414,61 @@ def fig10(out):
     _save(fig, out, "fig10_error_taxonomy.png")
 
 
+# ------------------------------------------------------------------ fig 9 ---
+def fig9(out):
+    """Real two-epoch update: June manual scan -> July exploration scan."""
+    g = json.load(open(O("testroom_epochs_kg.json")))
+    b = json.load(open(O("vis_n2_room_bounds.json")))
+    cells = np.array(b["cells"]) * b["cell_m"]
+    fig, ax = plt.subplots(figsize=(8.6, 7.0))
+    ax.scatter(cells[:, 0], cells[:, 1], s=2.5, c="#f4f4f4", linewidths=0)
+
+    def rect(x, y, L, W, color, lw=1.2, ls="-"):
+        ax.add_patch(Rectangle((x - L / 2, y - W / 2), L, W, fill=False,
+                               ec=color, lw=lw, linestyle=ls))
+
+    counts = {"moved": 0, "inserted": 0, "absent": 0, "updated": 0}
+    for n in g["nodes"]:
+        hist = n.get("history", [])
+        born = hist[0]["revision"] if hist else 1
+        d = n["dimensions"]
+        if n.get("presence") == "absent":
+            rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
+                 BAD, 1.1, "--")
+            counts["absent"] += 1
+        elif born == g.get("revision", 2):
+            rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
+                 OK, 1.1)
+            counts["inserted"] += 1
+        elif any(h.get("event") == "moved" for h in hist):
+            ev = [h for h in hist if h.get("event") == "moved"][-1]
+            old, new = ev["changes"]["pose"]["old"], ev["changes"]["pose"]["new"]
+            rect(old["x"], old["y"], d["length"], d["width"], "#888", 0.9, ":")
+            rect(new["x"], new["y"], d["length"], d["width"], DET, 1.9)
+            ax.add_patch(FancyArrowPatch((old["x"], old["y"]),
+                         (new["x"], new["y"]), arrowstyle="-|>",
+                         mutation_scale=13, color=DET, lw=1.6))
+            counts["moved"] += 1
+        else:
+            rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
+                 "#b08c2e", 1.4)
+            counts["updated"] += 1
+    for c, lbl in [("#b08c2e", f"matched in place ({counts['updated']})"),
+                   (DET, f"moved, ID preserved ({counts['moved']})"),
+                   (OK, f"inserted ({counts['inserted']})"),
+                   (BAD, f"absent, kept in graph ({counts['absent']})")]:
+        ax.plot([], [], color=c, label=lbl)
+    ax.legend(fontsize=8.6, loc="lower right")
+    ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+    ax.set_title("real two-epoch update of the same room: 2026-06-01 manual "
+                 "scan \u2192 2026-07 exploration scan\n(registered at 5.1 cm "
+                 "RMSE; identity carried for specific-type objects)",
+                 fontsize=10)
+    _save(fig, out, "fig9_two_epoch_update.png")
+
+
 FIGS = {"fig1": fig1, "fig2": fig2, "fig3": fig3, "fig4": fig4, "fig5": fig5,
-        "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig10": fig10}
+        "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig9": fig9, "fig10": fig10}
 
 
 def main():
