@@ -427,21 +427,30 @@ def fig9(out):
         ax.add_patch(Rectangle((x - L / 2, y - W / 2), L, W, fill=False,
                                ec=color, lw=lw, linestyle=ls))
 
+    rev = g.get("revision", 2)
     counts = {"moved": 0, "inserted": 0, "absent": 0, "updated": 0}
     for n in g["nodes"]:
         hist = n.get("history", [])
         born = hist[0]["revision"] if hist else 1
         d = n["dimensions"]
         if n.get("presence") == "absent":
+            # only nodes that BECAME absent at the latest revision; earlier
+            # departures would bury the current transition under old boxes
+            if not any(h["revision"] == rev and
+                       h["changes"].get("presence", {}).get("new") == "absent"
+                       for h in hist):
+                continue
             rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
                  BAD, 1.1, "--")
             counts["absent"] += 1
-        elif born == g.get("revision", 2):
+        elif born == rev:
             rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
                  OK, 1.1)
             counts["inserted"] += 1
-        elif any(h.get("event") == "moved" for h in hist):
-            ev = [h for h in hist if h.get("event") == "moved"][-1]
+        elif any(h.get("event") == "moved" and h["revision"] == rev
+                 for h in hist):
+            ev = [h for h in hist
+                  if h.get("event") == "moved" and h["revision"] == rev][-1]
             old, new = ev["changes"]["pose"]["old"], ev["changes"]["pose"]["new"]
             rect(old["x"], old["y"], d["length"], d["width"], "#888", 0.9, ":")
             rect(new["x"], new["y"], d["length"], d["width"], DET, 1.9)
@@ -460,10 +469,10 @@ def fig9(out):
         ax.plot([], [], color=c, label=lbl)
     ax.legend(fontsize=8.6, loc="lower right")
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title("real two-epoch update of the same room: 2026-06-01 manual "
-                 "scan \u2192 2026-07 exploration scan\n(registered at 5.1 cm "
-                 "RMSE; identity carried for specific-type objects)",
-                 fontsize=10)
+    ax.set_title(f"real multi-epoch update of the same room, latest "
+                 f"transition (rev {rev-1} \u2192 {rev})\n(cross-scan "
+                 "registration 4.2\u20135.1 cm RMSE; identity carried for "
+                 "specific-type objects)", fontsize=10)
     _save(fig, out, "fig9_two_epoch_update.png")
 
 
