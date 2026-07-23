@@ -15,18 +15,26 @@ def load_csv(path):
     return _clean(xyz, np.clip(rgb, 0.0, 1.0))
 
 
-def load_e57(path, scan_index=0):
+def load_e57(path, scan_index=None):
+    """scan_index=None merges every setup in the file (poses applied by
+    pye57); an int loads that single setup only. Multi-setup files come
+    straight from Cyclone without merge-on-export."""
     import pye57
     e = pye57.E57(str(path))
-    d = e.read_scan(scan_index, ignore_missing_fields=True, colors=True)
-    xyz = np.column_stack([d["cartesianX"], d["cartesianY"], d["cartesianZ"]]).astype(np.float32)
-    if "colorRed" in d:
-        rgb = np.column_stack([d["colorRed"], d["colorGreen"], d["colorBlue"]]).astype(np.float32)
-        if rgb.max() > 1.5:
-            rgb /= 255.0
-    else:
-        rgb = np.zeros_like(xyz)
-    return _clean(xyz, np.clip(rgb, 0.0, 1.0))
+    idxs = range(e.scan_count) if scan_index is None else [scan_index]
+    xs, cs = [], []
+    for i in idxs:
+        d = e.read_scan(i, ignore_missing_fields=True, colors=True)
+        xyz = np.column_stack([d["cartesianX"], d["cartesianY"], d["cartesianZ"]]).astype(np.float32)
+        if "colorRed" in d:
+            rgb = np.column_stack([d["colorRed"], d["colorGreen"], d["colorBlue"]]).astype(np.float32)
+            if rgb.max() > 1.5:
+                rgb /= 255.0
+        else:
+            rgb = np.zeros_like(xyz)
+        xs.append(xyz)
+        cs.append(np.clip(rgb, 0.0, 1.0))
+    return _clean(np.concatenate(xs), np.concatenate(cs))
 
 
 def load_ply(path):
