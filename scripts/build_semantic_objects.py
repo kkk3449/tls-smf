@@ -4,7 +4,7 @@
 Deterministic: fills explicit (pose/size/color) + provisional symbolic
 (type/name/id). Implicit fields are added later by the VLM stage (Stage B).
 
-  CUDA_HOME=/home/caselab/cuda128 \
+  CUDA_HOME=/path/to/cuda \
   python scripts/build_semantic_objects.py \
       --objects-dir outputs/stage2_no_wall_objects \
       --classification outputs/stage2_no_wall_objects/classification.csv \

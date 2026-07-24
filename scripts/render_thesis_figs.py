@@ -24,7 +24,7 @@ OUT = os.path.join(ROOT, "outputs")
 sys.path.insert(0, ROOT)
 from blk360seg import io as bio, preprocess  # noqa: E402
 
-CYC = "/home/caselab/Downloads/Cyclone360_data"
+CYC = os.environ.get("BLK360_DATA_DIR", "data")
 RAW_E57 = os.path.join(CYC, "testroom260601.e57")
 NOWALL_PLY = os.path.join(CYC, "testroom_no_wall/stage2_no_wall.ply")
 

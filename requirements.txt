@@ -1,11 +1,17 @@
-# Core (CPU) — enough to run the geometric baseline end-to-end.
-numpy
-open3d
-pandas
+# Core — geometric backbone (Stage A), KG, place layer, figures. CPU-only.
+numpy>=2.0
+open3d>=0.19
+pandas>=2.0
 pyyaml
-pye57            # only needed for .e57 input
+pye57>=0.4          # .e57 input (multi-setup files supported)
+scipy>=1.14
+matplotlib>=3.9
 
-# Deep-learning backend (install when wiring DLSegmenter; pick the CUDA build
-# that matches your driver). Listed here for reference, not required for baseline.
+# Stage B — multi-view VLM verification (needs ANTHROPIC_API_KEY).
+anthropic>=0.40
+
+# Optional learned baselines (Uni3D / PointCLIP V2 / SPFormer / PTv3 /
+# Point-SAM). Not needed for the proposed pipeline. Install torch matching
+# your CUDA driver, then follow patches/README.md for the pinned upstream
+# repos and weights.
 # torch
-# Pointcept (https://github.com/Pointcept/Pointcept) + its deps (spconv, etc.)

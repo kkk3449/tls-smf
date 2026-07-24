@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Semantic-segment a BLK360 cloud with PTv3 (ScanNet-pretrained, semantic-only).
 
-  CUDA_HOME=/home/caselab/cuda128 \
+  CUDA_HOME=/path/to/cuda \
   LD_LIBRARY_PATH=$CUDA_HOME/targets/x86_64-linux/lib:$CUDA_HOME/lib:$LD_LIBRARY_PATH \
   PYTHONPATH=third_party/Pointcept \
   python scripts/segment_ptv3.py --input ../testroom_no_wall/stage2_no_wall.e57

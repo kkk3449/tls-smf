@@ -374,7 +374,7 @@ def fig10(out):
     # (b) vis_n2 hanging strip verified as door handle
     ax = axes[0][1]
     raw2 = np.asarray(o3d.io.read_point_cloud(
-        "/home/caselab/ammr_twin/scene_vis_n2_hd.ply").points)
+        os.environ.get("VIS_N2_HD_PLY", "data/scene_vis_n2_hd.ply")).points)
     q = np.asarray(o3d.io.read_point_cloud(
         O("vis_n2_det_run1", "obj_0083.ply")).points)
     c = q.mean(0)

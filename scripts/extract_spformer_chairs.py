@@ -11,7 +11,7 @@ This pulls them out so a human can eyeball which is which:
     chairs.csv             id, conf, n_points, centroid, bbox size
 
 Run with the SPFormer CUDA env (same as scripts/segment_spformer.py):
-  CUDA_HOME=/home/caselab/cuda128 \
+  CUDA_HOME=/path/to/cuda \
   LD_LIBRARY_PATH=$CUDA_HOME/targets/x86_64-linux/lib:$CUDA_HOME/lib:$LD_LIBRARY_PATH \
   python scripts/extract_spformer_chairs.py --input ../testroom_no_wall/stage2_no_wall.e57
 """

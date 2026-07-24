@@ -4,7 +4,7 @@
 Reproduces the common paper figure: each segmented object drawn in its original
 RGB with a red 3D bounding box, plus the full-scene reference.
 
-  CUDA_HOME=/home/caselab/cuda128 \
+  CUDA_HOME=/path/to/cuda \
   python scripts/render_instances.py \
       --objects-dir outputs/stage2_no_wall_objects \
       --scene ../testroom_no_wall/stage2_no_wall.e57 \

@@ -1,83 +1,129 @@
-# blk360_seg
+# blk360_seg — TLS → Queryable Robot Knowledge
 
-Offline **semantic segmentation + open-vocabulary classification** of Leica
-BLK360 (Cyclone360) point clouds, built to run and **compare two pipelines** on
-an *industrial* environment (no fine-tuning, inference only):
+Code for **"From Terrestrial Laser Scans to Queryable Robot Knowledge: A
+VLM-Verified Framework for Incremental 3D Semantic Modeling"** (submitted to
+*Electronics*).
 
-| | Pipeline | Idea | Expectation |
-|---|---|---|---|
-| **Exp 1 (Baseline)** | **Mask3D + PTv3 + Uni3D**, ScanNet-pretrained | supervised SOTA applied as-is | weaker on industrial objects → shows SOTA's limits |
-| **Exp 2 (Proposed)** | **Part2Object + Uni3D**, inference only | unsupervised discovery + open-vocab | better on industrial objects → unsup+open-vocab fits industry |
+The framework converts registered terrestrial laser scans (Leica BLK360 /
+Cyclone360 exports) into a confidence-aware semantic knowledge graph and keeps
+it current across repeated scans:
 
-Metrics: **segmentation mIoU**, **classification Top-1**.
-Class sets: **S3DIS-13 / ScanNet-20** (structure + furniture) by default — extend
-with industrial classes (pipe, valve, tank, beam, rack, …) for the open-vocab part.
+1. **Deterministic geometric backbone** — seeded-RANSAC structure removal,
+   fixed-parameter DBSCAN clustering with a structure-remnant (ceiling-soffit)
+   filter, explicit PCA-based object models. Re-runs are byte-identical on the
+   same host.
+2. **Multi-view VLM verification with escalation** — per-view forced-schema
+   classification (Claude API), confidence-weighted late fusion, automatic
+   escalation of split votes to a wider view set; unresolved objects stay
+   explicitly `unverified`.
+3. **Identity-preserving incremental update** — two-pass matching of re-scanned
+   objects to mint-once node identities, confidence-gated node-level upserts,
+   selective re-verification (unchanged geometry re-uses prior VLM verdicts).
+4. **Derived layers** — verified-only place semantics (ring codes + LLM
+   naming), structurally gated query views, VDA5050-style JSON export, Neo4j
+   ingest, USD export for Isaac Sim.
 
-## ⚠️ The metrics need ground-truth labels
-
-"No labels" only covers **training/inference** — both pipelines are inference-only.
-But **mIoU and Top-1 are measured against ground truth**, so you must annotate a
-small **evaluation set** (a few BLK360 scans labelled with the target classes,
-including the industrial objects). Without it there's nothing to compute the
-metrics against. Plan this first (or find a labelled industrial 3D set).
-
-## Pipeline shape
-
-```
-load (csv/e57) → preprocess (downsample, normalize)
-   ├─ Exp1: Mask3D (instances) + PTv3 (semantic)  ─┐
-   │                                                ├─ Uni3D (open-vocab class) → labels
-   └─ Exp2: Part2Object (unsup. objects)  ─────────┘
-→ metrics vs GT (mIoU, Top-1) → compare Exp1 vs Exp2
-```
-
-## Models (separate repos, heavy, distinct deps)
-
-- **PTv3 / Point Transformer V3** — semantic seg, via **Pointcept** (ScanNet/S3DIS ckpts).
-- **Mask3D** — 3D instance seg (ScanNet ckpt).
-- **Uni3D** (BAAI) — open-vocabulary 3D features aligned to CLIP; classify instances
-  against text prompts (your class names, incl. industrial).
-- **Part2Object** — unsupervised hierarchical 3D object discovery (no labels).
-
-Each is its own repo with conflicting deps → run them as **adapters/steps**
-(own sub-env, export cloud → run repo inference → import predictions) rather than
-one monolithic env. This harness owns the common IO, the eval set, the metrics,
-and the comparison.
-
-## Recommended build order
-
-1. **Env + CUDA**: `python -c "import torch; print(torch.cuda.is_available())"`
-   (GPU exists per you; confirm the CUDA torch build works). Make a venv/conda env.
-2. **Eval set**: annotate a few scans with the class set (the metric blocker).
-3. **PTv3 (Pointcept)** semantic inference → first mIoU number. Most turnkey.
-4. **Uni3D** open-vocab classification on instances → Top-1.
-5. **Mask3D** instances (completes Exp 1).
-6. **Part2Object** unsupervised (Exp 2), then the Exp1-vs-Exp2 comparison table.
-
-## Current scaffold (runs today, no GPU)
-
-Common infra is in place; a **geometric baseline** stands in for the DL pipelines
-so IO / preprocessing / instance grouping / visualization can be validated now:
-
-```
-blk360seg/
-├── io.py          .csv / .e57 -> (xyz, rgb)
-├── preprocess.py  voxel downsample, normalize
-├── classes.py     S3DIS-13 / ScanNet-20 names + palette
-├── segmenter.py   Segmenter API; GeometricBaseline (runnable) + DL stubs
-├── postprocess.py per-class DBSCAN -> instances
-├── metrics.py     mIoU, Top-1  (need GT)
-└── viz.py         color-by-label, save .ply/.csv, show
-scripts/segment.py CLI (smoke test)
-configs/default.yaml
-```
+## Install
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/segment.py --input ../testroom260601.e57 --viz
+export ANTHROPIC_API_KEY=...   # required for Stage B (VLM verification) only
 ```
 
-Next: replace the baseline with the Mask3D/PTv3/Uni3D and Part2Object adapters
-(each behind the same `Segmenter` / a `Pipeline` interface), then wire `metrics.py`
-against the annotated eval set.
+The geometric backbone (Stage A) is CPU-only. The optional learned baselines
+(Uni3D, PointCLIP V2, SPFormer, PTv3, Point-SAM) need `torch` + per-repo
+dependencies and pretrained weights; see `patches/README.md` for the pinned
+upstream commits. They are comparison baselines, not part of the proposed
+pipeline.
+
+## Pipeline quickstart
+
+```bash
+# Stage A: scan -> deterministic object instances (obj_*.ply + objects.csv)
+python scripts/extract_objects.py --input scan.e57 --out outputs/scene_det
+
+# Provisional open-vocab prior (optional; needs Uni3D weights) or skip
+python scripts/classify_objects.py --objects-dir outputs/scene_det
+
+# Explicit VDA5050 semantic-object records
+python scripts/build_semantic_objects.py --objects-dir outputs/scene_det \
+    --classification outputs/scene_det/classification.csv
+
+# Multi-view render sets for verification
+python scripts/render_object_views.py \
+    --semantic outputs/scene_det/semanticObjects.json \
+    --objects-dir outputs/scene_det --out outputs/scene_views
+
+# Stage B: per-view VLM classification + late fusion + escalation (API cost)
+python scripts/vlm_late_fusion.py \
+    --input outputs/scene_det/semanticObjects.json \
+    --views-dir outputs/scene_views --escalate \
+    --out outputs/scene_det/semanticObjects.lf_esc.json
+
+# Knowledge graph: first run creates, re-runs upsert (update/move/insert/absent)
+python scripts/kg_upsert.py \
+    --input outputs/scene_det/semanticObjects.lf_esc.json \
+    --graph outputs/scene_kg.json --map-id scene \
+    --timestamp 2026-07-24T12:00:00
+
+# Re-scan economics: carry verdicts for byte-identical clusters, list the rest
+python scripts/selective_reverify.py \
+    --new outputs/rescan_det/semanticObjects.json \
+    --new-objects-dir outputs/rescan_det \
+    --prev outputs/scene_det/semanticObjects.lf_esc.json \
+    --prev-objects-dir outputs/scene_det \
+    --out outputs/rescan_det/semanticObjects.carried.json
+```
+
+Multi-epoch tooling: `scripts/register_epoch_scan.py` (FPFH+RANSAC → ICP
+cross-epoch registration), `scripts/roomscope_transform.py` (frame transform +
+room scoping), `scripts/synthetic_rescan.py` (controlled edit scenarios),
+`scripts/place_layer.py` / `scripts/place_ring_naming.py` (place semantics).
+
+Evaluation and paper artifacts: `scripts/analyze_escalation.py`,
+`scripts/kg_query_benchmark.py`, `scripts/sensitivity_sweep.py`,
+`scripts/make_paper_figs.py`.
+
+## Layout
+
+```
+blk360seg/            library: io, preprocess, structure_filter, objects,
+                      semantic_object, vlm_stage_b, kg, place_modeling,
+                      spatial_relations, tosm_graph, usd_export, viz, ...
+scripts/              pipeline CLIs (Stage A/B, KG, epochs, figures, baselines)
+configs/              operating-point config + re-scan edit scenarios
+data_prep/            e57/ply inspection and conversion helpers
+patches/              pinned upstream commits + patches for baseline repos
+```
+
+## Data
+
+The scans used in the paper were collected in a facility of CASELAB Co., Ltd.
+and are subject to facility-owner restrictions; they are not distributed with
+this repository. Point-cloud inputs are standard `.e57` (multi-setup files are
+merged with per-setup registered poses applied) or `.csv`/`.ply`.
+
+## Notes
+
+- Stage B costs money (Anthropic API). Every VLM script prints per-run token
+  usage and cost estimates.
+- Determinism claims apply to Stage A only and are per-host (BLAS/compiler
+  variation across hosts may flip borderline RANSAC/DBSCAN decisions).
+
+## Citation
+
+```bibtex
+@article{kim2026tls2kg,
+  author  = {Kim, Sangmin and Kim, Haryeong and Kuc, Tae-Yong},
+  title   = {From Terrestrial Laser Scans to Queryable Robot Knowledge:
+             A {VLM}-Verified Framework for Incremental 3{D} Semantic Modeling},
+  journal = {Electronics},
+  note    = {submitted},
+  year    = {2026}
+}
+```
+
+## License
+
+MIT — see `LICENSE`.

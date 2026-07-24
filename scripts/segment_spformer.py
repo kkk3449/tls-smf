@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Segment a BLK360 cloud with SPFormer (ScanNet-pretrained, Mask3D substitute).
 
-  CUDA_HOME=/home/caselab/cuda128 \
+  CUDA_HOME=/path/to/cuda \
   LD_LIBRARY_PATH=$CUDA_HOME/targets/x86_64-linux/lib:$CUDA_HOME/lib:$LD_LIBRARY_PATH \
   python scripts/segment_spformer.py --input ../testroom_no_wall/stage2_no_wall.e57
 
