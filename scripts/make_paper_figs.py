@@ -241,8 +241,8 @@ def fig5(out):
 def fig6(out):
     fig, ax = plt.subplots(figsize=(6.4, 4.4))
     for f, scene, color, n_gt in [
-            (O("esc_analysis_showroom.json"), "showroom", DET, None),
-            (O("esc_analysis_vis_n2.json"), "vis_n2", STO, None)]:
+            (O("esc_analysis_showroom.json"), "Showroom", DET, None),
+            (O("esc_analysis_vis_n2.json"), "Robot hall", STO, None)]:
         s = json.load(open(f))["summary"]
         n = s["objects_gt"]
         base_calls = 5 * n                    # 4 views + 1 implicit per object
@@ -268,8 +268,8 @@ def fig7(out):
     conds = ["llm_only", "ungated", "verified_only", "gated"]
     labels = ["LLM-only", "ungated KG", "verified-only KG", "gated KG"]
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
-    for ax, f, scene in [(axes[0], O("query_bench_showroom_v5.json"), "showroom"),
-                         (axes[1], O("query_bench_vis_n2.json"), "vis_n2")]:
+    for ax, f, scene in [(axes[0], O("query_bench_showroom_v5.json"), "Showroom"),
+                         (axes[1], O("query_bench_vis_n2.json"), "Robot hall")]:
         s = json.load(open(f))["summary"]
         acc = [s[c]["accuracy"] * 100 for c in conds]
         hal = [s[c]["hallucination_rate"] * 100 for c in conds]
