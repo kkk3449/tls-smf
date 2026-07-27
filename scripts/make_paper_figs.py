@@ -291,59 +291,134 @@ def fig7(out):
 
 # ------------------------------------------------------------------ fig 8 ---
 def fig8(out):
+    """Scenario panels A-D: one story per panel instead of a wall of boxes.
+
+    Unchanged objects are soft filled shapes (background furniture); every
+    edited object gets a labeled callout saying what the matcher decided.
+    """
     t1 = json.load(open(O("vis_n2_det_filt", "semanticObjects.lf_esc.room.json")))["semanticObjects"]
-    t2 = json.load(open(O("vis_n2_rescan_filt", "semanticObjects.final.room.json")))["semanticObjects"]
-    g = json.load(open(O("vis_n2_kg.json")))
-    state = {}
-    for n in g["nodes"]:
-        state[n["name"]] = ("absent" if n.get("presence") == "absent" else
-                            n.get("lastChange", "unchanged"))
-    fig, ax = plt.subplots(figsize=(8.2, 6.6))
-    # room outline
+    pre = {o["name"]: o for o in
+           json.load(open(O("vis_n2_det_run1", "semanticObjects.json")))["semanticObjects"]}
     b = json.load(open(O("vis_n2_room_bounds.json")))
     carr = np.array(b["cells"]) * b["cell_m"]
-    ax.scatter(carr[:, 0], carr[:, 1], s=2.5, c="#f2f2f2", linewidths=0)
 
-    def rect(o, color, lw=1.2, ls="-"):
+    chair, toolbox, donor = pre["chair_011"], pre["toolbox_013"], pre["clutter_012"]
+    ins = {"poseX": donor["poseX"] + 5.0, "poseY": donor["poseY"] - 2.0,
+           "dimensions": donor["dimensions"]}
+
+    def base(ax, skip=()):
+        ax.scatter(carr[:, 0], carr[:, 1], s=1.4, c="#f4f4f4", linewidths=0)
+        skip_xy = [(pre[n]["poseX"], pre[n]["poseY"]) for n in skip]
+        for o in t1:
+            if any(abs(o["poseX"] - x) < .3 and abs(o["poseY"] - y) < .3
+                   for x, y in skip_xy):
+                continue
+            L, W = o["dimensions"]["length"], o["dimensions"]["width"]
+            ax.add_patch(Rectangle((o["poseX"] - L / 2, o["poseY"] - W / 2), L, W,
+                                   facecolor="#e9e9e9", edgecolor="#d2d2d2", lw=0.4))
+        ax.set_aspect("equal")
+        ax.set_xticks([]); ax.set_yticks([])
+        ax.set_xlim(-11.7, 7.0); ax.set_ylim(-10.4, 7.9)
+        for s in ax.spines.values():
+            s.set_color("#cccccc")
+
+    def box(ax, o, fc, ec, ls="-", lw=1.7, dx=0.0, dy=0.0):
         L, W = o["dimensions"]["length"], o["dimensions"]["width"]
-        ax.add_patch(Rectangle((o["poseX"] - L / 2, o["poseY"] - W / 2), L, W,
-                               fill=False, ec=color, lw=lw, linestyle=ls))
+        ax.add_patch(Rectangle((o["poseX"] + dx - L / 2, o["poseY"] + dy - W / 2),
+                               L, W, facecolor=fc, edgecolor=ec, lw=lw,
+                               linestyle=ls, zorder=5))
 
-    by1 = {o["name"]: o for o in t1}
-    by2 = {o["name"]: o for o in t2}
-    last_rev = g.get("revision", 2)
-    for n in g["nodes"]:
-        nm = n["name"]
-        hist = n.get("history", [])
-        kinds = {h.get("event") for h in hist}
-        born_rev = hist[0]["revision"] if hist else 1
-        if n.get("presence") == "absent" and nm in by1:
-            rect(by1[nm], BAD, 1.6, "--")
-            ax.plot(by1[nm]["poseX"], by1[nm]["poseY"], "x", color=BAD, ms=9)
-        elif born_rev == last_rev:
-            o2 = {"poseX": n["pose"]["x"], "poseY": n["pose"]["y"],
-                  "dimensions": n["dimensions"]}
-            rect(o2, OK, 1.8)
-        elif "moved" in kinds and nm in by1:
-            o2 = {"poseX": n["pose"]["x"], "poseY": n["pose"]["y"],
-                  "dimensions": n["dimensions"]}
-            rect(by1[nm], "#888", 1.0, ":")
-            rect(o2, DET, 1.8)
-            ax.add_patch(FancyArrowPatch(
-                (by1[nm]["poseX"], by1[nm]["poseY"]),
-                (o2["poseX"], o2["poseY"]), arrowstyle="-|>",
-                mutation_scale=14, color=DET, lw=1.6))
-        elif nm in by1:
-            rect(by1[nm], "#bbbbbb", 0.7)
-    ax.plot([], [], color="#bbbbbb", label="unchanged (53)")
-    ax.plot([], [], color=DET, label="moved (ID preserved)")
-    ax.plot([], [], color=OK, label="inserted (new ID)")
-    ax.plot([], [], color=BAD, ls="--", label="absent (kept in graph)")
-    ax.legend(fontsize=8.6, loc="lower right")
-    ax.set_aspect("equal")
-    ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title("incremental update: vis_n2 test room, revision 1 → 2 "
-                 "(re-verification cost: 2 clusters, 2.7% of full)", fontsize=10.5)
+    def note(ax, xy, text, at, color):
+        ax.annotate(text, xy=xy, xytext=at, textcoords="axes fraction",
+                    fontsize=8.4, color=color, ha="center", va="center", zorder=8,
+                    arrowprops=dict(arrowstyle="-", color=color, lw=0.9,
+                                    shrinkB=2),
+                    bbox=dict(boxstyle="round,pad=0.35", fc="white", ec=color,
+                              lw=0.9))
+
+    def verdict(ax, text, color, fc):
+        ax.text(0.5, 0.045, text, transform=ax.transAxes, ha="center",
+                va="bottom", fontsize=9.2, color=color, zorder=9,
+                bbox=dict(boxstyle="round,pad=0.4", fc=fc, ec=color, lw=1.1))
+
+    fig, axes = plt.subplots(2, 2, figsize=(10.6, 9.4))
+    fig.suptitle("Controlled re-scan scenarios, room-scoped robot hall "
+                 "(55 objects; gray = unchanged furniture)", fontsize=11.5,
+                 y=0.98)
+
+    # --- (A) unchanged repeat ------------------------------------------------
+    ax = axes[0][0]
+    base(ax)
+    ax.set_title("(A) re-scan, nothing changed", fontsize=10.5, loc="left")
+    verdict(ax, "all 55 verdicts carried over\n0 VLM calls  ·  0 identity switches",
+            OK, "#f0f9f4")
+
+    # --- (B) single move -----------------------------------------------------
+    ax = axes[0][1]
+    base(ax, skip=("chair_011",))
+    ax.set_title("(B) one chair moved 3.6 m", fontsize=10.5, loc="left")
+    box(ax, chair, "none", "#909090", ls=":", lw=1.4)
+    box(ax, chair, "#dce8f7", DET, dx=-3.0, dy=2.0)
+    ax.add_patch(FancyArrowPatch(
+        (chair["poseX"], chair["poseY"]),
+        (chair["poseX"] - 3.0, chair["poseY"] + 2.0),
+        arrowstyle="-|>", mutation_scale=15, color=DET, lw=1.7, zorder=6))
+    note(ax, (chair["poseX"], chair["poseY"] - 0.4), "old position",
+         (0.86, 0.30), "#707070")
+    note(ax, (chair["poseX"] - 3.0, chair["poseY"] + 2.4),
+         "recognized as the SAME chair\n(node ID preserved)", (0.30, 0.88), DET)
+    verdict(ax, "diff: 1 moved  ·  54 carried  ·  no false events",
+            DET, "#eef4fb")
+
+    # --- (C) remove + insert -------------------------------------------------
+    ax = axes[1][0]
+    base(ax)
+    ax.set_title("(C) one object removed, one new object placed",
+                 fontsize=10.5, loc="left")
+    box(ax, toolbox, "none", BAD, ls="--", lw=1.8)
+    ax.plot(toolbox["poseX"], toolbox["poseY"], "x", color=BAD, ms=10,
+            mew=2.2, zorder=6)
+    box(ax, ins, "#e6f4ec", OK)
+    note(ax, (toolbox["poseX"] + 0.3, toolbox["poseY"] - 0.2),
+         "gone → marked absent\n(node kept in graph, flagged)",
+         (0.80, 0.34), BAD)
+    note(ax, (ins["poseX"], ins["poseY"] + 0.4),
+         "new → inserted, new ID\n(only this cluster re-verified: $0.23)",
+         (0.26, 0.63), OK)
+    verdict(ax, "diff exact: 1 absent + 1 inserted  ·  53 carried",
+            OK, "#f0f9f4")
+
+    # --- (D) occlusion stress ------------------------------------------------
+    ax = axes[1][1]
+    ax.set_xlim(0, 10); ax.set_ylim(0, 10); ax.axis("off")
+    ax.set_title("(D) partial occlusion — where matching breaks",
+                 fontsize=10.5, loc="left")
+
+    def occl_row(y, frac, ok_flag, verdict_text):
+        w, h = 2.1, 1.25
+        x0 = 0.55
+        col = OK if ok_flag else BAD
+        ax.add_patch(Rectangle((x0, y), w, h, facecolor="#dce8f7",
+                               edgecolor=DET, lw=1.5))
+        ax.add_patch(Rectangle((x0 + w * (1 - frac), y), w * frac, h,
+                               facecolor="white", edgecolor=BAD,
+                               hatch="////", lw=1.1))
+        ax.text(x0 + w / 2, y - 0.55, f"{int(frac * 100)}% of points cropped",
+                ha="center", fontsize=8.6, color="#444444")
+        ax.text(x0 + w + 0.55, y + h / 2, verdict_text, ha="left", va="center",
+                fontsize=9.4, color=col,
+                bbox=dict(boxstyle="round,pad=0.42", fc="white", ec=col,
+                          lw=1.1))
+
+    occl_row(7.0, 0.2, True,
+             "still matched → updated\nlabels and IDs kept  (2/2 objects)")
+    occl_row(3.4, 0.4, False,
+             "match fails → 2 false-absent\n+ 2 false-new (IDs lost)")
+    ax.text(0.5, 0.9, "breaking point lies between 20% and 40% occlusion;\n"
+            "motivates overlap-based matching features (future work)",
+            ha="left", fontsize=8.8, color="#555555", style="italic")
+
+    fig.tight_layout(rect=(0, 0, 1, 0.965))
     _save(fig, out, "fig8_incremental_update.png")
 
 
