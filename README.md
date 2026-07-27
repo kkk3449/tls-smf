@@ -1,10 +1,10 @@
-# blk360_seg — TLS → Queryable Robot Knowledge
+# TLS-SMF — TLS-driven Semantic Modeling Framework
 
 Code for **"From Terrestrial Laser Scans to Queryable Robot Knowledge: A
 VLM-Verified Framework for Incremental 3D Semantic Modeling"** (submitted to
 *Electronics*).
 
-The framework converts registered terrestrial laser scans (Leica BLK360 /
+TLS-SMF converts registered terrestrial laser scans (Leica BLK360 /
 Cyclone360 exports) into a confidence-aware semantic knowledge graph and keeps
 it current across repeated scans:
 
@@ -114,7 +114,7 @@ merged with per-setup registered poses applied) or `.csv`/`.ply`.
 ## Citation
 
 ```bibtex
-@article{kim2026tls2kg,
+@article{kim2026tlssmf,
   author  = {Kim, Sangmin and Kim, Haryeong and Kuc, Tae-Yong},
   title   = {From Terrestrial Laser Scans to Queryable Robot Knowledge:
              A {VLM}-Verified Framework for Incremental 3{D} Semantic Modeling},
