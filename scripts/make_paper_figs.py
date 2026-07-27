@@ -290,32 +290,113 @@ def fig7(out):
 
 
 # ------------------------------------------------------------------ fig 8 ---
-def fig8(out):
-    """Scenario panels A-D: one story per panel instead of a wall of boxes.
+def _room_outline(ax, b, color="#555555", lw=1.4, tag=None):
+    """Boundary contour of the room-mask cell grid (the test-room wall line)."""
+    cells = np.array(b["cells"], dtype=int)
+    cm = b["cell_m"]
+    x0, y0 = cells[:, 0].min() - 2, cells[:, 1].min() - 2
+    gx, gy = cells[:, 0] - x0, cells[:, 1] - y0
+    grid = np.zeros((gy.max() + 3, gx.max() + 3))
+    grid[gy, gx] = 1
+    X = (np.arange(grid.shape[1]) + x0) * cm
+    Y = (np.arange(grid.shape[0]) + y0) * cm
+    ax.contour(*np.meshgrid(X, Y), grid, levels=[0.5], colors=color,
+               linewidths=lw, zorder=2)
+    if tag:
+        ax.text(X[0] + 0.3, Y.max() - 0.2, tag, fontsize=7.2, color=color,
+                style="italic", va="top")
 
-    Unchanged objects are soft filled shapes (background furniture); every
-    edited object gets a labeled callout saying what the matcher decided.
+
+def _rbox(ax, x, y, L, W, th, ec, lw=1.0, ls="-", fc="none", z=5, alpha=1.0):
+    """Object footprint rectangle rotated by the explicit model's yaw."""
+    import math
+    c, s = math.cos(th), math.sin(th)
+    cx = x + (-L / 2) * c - (-W / 2) * s
+    cy = y + (-L / 2) * s + (-W / 2) * c
+    ax.add_patch(Rectangle((cx, cy), L, W, angle=math.degrees(th),
+                           facecolor=fc, edgecolor=ec, lw=lw, linestyle=ls,
+                           zorder=z, alpha=alpha))
+
+
+def _seg_points(objs, objdir, max_pts=320, T=None):
+    """name -> downsampled xy points of the segmented cluster (top-down)."""
+    import open3d as o3d
+    rng = np.random.default_rng(0)
+    pts = {}
+    for o in objs:
+        try:
+            idx = int(o["name"].rsplit("_", 1)[1])
+        except ValueError:
+            continue
+        f = os.path.join(objdir, f"obj_{idx:04d}.ply")
+        if not os.path.exists(f):
+            continue
+        p = np.asarray(o3d.io.read_point_cloud(f).points)
+        if T is not None:
+            p = p @ T[:3, :3].T + T[:3, 3]
+        if len(p) > max_pts:
+            p = p[rng.choice(len(p), max_pts, replace=False)]
+        pts[o["name"]] = p[:, :2]
+    return pts
+
+
+def _pastel(i):
+    c = np.array(plt.get_cmap("tab20")(i % 20)[:3])
+    return tuple(0.55 * c + 0.45)
+
+
+_SHORT = {"fire_extinguisher": "fire_ext", "industrial_robot": "ind_robot"}
+
+
+def _label(ax, o, fs=4.8, color="#333333", z=7):
+    L, W = o["dimensions"]["length"], o["dimensions"]["width"]
+    if o.get("type") in ("clutter", "unknown") and L * W < 1.5:
+        return
+    if L * W < 0.30:
+        return
+    nm = o["name"]
+    for k, v in _SHORT.items():
+        nm = nm.replace(k, v)
+    ax.text(o["poseX"], o["poseY"], nm, fontsize=fs, color=color,
+            ha="center", va="center", zorder=z)
+
+
+def fig8(out):
+    """Scenario panels A-D over the real segmentation.
+
+    Each object's segmented points are drawn in its own muted color with the
+    yaw-rotated explicit-model footprint and its node name; the test-room
+    boundary is the dark contour. Edited objects carry callouts with the
+    matcher's decision.
     """
     t1 = json.load(open(O("vis_n2_det_filt", "semanticObjects.lf_esc.room.json")))["semanticObjects"]
     pre = {o["name"]: o for o in
            json.load(open(O("vis_n2_det_run1", "semanticObjects.json")))["semanticObjects"]}
     b = json.load(open(O("vis_n2_room_bounds.json")))
-    carr = np.array(b["cells"]) * b["cell_m"]
+    seg = _seg_points(t1, O("vis_n2_det_filt"))
 
     chair, toolbox, donor = pre["chair_011"], pre["toolbox_013"], pre["clutter_012"]
+    seg_pre = _seg_points([chair, toolbox, donor], O("vis_n2_det_filt"))
     ins = {"poseX": donor["poseX"] + 5.0, "poseY": donor["poseY"] - 2.0,
-           "dimensions": donor["dimensions"]}
+           "dimensions": donor["dimensions"], "name": "inserted object",
+           "type": "clutter"}
 
-    def base(ax, skip=()):
-        ax.scatter(carr[:, 0], carr[:, 1], s=1.4, c="#f4f4f4", linewidths=0)
+    def base(ax, skip=(), labels=True):
+        _room_outline(ax, b)
         skip_xy = [(pre[n]["poseX"], pre[n]["poseY"]) for n in skip]
-        for o in t1:
+        for i, o in enumerate(t1):
             if any(abs(o["poseX"] - x) < .3 and abs(o["poseY"] - y) < .3
                    for x, y in skip_xy):
                 continue
-            L, W = o["dimensions"]["length"], o["dimensions"]["width"]
-            ax.add_patch(Rectangle((o["poseX"] - L / 2, o["poseY"] - W / 2), L, W,
-                                   facecolor="#e9e9e9", edgecolor="#d2d2d2", lw=0.4))
+            p = seg.get(o["name"])
+            if p is not None:
+                ax.scatter(p[:, 0], p[:, 1], s=0.45, color=_pastel(i),
+                           linewidths=0, zorder=3)
+            _rbox(ax, o["poseX"], o["poseY"], o["dimensions"]["length"],
+                  o["dimensions"]["width"], o.get("poseTheta", 0.0),
+                  "#c8c8c8", lw=0.4, z=4)
+            if labels:
+                _label(ax, o)
         ax.set_aspect("equal")
         ax.set_xticks([]); ax.set_yticks([])
         ax.set_xlim(-11.7, 7.0); ax.set_ylim(-10.4, 7.9)
@@ -323,10 +404,9 @@ def fig8(out):
             s.set_color("#cccccc")
 
     def box(ax, o, fc, ec, ls="-", lw=1.7, dx=0.0, dy=0.0):
-        L, W = o["dimensions"]["length"], o["dimensions"]["width"]
-        ax.add_patch(Rectangle((o["poseX"] + dx - L / 2, o["poseY"] + dy - W / 2),
-                               L, W, facecolor=fc, edgecolor=ec, lw=lw,
-                               linestyle=ls, zorder=5))
+        _rbox(ax, o["poseX"] + dx, o["poseY"] + dy,
+              o["dimensions"]["length"], o["dimensions"]["width"],
+              o.get("poseTheta", 0.0), ec, lw=lw, ls=ls, fc=fc, z=5)
 
     def note(ax, xy, text, at, color):
         ax.annotate(text, xy=xy, xytext=at, textcoords="axes fraction",
@@ -343,8 +423,8 @@ def fig8(out):
 
     fig, axes = plt.subplots(2, 2, figsize=(10.6, 9.4))
     fig.suptitle("Controlled re-scan scenarios, room-scoped robot hall "
-                 "(55 objects; gray = unchanged furniture)", fontsize=11.5,
-                 y=0.98)
+                 "(55 objects; colored points = segmented clusters, "
+                 "thin boxes = explicit models)", fontsize=11.5, y=0.98)
 
     # --- (A) unchanged repeat ------------------------------------------------
     ax = axes[0][0]
@@ -358,7 +438,11 @@ def fig8(out):
     base(ax, skip=("chair_011",))
     ax.set_title("(B) one chair moved 3.6 m", fontsize=10.5, loc="left")
     box(ax, chair, "none", "#909090", ls=":", lw=1.4)
-    box(ax, chair, "#dce8f7", DET, dx=-3.0, dy=2.0)
+    box(ax, chair, "none", DET, dx=-3.0, dy=2.0)
+    pc = seg_pre.get("chair_011")
+    if pc is not None:
+        ax.scatter(pc[:, 0] - 3.0, pc[:, 1] + 2.0, s=1.0, color=DET,
+                   linewidths=0, zorder=6)
     ax.add_patch(FancyArrowPatch(
         (chair["poseX"], chair["poseY"]),
         (chair["poseX"] - 3.0, chair["poseY"] + 2.0),
@@ -378,7 +462,11 @@ def fig8(out):
     box(ax, toolbox, "none", BAD, ls="--", lw=1.8)
     ax.plot(toolbox["poseX"], toolbox["poseY"], "x", color=BAD, ms=10,
             mew=2.2, zorder=6)
-    box(ax, ins, "#e6f4ec", OK)
+    box(ax, ins, "none", OK)
+    pd_ = seg_pre.get("clutter_012")
+    if pd_ is not None:
+        ax.scatter(pd_[:, 0] + 5.0, pd_[:, 1] - 2.0, s=1.0, color=OK,
+                   linewidths=0, zorder=6)
     note(ax, (toolbox["poseX"] + 0.3, toolbox["poseY"] - 0.2),
          "gone → marked absent\n(node kept in graph, flagged)",
          (0.80, 0.34), BAD)
@@ -491,23 +579,42 @@ def fig10(out):
 
 # ------------------------------------------------------------------ fig 9 ---
 def fig9(out):
-    """Real two-epoch update: June manual scan -> July exploration scan."""
+    """Real multi-epoch update over the T3 segmentation.
+
+    Underlay: every T3 cluster's segmented points in its own muted color
+    (what the deterministic backbone produced from the newest scan), plus the
+    test-room boundary. Overlay: yaw-rotated node footprints colored by the
+    diff state, with node names on the specific-type objects.
+    """
     g = json.load(open(O("testroom_epochs_kg.json")))
     b = json.load(open(O("vis_n2_room_bounds.json")))
-    cells = np.array(b["cells"]) * b["cell_m"]
-    fig, ax = plt.subplots(figsize=(8.6, 7.0))
-    ax.scatter(cells[:, 0], cells[:, 1], s=2.5, c="#f4f4f4", linewidths=0)
+    t3 = json.load(open(O("vis_sota_det",
+                          "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
+    T = np.load(O("vissota_to_visn2_T.npy"))
+    seg = _seg_points(t3, O("vis_sota_det"), max_pts=420, T=T)
 
-    def rect(x, y, L, W, color, lw=1.2, ls="-"):
-        ax.add_patch(Rectangle((x - L / 2, y - W / 2), L, W, fill=False,
-                               ec=color, lw=lw, linestyle=ls))
+    fig, ax = plt.subplots(figsize=(9.4, 7.6))
+    _room_outline(ax, b, tag="test-room boundary")
+    for i, o in enumerate(t3):
+        p = seg.get(o["name"])
+        if p is not None:
+            ax.scatter(p[:, 0], p[:, 1], s=0.5, color=_pastel(i),
+                       linewidths=0, zorder=3)
+
+    def rbox(x, y, d, th, color, lw=1.3, ls="-"):
+        # huge merged clusters would dominate the map: fade their footprints
+        big = d["length"] * d["width"] > 18.0
+        _rbox(ax, x, y, d["length"], d["width"], th, color,
+              lw=0.9 if big else lw, ls=ls, z=5, alpha=0.30 if big else 1.0)
 
     rev = g.get("revision", 2)
     counts = {"moved": 0, "inserted": 0, "absent": 0, "updated": 0}
     for n in g["nodes"]:
         hist = n.get("history", [])
         born = hist[0]["revision"] if hist else 1
-        d = n["dimensions"]
+        d, th = n["dimensions"], n["pose"].get("theta", 0.0)
+        o_lbl = {"poseX": n["pose"]["x"], "poseY": n["pose"]["y"],
+                 "dimensions": d, "name": n["name"], "type": n.get("type")}
         if n.get("presence") == "absent":
             # only nodes that BECAME absent at the latest revision; earlier
             # departures would bury the current transition under old boxes
@@ -515,34 +622,51 @@ def fig9(out):
                        h["changes"].get("presence", {}).get("new") == "absent"
                        for h in hist):
                 continue
-            rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
-                 BAD, 1.1, "--")
+            big = d["length"] * d["width"] > 18.0
+            _rbox(ax, n["pose"]["x"], n["pose"]["y"], d["length"],
+                  d["width"], th, BAD, lw=0.8, ls="--", z=5,
+                  alpha=0.25 if big else 0.55)
             counts["absent"] += 1
         elif born == rev:
-            rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
-                 OK, 1.1)
+            rbox(n["pose"]["x"], n["pose"]["y"], d, th, OK, 1.3)
+            if n["name"] == "machine_012":
+                ax.text(n["pose"]["x"], n["pose"]["y"],
+                        "machine_012\n(merged mega-cluster, Sec. 5.6)",
+                        fontsize=5.8, color="#1e5e40", ha="center",
+                        va="center", style="italic", zorder=7)
+            else:
+                _label(ax, o_lbl, fs=5.4, color="#1e5e40")
             counts["inserted"] += 1
         elif any(h.get("event") == "moved" and h["revision"] == rev
                  for h in hist):
             ev = [h for h in hist
                   if h.get("event") == "moved" and h["revision"] == rev][-1]
             old, new = ev["changes"]["pose"]["old"], ev["changes"]["pose"]["new"]
-            rect(old["x"], old["y"], d["length"], d["width"], "#888", 0.9, ":")
-            rect(new["x"], new["y"], d["length"], d["width"], DET, 1.9)
+            rbox(old["x"], old["y"], d, th, "#888888", 0.9, ":")
+            rbox(new["x"], new["y"], d, th, DET, 2.0)
             ax.add_patch(FancyArrowPatch((old["x"], old["y"]),
                          (new["x"], new["y"]), arrowstyle="-|>",
-                         mutation_scale=13, color=DET, lw=1.6))
+                         mutation_scale=13, color=DET, lw=1.6, zorder=6))
+            ax.annotate(n["name"] + " (ID kept)", xy=(new["x"], new["y"]),
+                        xytext=(new["x"] + 1.0, new["y"] + 1.6), fontsize=6.4,
+                        color=DET, zorder=8,
+                        arrowprops=dict(arrowstyle="-", color=DET, lw=0.7),
+                        bbox=dict(boxstyle="round,pad=0.25", fc="white",
+                                  ec=DET, lw=0.8))
             counts["moved"] += 1
         else:
-            rect(n["pose"]["x"], n["pose"]["y"], d["length"], d["width"],
-                 "#b08c2e", 1.4)
+            rbox(n["pose"]["x"], n["pose"]["y"], d, th, "#b08c2e", 1.5)
+            _label(ax, o_lbl, fs=5.4, color="#7a5f14")
             counts["updated"] += 1
-    for c, lbl in [("#b08c2e", f"matched in place ({counts['updated']})"),
-                   (DET, f"moved, ID preserved ({counts['moved']})"),
-                   (OK, f"inserted ({counts['inserted']})"),
-                   (BAD, f"absent, kept in graph ({counts['absent']})")]:
-        ax.plot([], [], color=c, label=lbl)
-    ax.legend(fontsize=8.6, loc="lower right")
+    for c, ls, lbl in [
+            ("#b08c2e", "-", f"matched in place ({counts['updated']})"),
+            (DET, "-", f"moved, ID preserved ({counts['moved']})"),
+            (OK, "-", f"inserted ({counts['inserted']})"),
+            (BAD, "--", f"absent, kept in graph ({counts['absent']})")]:
+        ax.plot([], [], color=c, ls=ls, label=lbl)
+    ax.scatter([], [], s=12, color=_pastel(4),
+               label="segmented clusters (T3 scan)")
+    ax.legend(fontsize=8.4, loc="lower right", framealpha=0.95)
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
     ax.set_title(f"real multi-epoch update of the same room, latest "
                  f"transition (rev {rev-1} \u2192 {rev})\n(cross-scan "
