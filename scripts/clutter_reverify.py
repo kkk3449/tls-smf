@@ -61,6 +61,12 @@ def main():
     ap.add_argument("--subs-dir", default=None)
     ap.add_argument("--out", required=True)
     ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--cands-csv", default=None,
+                    help="classification.csv to draw candidate shortlists "
+                         "from (default: <det-dir>/classification.csv)")
+    ap.add_argument("--extra-cands", default=None,
+                    help="comma-separated domain-knowledge classes appended "
+                         "to every candidate shortlist (site metadata)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -71,7 +77,8 @@ def main():
     pre = json.load(open(os.path.join(args.det_dir, "semanticObjects.json")))
     pre = pre["semanticObjects"] if isinstance(pre, dict) else pre
     f2pre = {o["properties"]["imageFile"]: o["name"] for o in pre}
-    det_cands = topk_from_csv(os.path.join(args.det_dir, "classification.csv"))
+    det_cands = topk_from_csv(args.cands_csv or
+                              os.path.join(args.det_dir, "classification.csv"))
     # robust floor estimate: most objects rest on the floor, so the low
     # quartile of cluster bottoms tracks it; a plain min() gets dragged down
     # by wall-remnant outliers
@@ -83,20 +90,25 @@ def main():
         return [os.path.join(vdir, f"view_{a:03d}.png")
                 for a in (0, 90, 180, 270)]
 
+    extra = ([c.strip() for c in args.extra_cands.split(",") if c.strip()]
+             if args.extra_cands else [])
     jobs = []
     for t in json.load(open(args.targets)):
         o = byname[t["det"]]
         cands = [c for c, s in det_cands.get(t["file"], []) if c != "clutter"]
+        cands = cands[:4] + [c for c in extra if c not in cands[:4]]
         jobs.append({"key": t["kg"], "det": t["det"], "obj": o,
-                     "cands": cands[:4],
+                     "cands": cands,
                      "views": views(os.path.join(args.det_dir, "views",
                                                  f2pre[t["file"]]))})
-    # rescue target: the unverified monitor (large wall TV)
-    mon = byname["monitor_006"]
-    jobs.append({"key": "monitor_006", "det": "monitor_006", "obj": mon,
-                 "cands": ["tv", "monitor", "display panel", "whiteboard"],
-                 "views": views(os.path.join(args.det_dir, "views",
-                                             f2pre["obj_0006.ply"]))})
+    # rescue target: the unverified monitor (large wall TV) — only when the
+    # targets file doesn't already include it
+    if not any(j["det"] == "monitor_006" for j in jobs):
+        mon = byname["monitor_006"]
+        jobs.append({"key": "monitor_006", "det": "monitor_006", "obj": mon,
+                     "cands": ["tv", "monitor", "display panel", "whiteboard"],
+                     "views": views(os.path.join(args.det_dir, "views",
+                                                 f2pre["obj_0006.ply"]))})
     # Point-SAM sub-clusters
     if args.subs_dir and os.path.isdir(args.subs_dir):
         sub_cands = topk_from_csv(
