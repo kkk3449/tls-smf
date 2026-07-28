@@ -743,12 +743,17 @@ def fig12(out):
     for p in places:
         ax.plot(*p["centroid"], "s", ms=6, color="#333333", zorder=4)
     keyset = set(sc["keyObjects"].values())
+    refuted = set(sc.get("ownerRefuted", []))
     for n in nodes.values():
         ver = str(n.get("status", "")).startswith("verified")
         ax.plot(n["pose"]["x"], n["pose"]["y"], "o",
                 ms=6 if ver else 5, color="#f2c200" if ver else "white",
                 mec="#333333", mew=0.7, zorder=5)
-        if n.get("type") not in ("clutter", "unknown") and ver:
+        if n["name"] in refuted:
+            ax.plot(n["pose"]["x"], n["pose"]["y"], "x", ms=9,
+                    color="#b91c1c", mew=2.0, zorder=7)
+        if (n.get("type") not in ("clutter", "unknown") and ver
+                and n["name"] not in keyset):
             ax.annotate(n["type"], (n["pose"]["x"], n["pose"]["y"]),
                         textcoords="offset points", xytext=(4, 4),
                         fontsize=6.0, color="#111111", zorder=6,
@@ -758,6 +763,10 @@ def fig12(out):
             n = byname[nm]
             ax.plot(n["pose"]["x"], n["pose"]["y"], "*", ms=15,
                     color="#f2c200", mec="#b91c1c", mew=1.3, zorder=7)
+            ax.annotate(nm, (n["pose"]["x"], n["pose"]["y"]),
+                        textcoords="offset points", xytext=(6, -11),
+                        fontsize=6.8, color="#b91c1c", weight="bold",
+                        zorder=8, path_effects=stroke)
     for pred, c in colors.items():
         n_e = sum(1 for e in sc["edges_intra_nextTo"] + sc["edges_vertical"]
                   if e["pred"] == pred)
@@ -773,6 +782,8 @@ def fig12(out):
             label="verified object")
     ax.plot([], [], "o", ms=5, color="white", mec="#333333",
             label="unverified")
+    ax.plot([], [], "x", ms=8, color="#b91c1c", mew=2.0,
+            label="owner-refuted phantom")
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
     ax.legend(fontsize=8.0, loc="lower right", framealpha=0.95)
     ax.set_title(f"place-scoped TOSM relation map (T3, rev {rev}): isInsideOf"

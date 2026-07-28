@@ -24,7 +24,15 @@ def main():
     ap.add_argument("--kg", required=True)
     ap.add_argument("--places", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--refuted", default="outputs/owner_refuted.json",
+                    help="owner ground-truth refutations; excluded from "
+                         "key-object designation (nodes stay in the graph)")
     args = ap.parse_args()
+
+    refuted = set()
+    if args.refuted and __import__("os").path.exists(args.refuted):
+        refuted = {r["name"]
+                   for r in json.load(open(args.refuted))["refuted"]}
 
     g = json.load(open(args.kg))
     rev = g["revision"]
@@ -102,7 +110,8 @@ def main():
     key = {}
     for k, p in enumerate(places):
         cand = [n for nid, n in nodes.items() if member_place[nid] == k
-                and str(n.get("status", "")).startswith("verified")]
+                and str(n.get("status", "")).startswith("verified")
+                and n["name"] not in refuted]
         flagged = [n for n in cand if n.get("implicit", {}).get("isKeyObject")]
         pool = flagged or [n for n in cand
                            if n.get("type") not in ("clutter", "unknown")] or cand
@@ -122,6 +131,7 @@ def main():
                                            in member_place.items() if pk == k]
                        for k in range(len(places))},
            "keyObjects": key,
+           "ownerRefuted": sorted(refuted),
            "edges_intra_nextTo": intra,
            "edges_vertical": vertical,
            "dropped_cross_place_nextTo": dropped,
