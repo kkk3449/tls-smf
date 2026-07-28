@@ -539,29 +539,45 @@ def fig8(out):
 
 # ----------------------------------------------------------------- fig 11 ---
 def fig11(out):
-    """Semantic place map (T3): VRF-completed full partition + LLM names."""
-    from matplotlib.collections import PatchCollection
-    places = json.load(open(O("place_layer_T3_vrf.json")))["semanticPlaces"]
-    cm = json.load(open(O("place_layer_T3_vrf.json")))["cell_m"]
-    names = json.load(open(O("place_ring_naming.json")))["T3_vrf"]
+    """Semantic place map (T3): SLIC superpixel regions on the nav grid map."""
+    d = json.load(open(O("place_layer_T3_slic.json")))
+    places = d["semanticPlaces"]
+    cm = d["cell_m"]
+    try:
+        names = json.load(open(O("place_ring_naming.json")))["T3_slic"]
+    except KeyError:
+        names = {}
     t3 = json.load(open(O("vis_sota_det",
                           "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
     b = json.load(open(O("vis_n2_room_bounds.json")))
 
-    fig, ax = plt.subplots(figsize=(9.2, 7.4))
+    allc = np.concatenate([np.array(p["cells"]) for p in places])
+    xmin, ymin = allc.min(0) - cm
+    xmax, ymax = allc.max(0) + cm
+    W = int(round((xmax - xmin) / cm)) + 1
+    H = int(round((ymax - ymin) / cm)) + 1
+    img = np.ones((H, W, 4))
+    img[:, :, 3] = 0.0
     for p in places:
-        rgb = tuple(int(c) / 255 for c in p["color"].split(","))
-        pats = [Rectangle((x - cm / 2, y - cm / 2), cm, cm)
-                for x, y in p["cells"]]
-        ax.add_collection(PatchCollection(pats, facecolor=rgb, alpha=0.55,
-                                          edgecolor="none", zorder=2))
+        rgb = [int(c) / 255 for c in p["color"].split(",")]
+        cel = np.array(p["cells"])
+        xi = np.round((cel[:, 0] - xmin) / cm).astype(int)
+        yi = np.round((cel[:, 1] - ymin) / cm).astype(int)
+        img[yi, xi, :3] = rgb
+        img[yi, xi, 3] = 0.62
+
+    fig, ax = plt.subplots(figsize=(9.2, 7.4))
+    ax.imshow(img, origin="lower", extent=(xmin - cm / 2, xmax + cm / 2,
+                                           ymin - cm / 2, ymax + cm / 2),
+              interpolation="nearest", zorder=2)
+    _room_outline(ax, b, tag="test-room boundary")
+    for p in places:
         nm = names.get(p["name"], {}).get("name", p["name"])
         cx, cy = p["centroid"]
         ax.text(cx, cy, nm.replace("_", "\n"), fontsize=8.6, ha="center",
                 va="center", color="#111111", weight="bold", zorder=6,
                 bbox=dict(boxstyle="round,pad=0.25", fc="white", alpha=0.78,
                           ec="none"))
-    _room_outline(ax, b, tag="test-room boundary")
     ver_x, ver_y, unv_x, unv_y = [], [], [], []
     for o in t3:
         st = o["properties"].get("verificationStatus", "")
@@ -574,8 +590,8 @@ def fig11(out):
     ax.set_aspect("equal")
     ax.set_xticks([]); ax.set_yticks([])
     ax.legend(fontsize=8.6, loc="lower right", framealpha=0.95)
-    ax.set_title("object-grounded place layer (T3): Voronoi-completed full"
-                 " partition of the room;\nLLM-derived names from"
+    ax.set_title("object-grounded place layer (T3): SLIC superpixel regions"
+                 " over the nav-stack grid map;\nLLM-derived names from"
                  " verified-object ring codes", fontsize=10.5)
     _save(fig, out, "fig11_place_map.png")
 
