@@ -539,7 +539,12 @@ def fig8(out):
 
 # ----------------------------------------------------------------- fig 11 ---
 def fig11(out):
-    """Semantic place map (T3): SLIC superpixel regions on the nav grid map."""
+    """Semantic place map (T3), DK-SMF style: dark map, saturated regions,
+    white object-type labels; SLIC superpixel regions on the nav grid map."""
+    import re as _re
+    from PIL import Image
+    import matplotlib.patheffects as pe
+
     d = json.load(open(O("place_layer_T3_slic.json")))
     places = d["semanticPlaces"]
     cm = d["cell_m"]
@@ -549,50 +554,74 @@ def fig11(out):
         names = {}
     t3 = json.load(open(O("vis_sota_det",
                           "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
-    b = json.load(open(O("vis_n2_room_bounds.json")))
+
+    # nav-stack grid map for obstacle/unknown context
+    ymap = os.environ.get("NAV_MAP_YAML",
+                          "/home/caselab/ammr_twin/map_vis_n2_1.yaml")
+    meta = dict(_re.findall(r"(\w+):\s*(.+)", open(ymap).read()))
+    res = float(meta["resolution"])
+    ox, oy = [float(v) for v in meta["origin"].strip("[]").split(",")[:2]]
+    gm = np.flipud(np.asarray(Image.open(
+        os.path.join(os.path.dirname(ymap), meta["image"]))))
 
     allc = np.concatenate([np.array(p["cells"]) for p in places])
-    xmin, ymin = allc.min(0) - cm
-    xmax, ymax = allc.max(0) + cm
-    W = int(round((xmax - xmin) / cm)) + 1
-    H = int(round((ymax - ymin) / cm)) + 1
-    img = np.ones((H, W, 4))
-    img[:, :, 3] = 0.0
+    pad = 0.8
+    xmin, ymin = allc.min(0) - pad
+    xmax, ymax = allc.max(0) + pad
+    i0, i1 = int((xmin - ox) / res), int((xmax - ox) / res) + 1
+    j0, j1 = int((ymin - oy) / res), int((ymax - oy) / res) + 1
+    crop = gm[j0:j1, i0:i1]
+
+    H, W = crop.shape
+    img = np.zeros((H, W, 3))
+    img[:] = 0.16                       # unknown: dark gray
+    img[crop >= 250] = 0.30             # free space outside regions
+    img[crop <= 50] = 0.0               # obstacles: black
     for p in places:
         rgb = [int(c) / 255 for c in p["color"].split(",")]
         cel = np.array(p["cells"])
-        xi = np.round((cel[:, 0] - xmin) / cm).astype(int)
-        yi = np.round((cel[:, 1] - ymin) / cm).astype(int)
-        img[yi, xi, :3] = rgb
-        img[yi, xi, 3] = 0.62
+        xi = np.round((cel[:, 0] - ox) / res - 0.5).astype(int) - i0
+        yi = np.round((cel[:, 1] - oy) / res - 0.5).astype(int) - j0
+        ok = (xi >= 0) & (xi < W) & (yi >= 0) & (yi < H)
+        img[yi[ok], xi[ok]] = rgb
 
-    fig, ax = plt.subplots(figsize=(9.2, 7.4))
-    ax.imshow(img, origin="lower", extent=(xmin - cm / 2, xmax + cm / 2,
-                                           ymin - cm / 2, ymax + cm / 2),
-              interpolation="nearest", zorder=2)
-    _room_outline(ax, b, tag="test-room boundary")
+    fig, ax = plt.subplots(figsize=(9.4, 7.6))
+    ax.imshow(img, origin="lower",
+              extent=(ox + i0 * res, ox + i1 * res,
+                      oy + j0 * res, oy + j1 * res),
+              interpolation="nearest", zorder=1)
+
+    stroke = [pe.withStroke(linewidth=2.2, foreground="black")]
     for p in places:
         nm = names.get(p["name"], {}).get("name", p["name"])
         cx, cy = p["centroid"]
-        ax.text(cx, cy, nm.replace("_", "\n"), fontsize=8.6, ha="center",
-                va="center", color="#111111", weight="bold", zorder=6,
-                bbox=dict(boxstyle="round,pad=0.25", fc="white", alpha=0.78,
-                          ec="none"))
-    ver_x, ver_y, unv_x, unv_y = [], [], [], []
+        ax.text(cx, cy, nm.replace("_", "\n"), fontsize=9.4, ha="center",
+                va="center", color="white", weight="bold", zorder=6,
+                path_effects=stroke)
     for o in t3:
         st = o["properties"].get("verificationStatus", "")
-        (ver_x if st.startswith("verified") else unv_x).append(o["poseX"])
-        (ver_y if st.startswith("verified") else unv_y).append(o["poseY"])
-    ax.scatter(ver_x, ver_y, s=26, c="#f2c200", edgecolors="#333333",
-               lw=0.6, zorder=5, label="verified object")
-    ax.scatter(unv_x, unv_y, s=22, c="white", edgecolors="#888888", lw=0.9,
-               zorder=5, label="unverified (excluded from ring codes)")
+        x, y = o["poseX"], o["poseY"]
+        if st.startswith("verified"):
+            ax.plot(x, y, "o", ms=5.5, color="#ffd400",
+                    mec="black", mew=0.6, zorder=5)
+            if o["type"] not in ("clutter", "unknown"):
+                ax.annotate(o["type"], (x, y), textcoords="offset points",
+                            xytext=(4, 4), fontsize=6.2, color="white",
+                            zorder=6, path_effects=stroke)
+        else:
+            ax.plot(x, y, "o", ms=4.5, color="#4da3ff",
+                    mec="black", mew=0.6, zorder=5)
+    ax.plot([], [], "o", ms=6, color="#ffd400", mec="black",
+            label="verified object (type labeled)")
+    ax.plot([], [], "o", ms=5, color="#4da3ff", mec="black",
+            label="unverified (excluded from ring codes)")
     ax.set_aspect("equal")
     ax.set_xticks([]); ax.set_yticks([])
-    ax.legend(fontsize=8.6, loc="lower right", framealpha=0.95)
+    leg = ax.legend(fontsize=8.4, loc="lower right", framealpha=0.9)
     ax.set_title("object-grounded place layer (T3): SLIC superpixel regions"
                  " over the nav-stack grid map;\nLLM-derived names from"
-                 " verified-object ring codes", fontsize=10.5)
+                 " verified-object ring codes (black = obstacles)",
+                 fontsize=10.5)
     _save(fig, out, "fig11_place_map.png")
 
 
