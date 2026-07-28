@@ -714,14 +714,24 @@ def fig12(out):
                 va="center", color="#444444", style="italic", zorder=3,
                 path_effects=stroke)
 
+    sc = json.load(open(O("t3_place_scoped_relations.json")))
     colors = {"isNextTo": "#5b7ba6", "isOn": "#dd6b20", "isAboveOf": "#7c3aed"}
-    widths = {"isNextTo": 1.0, "isOn": 2.4, "isAboveOf": 2.4}
-    for e in edges:
+    widths = {"isNextTo": 1.1, "isOn": 2.4, "isAboveOf": 2.4}
+    for e in sc["edges_intra_nextTo"] + sc["edges_vertical"]:
         a, bb = nodes[e["subj"]], nodes[e["obj"]]
         ax.plot([a["pose"]["x"], bb["pose"]["x"]],
                 [a["pose"]["y"], bb["pose"]["y"]],
                 color=colors[e["pred"]], lw=widths[e["pred"]],
-                alpha=0.9 if e["pred"] != "isNextTo" else 0.5, zorder=4)
+                alpha=0.9 if e["pred"] != "isNextTo" else 0.6, zorder=4)
+    cent = {p["name"]: p["centroid"] for p in places}
+    for pa, pb in sc["place_adjacency"]:
+        (x1, y1), (x2, y2) = cent[pa], cent[pb]
+        ax.plot([x1, x2], [y1, y2], ls="--", color="#333333", lw=1.4,
+                alpha=0.75, zorder=3)
+    for p in places:
+        ax.plot(*p["centroid"], "s", ms=6, color="#333333", zorder=4)
+    keyset = set(sc["keyObjects"].values())
+    byname = {n["name"]: n for n in nodes.values()}
     for n in nodes.values():
         ver = str(n.get("status", "")).startswith("verified")
         ax.plot(n["pose"]["x"], n["pose"]["y"], "o",
@@ -732,18 +742,29 @@ def fig12(out):
                         textcoords="offset points", xytext=(4, 4),
                         fontsize=6.0, color="#111111", zorder=6,
                         path_effects=stroke)
+    for nm in keyset:
+        if nm in byname:
+            n = byname[nm]
+            ax.plot(n["pose"]["x"], n["pose"]["y"], "*", ms=15,
+                    color="#f2c200", mec="#b91c1c", mew=1.3, zorder=7)
     for pred, c in colors.items():
-        n_e = sum(1 for e in edges if e["pred"] == pred)
-        ax.plot([], [], color=c, lw=widths[pred], label=f"{pred} ({n_e})")
+        n_e = sum(1 for e in sc["edges_intra_nextTo"] + sc["edges_vertical"]
+                  if e["pred"] == pred)
+        lbl = "isNextTo (intra-place, " if pred == "isNextTo" else f"{pred} ("
+        ax.plot([], [], color=c, lw=widths[pred], label=f"{lbl}{n_e})")
+    ax.plot([], [], ls="--", color="#333333", lw=1.4,
+            label=f"place isAdjacentTo ({len(sc['place_adjacency'])})")
+    ax.plot([], [], "*", ms=12, color="#f2c200", mec="#b91c1c",
+            label="place key object")
     ax.plot([], [], "o", ms=6, color="#f2c200", mec="#333333",
             label="verified object")
     ax.plot([], [], "o", ms=5, color="white", mec="#333333",
             label="unverified")
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
     ax.legend(fontsize=8.0, loc="lower right", framealpha=0.95)
-    ax.set_title(f"TOSM relation map (T3, rev {rev}): object edges over the "
-                 "place layer\n(isInsideOf = the region an object lies in)",
-                 fontsize=10.5)
+    ax.set_title(f"place-scoped TOSM relation map (T3, rev {rev}): intra-place"
+                 " object edges, place adjacency,\nand per-place key objects"
+                 " (isInsideOf = the region an object lies in)", fontsize=10.5)
     _save(fig, out, "fig12_relations_map.png")
 
 
