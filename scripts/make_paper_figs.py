@@ -645,24 +645,83 @@ def fig11(out):
 
 # ----------------------------------------------------------------- fig 12 ---
 def fig12(out):
-    """Relation-annotated semantic map (T3): isNextTo / isOn / isAboveOf."""
+    """Relation map on the TOSM hierarchy: place regions (isInsideOf) as the
+    base layer, object nodes and isNextTo/isOn/isAboveOf edges on top."""
+    import re as _re
+    from PIL import Image
+    import matplotlib.patheffects as pe
+    from scipy.ndimage import gaussian_filter, binary_fill_holes
+
+    d = json.load(open(O("place_layer_T3_slic.json")))
+    places = d["semanticPlaces"]
+    try:
+        names = json.load(open(O("place_ring_naming.json")))["T3_slic"]
+    except KeyError:
+        names = {}
     g = json.load(open(O("testroom_epochs_kg.json")))
-    b = json.load(open(O("vis_n2_room_bounds.json")))
     rev = g["revision"]
     nodes = {n["id"]: n for n in g["nodes"] if n.get("presence") != "absent"}
     edges = [e for e in g["edges"] if e.get("revision") == rev
              and e["subj"] in nodes and e["obj"] in nodes]
 
-    fig, ax = plt.subplots(figsize=(9.4, 7.6))
-    _room_outline(ax, b, tag="test-room boundary")
-    colors = {"isNextTo": "#8aa2c0", "isOn": "#dd6b20", "isAboveOf": "#7c3aed"}
-    widths = {"isNextTo": 1.0, "isOn": 2.2, "isAboveOf": 2.2}
+    # pastel place background (same smoothing as fig11, lightened)
+    ymap = os.environ.get("NAV_MAP_YAML",
+                          "/home/caselab/ammr_twin/map_vis_n2_1.yaml")
+    meta = dict(_re.findall(r"(\w+):\s*(.+)", open(ymap).read()))
+    res = float(meta["resolution"])
+    ox, oy = [float(v) for v in meta["origin"].strip("[]").split(",")[:2]]
+    allc = np.concatenate([np.array(p["cells"]) for p in places])
+    pad = 0.8
+    xmin, ymin = allc.min(0) - pad
+    xmax, ymax = allc.max(0) + pad
+    i0, i1 = int((xmin - ox) / res), int((xmax - ox) / res) + 1
+    j0, j1 = int((ymin - oy) / res), int((ymax - oy) / res) + 1
+    W, H = i1 - i0, j1 - j0
+    lab = np.zeros((H, W), dtype=int)
+    for k, p in enumerate(places, start=1):
+        cel = np.array(p["cells"])
+        xi = np.round((cel[:, 0] - ox) / res - 0.5).astype(int) - i0
+        yi = np.round((cel[:, 1] - oy) / res - 0.5).astype(int) - j0
+        ok = (xi >= 0) & (xi < W) & (yi >= 0) & (yi < H)
+        lab[yi[ok], xi[ok]] = k
+    UP, SIG = 2, 4.0
+    labu = np.kron(lab, np.ones((UP, UP), dtype=int))
+    room = binary_fill_holes(
+        gaussian_filter((labu > 0).astype(float), SIG) > 0.5)
+    votes = np.stack([gaussian_filter((labu == k).astype(float), SIG)
+                      for k in range(1, len(places) + 1)])
+    smooth = votes.argmax(0) + 1
+    smooth[~room] = 0
+    Hs, Ws = smooth.shape
+    img = np.ones((Hs, Ws, 3))
+    for k, p in enumerate(places, start=1):
+        rgb = np.array([int(c) / 255 for c in p["color"].split(",")])
+        img[smooth == k] = 0.45 * rgb + 0.55       # pastel wash
+    ext = (ox + i0 * res, ox + i1 * res, oy + j0 * res, oy + j1 * res)
+
+    fig, ax = plt.subplots(figsize=(9.6, 7.8))
+    ax.imshow(img, origin="lower", extent=ext, interpolation="bilinear",
+              zorder=1)
+    gx = np.linspace(ext[0], ext[1], Ws)
+    gy = np.linspace(ext[2], ext[3], Hs)
+    ax.contour(gx, gy, room.astype(float), levels=[0.5], colors="black",
+               linewidths=2.6, zorder=2)
+    stroke = [pe.withStroke(linewidth=2.0, foreground="white")]
+    for p in places:
+        nm = names.get(p["name"], {}).get("name", p["name"])
+        cx, cy = p["centroid"]
+        ax.text(cx, cy, nm.replace("_", "\n"), fontsize=7.8, ha="center",
+                va="center", color="#444444", style="italic", zorder=3,
+                path_effects=stroke)
+
+    colors = {"isNextTo": "#5b7ba6", "isOn": "#dd6b20", "isAboveOf": "#7c3aed"}
+    widths = {"isNextTo": 1.0, "isOn": 2.4, "isAboveOf": 2.4}
     for e in edges:
         a, bb = nodes[e["subj"]], nodes[e["obj"]]
         ax.plot([a["pose"]["x"], bb["pose"]["x"]],
                 [a["pose"]["y"], bb["pose"]["y"]],
                 color=colors[e["pred"]], lw=widths[e["pred"]],
-                alpha=0.85 if e["pred"] != "isNextTo" else 0.55, zorder=3)
+                alpha=0.9 if e["pred"] != "isNextTo" else 0.5, zorder=4)
     for n in nodes.values():
         ver = str(n.get("status", "")).startswith("verified")
         ax.plot(n["pose"]["x"], n["pose"]["y"], "o",
@@ -671,7 +730,8 @@ def fig12(out):
         if n.get("type") not in ("clutter", "unknown") and ver:
             ax.annotate(n["type"], (n["pose"]["x"], n["pose"]["y"]),
                         textcoords="offset points", xytext=(4, 4),
-                        fontsize=6.2, color="#222222", zorder=6)
+                        fontsize=6.0, color="#111111", zorder=6,
+                        path_effects=stroke)
     for pred, c in colors.items():
         n_e = sum(1 for e in edges if e["pred"] == pred)
         ax.plot([], [], color=c, lw=widths[pred], label=f"{pred} ({n_e})")
@@ -680,9 +740,9 @@ def fig12(out):
     ax.plot([], [], "o", ms=5, color="white", mec="#333333",
             label="unverified")
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
-    ax.legend(fontsize=8.2, loc="lower right", framealpha=0.95)
-    ax.set_title(f"relation-annotated semantic map (T3, rev {rev}): "
-                 "spatial predicates recomputed from explicit models",
+    ax.legend(fontsize=8.0, loc="lower right", framealpha=0.95)
+    ax.set_title(f"TOSM relation map (T3, rev {rev}): object edges over the "
+                 "place layer\n(isInsideOf = the region an object lies in)",
                  fontsize=10.5)
     _save(fig, out, "fig12_relations_map.png")
 
