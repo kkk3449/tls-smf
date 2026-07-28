@@ -168,33 +168,60 @@ def fig3(out):
 
 # ------------------------------------------------------------------ fig 4 ---
 def fig4(out):
+    """TOSM record cards: render + Symbolic / Explicit / Implicit panels."""
+    from PIL import Image
     d = json.load(open(O("stage2_no_wall_objects_split",
                          "semanticObjects.lf_esc.filtered.json")))
     by = {o["id"]: o for o in d["semanticObjects"]}
-    def card(o):
+
+    def fields(o):
         pr = o["properties"]
-        return json.dumps({
-            "name": o["name"], "type": o["type"],
-            "pose": {"x": o["poseX"], "y": o["poseY"],
-                     "z": pr.get("poseZ"), "theta": o.get("poseTheta")},
-            "dimensions": o["dimensions"], "color": o.get("color"),
-            "verificationStatus": pr.get("verificationStatus"),
-            "voteShare": pr.get("voteShare"),
-            "voteScores": pr.get("voteScores"),
-            "escalated": pr.get("escalated"),
-            "isMovable": pr.get("isMovable"),
-            "isKeyObject": pr.get("isKeyObject"),
-        }, indent=1, ensure_ascii=False)
-    fig, axes = plt.subplots(1, 2, figsize=(11, 5.6))
-    for ax, oid, title, col in [
-            (axes[0], "0", "verified record", OK),
-            (axes[1], "46", "unverified record (gated at query time)", BAD)]:
-        ax.axis("off")
-        ax.set_title(title, fontsize=11, color=col)
-        ax.text(0.02, 0.97, card(by[oid]), family="monospace", fontsize=7.6,
-                va="top", transform=ax.transAxes)
-        for s in ax.spines.values():
-            s.set_visible(True)
+        ver = pr.get("verificationStatus", "?")
+        sym = [("type", o["type"] if ver != "unverified"
+                else f"unknown (gated; was '{o['type']}')"),
+               ("name", o["name"]),
+               ("verified", {"verified": "true (VLM 4-view unanimous)",
+                             "verified_escalated": "true (escalated 12-view)",
+                             "unverified": "false → demoted at query time"}
+                .get(ver, ver)),
+               ("voteShare", str(pr.get("voteShare", "—")))]
+        dm = o["dimensions"]
+        exp = [("pose", f"x {o['poseX']:.2f}  y {o['poseY']:.2f}  z "
+                        f"{pr.get('poseZ', 0.0):.2f} m  (map)"),
+               ("theta", f"{o.get('poseTheta', 0.0):.2f} rad"),
+               ("dims", f"{dm['length']:.2f} x {dm['width']:.2f} x "
+                        f"{dm['height']:.2f} m"),
+               ("color", str(o.get("color", "—"))),
+               ("conf.", f"{o.get('confidence', 0):.2f}")]
+        imp = [("keyObject", str(pr.get("isKeyObject", False)).lower()),
+               ("movable", str(pr.get("isMovable", False)).lower())]
+        return [("Symbolic", sym), ("Explicit", exp), ("Implicit", imp)]
+
+    cards = [("7", "control panel_007", "(a) verified object record", OK),
+             ("46", "ladder_046", "(b) unverified record (gated)", BAD)]
+    fig = plt.figure(figsize=(11.6, 4.6))
+    for ci, (oid, vdir, title, col) in enumerate(cards):
+        o = by[oid]
+        axi = fig.add_axes([0.015 + ci * 0.5, 0.06, 0.185, 0.78])
+        fp = O("s2_split_hdviews", "views", vdir, "view_000.png")
+        if os.path.exists(fp):
+            axi.imshow(Image.open(fp))
+        axi.axis("off")
+        axi.set_title(title, fontsize=10.5, color=col, loc="left")
+        axt = fig.add_axes([0.215 + ci * 0.5, 0.02, 0.27, 0.88])
+        axt.axis("off")
+        y = 0.98
+        for section, rows in fields(o):
+            axt.text(0.0, y, section, fontsize=10, color="#1a56a0",
+                     style="italic", weight="bold", va="top")
+            y -= 0.085
+            for k, v in rows:
+                axt.text(0.06, y, k, fontsize=8.6, color="#333333",
+                         family="monospace", va="top")
+                axt.text(0.34, y, v, fontsize=8.6, color="#111111",
+                         family="monospace", va="top", wrap=True)
+                y -= 0.072
+            y -= 0.030
     _save(fig, out, "fig4_record_cards.png")
 
 
@@ -510,6 +537,48 @@ def fig8(out):
     _save(fig, out, "fig8_incremental_update.png")
 
 
+# ----------------------------------------------------------------- fig 11 ---
+def fig11(out):
+    """Semantic place map (T3): polygons + LLM ring-code names + objects."""
+    import matplotlib.patches as mpatches
+    places = json.load(open(O("place_layer_T3_places.json")))["semanticPlaces"]
+    names = json.load(open(O("place_ring_naming.json")))["T3"]
+    t3 = json.load(open(O("vis_sota_det",
+                          "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
+    b = json.load(open(O("vis_n2_room_bounds.json")))
+
+    fig, ax = plt.subplots(figsize=(9.2, 7.4))
+    _room_outline(ax, b, tag="test-room boundary")
+    for p in places:
+        rgb = tuple(int(c) / 255 for c in p["color"].split(","))
+        poly = np.array(p["polygon"])
+        ax.add_patch(mpatches.Polygon(poly, closed=True, facecolor=rgb,
+                                      alpha=0.38, edgecolor=rgb, lw=1.6,
+                                      zorder=2))
+        nm = names.get(p["name"], {}).get("name", p["name"])
+        cx, cy = p["centroid"]
+        ax.text(cx, cy, nm.replace("_", "\n"), fontsize=8.6, ha="center",
+                va="center", color="#111111", weight="bold", zorder=6,
+                bbox=dict(boxstyle="round,pad=0.25", fc="white", alpha=0.75,
+                          ec="none"))
+    ver_x, ver_y, unv_x, unv_y = [], [], [], []
+    for o in t3:
+        st = o["properties"].get("verificationStatus", "")
+        (ver_x if st.startswith("verified") else unv_x).append(o["poseX"])
+        (ver_y if st.startswith("verified") else unv_y).append(o["poseY"])
+    ax.scatter(ver_x, ver_y, s=26, c="#f2c200", edgecolors="#333333",
+               lw=0.6, zorder=5, label="verified object")
+    ax.scatter(unv_x, unv_y, s=22, c="white", edgecolors="#888888", lw=0.9,
+               zorder=5, label="unverified (excluded from ring codes)")
+    ax.set_aspect("equal")
+    ax.set_xticks([]); ax.set_yticks([])
+    ax.legend(fontsize=8.6, loc="lower right", framealpha=0.95)
+    ax.set_title("object-grounded place layer (T3): polygons carry LLM-derived"
+                 " names from\nverified-object ring codes; unverified objects"
+                 " do not contribute", fontsize=10.5)
+    _save(fig, out, "fig11_place_map.png")
+
+
 # ----------------------------------------------------------------- fig 10 ---
 def fig10(out):
     import open3d as o3d
@@ -676,7 +745,8 @@ def fig9(out):
 
 
 FIGS = {"fig1": fig1, "fig2": fig2, "fig3": fig3, "fig4": fig4, "fig5": fig5,
-        "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig9": fig9, "fig10": fig10}
+        "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig9": fig9,
+        "fig10": fig10, "fig11": fig11}
 
 
 def main():
