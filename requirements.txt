@@ -6,6 +6,7 @@ pyyaml
 pye57>=0.4          # .e57 input (multi-setup files supported)
 scipy>=1.14
 matplotlib>=3.9
+scikit-image>=0.22   # SLIC place segmentation
 
 # Stage B — multi-view VLM verification (needs ANTHROPIC_API_KEY).
 anthropic>=0.40
