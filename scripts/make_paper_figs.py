@@ -572,22 +572,43 @@ def fig11(out):
     j0, j1 = int((ymin - oy) / res), int((ymax - oy) / res) + 1
     crop = gm[j0:j1, i0:i1]
 
+    from scipy.ndimage import gaussian_filter, binary_fill_holes
+
     H, W = crop.shape
-    img = np.zeros((H, W, 3))
-    img[:] = 0.16                       # outside the room: dark gray
-    for p in places:
-        rgb = [int(c) / 255 for c in p["color"].split(",")]
+    lab = np.zeros((H, W), dtype=int)
+    for k, p in enumerate(places, start=1):
         cel = np.array(p["cells"])
         xi = np.round((cel[:, 0] - ox) / res - 0.5).astype(int) - i0
         yi = np.round((cel[:, 1] - oy) / res - 0.5).astype(int) - j0
         ok = (xi >= 0) & (xi < W) & (yi >= 0) & (yi < H)
-        img[yi[ok], xi[ok]] = rgb
+        lab[yi[ok], xi[ok]] = k
 
+    # visualization-only smoothing: 2x upsample + gaussian soft voting turns
+    # the stair-stepped cell boundaries into smooth region borders
+    UP, SIG = 2, 4.0
+    labu = np.kron(lab, np.ones((UP, UP), dtype=int))
+    room = binary_fill_holes(
+        gaussian_filter((labu > 0).astype(float), SIG) > 0.5)
+    votes = np.stack([gaussian_filter((labu == k).astype(float), SIG)
+                      for k in range(1, len(places) + 1)])
+    smooth = votes.argmax(0) + 1
+    smooth[~room] = 0
+
+    Hs, Ws = smooth.shape
+    img = np.zeros((Hs, Ws, 3))
+    img[:] = 0.16                       # outside the room: dark gray
+    for k, p in enumerate(places, start=1):
+        rgb = [int(c) / 255 for c in p["color"].split(",")]
+        img[smooth == k] = rgb
+
+    ext = (ox + i0 * res, ox + i1 * res, oy + j0 * res, oy + j1 * res)
     fig, ax = plt.subplots(figsize=(9.4, 7.6))
-    ax.imshow(img, origin="lower",
-              extent=(ox + i0 * res, ox + i1 * res,
-                      oy + j0 * res, oy + j1 * res),
-              interpolation="nearest", zorder=1)
+    ax.imshow(img, origin="lower", extent=ext, interpolation="bilinear",
+              zorder=1)
+    gx = np.linspace(ext[0], ext[1], Ws)
+    gy = np.linspace(ext[2], ext[3], Hs)
+    ax.contour(gx, gy, room.astype(float), levels=[0.5], colors="black",
+               linewidths=3.2, zorder=3)
 
     stroke = [pe.withStroke(linewidth=2.2, foreground="black")]
     for p in places:
