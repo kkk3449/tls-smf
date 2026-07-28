@@ -643,6 +643,97 @@ def fig11(out):
     _save(fig, out, "fig11_place_map.png")
 
 
+# ----------------------------------------------------------------- fig 12 ---
+def fig12(out):
+    """Relation-annotated semantic map (T3): isNextTo / isOn / isAboveOf."""
+    g = json.load(open(O("testroom_epochs_kg.json")))
+    b = json.load(open(O("vis_n2_room_bounds.json")))
+    rev = g["revision"]
+    nodes = {n["id"]: n for n in g["nodes"] if n.get("presence") != "absent"}
+    edges = [e for e in g["edges"] if e.get("revision") == rev
+             and e["subj"] in nodes and e["obj"] in nodes]
+
+    fig, ax = plt.subplots(figsize=(9.4, 7.6))
+    _room_outline(ax, b, tag="test-room boundary")
+    colors = {"isNextTo": "#8aa2c0", "isOn": "#dd6b20", "isAboveOf": "#7c3aed"}
+    widths = {"isNextTo": 1.0, "isOn": 2.2, "isAboveOf": 2.2}
+    for e in edges:
+        a, bb = nodes[e["subj"]], nodes[e["obj"]]
+        ax.plot([a["pose"]["x"], bb["pose"]["x"]],
+                [a["pose"]["y"], bb["pose"]["y"]],
+                color=colors[e["pred"]], lw=widths[e["pred"]],
+                alpha=0.85 if e["pred"] != "isNextTo" else 0.55, zorder=3)
+    for n in nodes.values():
+        ver = str(n.get("status", "")).startswith("verified")
+        ax.plot(n["pose"]["x"], n["pose"]["y"], "o",
+                ms=6 if ver else 5, color="#f2c200" if ver else "white",
+                mec="#333333", mew=0.7, zorder=5)
+        if n.get("type") not in ("clutter", "unknown") and ver:
+            ax.annotate(n["type"], (n["pose"]["x"], n["pose"]["y"]),
+                        textcoords="offset points", xytext=(4, 4),
+                        fontsize=6.2, color="#222222", zorder=6)
+    for pred, c in colors.items():
+        n_e = sum(1 for e in edges if e["pred"] == pred)
+        ax.plot([], [], color=c, lw=widths[pred], label=f"{pred} ({n_e})")
+    ax.plot([], [], "o", ms=6, color="#f2c200", mec="#333333",
+            label="verified object")
+    ax.plot([], [], "o", ms=5, color="white", mec="#333333",
+            label="unverified")
+    ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+    ax.legend(fontsize=8.2, loc="lower right", framealpha=0.95)
+    ax.set_title(f"relation-annotated semantic map (T3, rev {rev}): "
+                 "spatial predicates recomputed from explicit models",
+                 fontsize=10.5)
+    _save(fig, out, "fig12_relations_map.png")
+
+
+# ----------------------------------------------------------------- fig 13 ---
+def fig13(out):
+    """Baselines figure: Uni3D vocabulary ablation + Point-SAM refinement."""
+    from PIL import Image
+    fig = plt.figure(figsize=(11.8, 4.4))
+
+    # (a) Uni3D provisional accuracy vs vocabulary size (Sec 5.6 numbers)
+    ax = fig.add_axes([0.05, 0.14, 0.20, 0.72])
+    vocab = ["generic-30", "curated-20", "owner-18"]
+    acc = [66.7, 48.7, 33.3]
+    ax.bar(vocab, acc, 0.55, color=STO)
+    for i, a in enumerate(acc):
+        ax.text(i, a + 1.5, f"{a}%", ha="center", fontsize=8.6)
+    ax.set_ylim(0, 80)
+    ax.set_ylabel("Uni3D top-1 [%]", fontsize=9)
+    ax.tick_params(axis="x", labelsize=7.6, rotation=12)
+    ax.set_title("(a) Uni3D provisional label:\naccuracy drops as vocabulary\n"
+                 "narrows to the true classes", fontsize=9.2)
+    ax.grid(axis="y", alpha=0.3)
+
+    # (b) Point-SAM: merged parent cluster
+    axp = fig.add_axes([0.30, 0.12, 0.20, 0.72])
+    axp.imshow(Image.open(O("pointsam_pilot_showroom", "orig_clutter_015.png")))
+    axp.axis("off")
+    axp.set_title("(b) flagged merged cluster\nclutter_015 (parent LF: "
+                  "'clutter')", fontsize=9.2)
+
+    # (c) Point-SAM sub-clusters with their own 4-view LF labels
+    sub_lbl = ["machine (1.00)", "office chair (0.53)", "clutter",
+               "clutter", "chair (0.72)", "clutter"]
+    for i in range(6):
+        r, c = divmod(i, 3)
+        axs = fig.add_axes([0.53 + c * 0.155, 0.50 - r * 0.40, 0.148, 0.36])
+        fp = O("pointsam_pilot_showroom", f"sub_clutter_015_{i}.png")
+        if os.path.exists(fp):
+            axs.imshow(Image.open(fp))
+        axs.axis("off")
+        good = "clutter" not in sub_lbl[i]
+        axs.set_title(f"sub {i}: {sub_lbl[i]}", fontsize=7.4,
+                      color=OK if good else "#666666",
+                      weight="bold" if good else "normal")
+    fig.text(0.765, 0.95, "(c) Point-SAM subdivision: a machine, an office chair, "
+             "and a chair re-emerge from one 'clutter' blob",
+             ha="center", fontsize=9.2)
+    _save(fig, out, "fig13_pointsam_uni3d.png")
+
+
 # ----------------------------------------------------------------- fig 10 ---
 def fig10(out):
     import open3d as o3d
@@ -810,7 +901,7 @@ def fig9(out):
 
 FIGS = {"fig1": fig1, "fig2": fig2, "fig3": fig3, "fig4": fig4, "fig5": fig5,
         "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig9": fig9,
-        "fig10": fig10, "fig11": fig11}
+        "fig10": fig10, "fig11": fig11, "fig12": fig12, "fig13": fig13}
 
 
 def main():
