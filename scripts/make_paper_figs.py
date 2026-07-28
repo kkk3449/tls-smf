@@ -724,6 +724,18 @@ def fig12(out):
                 color=colors[e["pred"]], lw=widths[e["pred"]],
                 alpha=0.9 if e["pred"] != "isNextTo" else 0.6, zorder=4)
     cent = {p["name"]: p["centroid"] for p in places}
+    pcol = {p["name"]: [int(c) / 255 for c in p["color"].split(",")]
+            for p in places}
+    byname = {n["name"]: n for n in nodes.values()}
+    # object -> place containment (isInsideOf) edges
+    for pname, members in sc["members"].items():
+        cxp, cyp = cent[pname]
+        col = [0.55 * v for v in pcol[pname]]
+        for nm in members:
+            if nm in byname:
+                n = byname[nm]
+                ax.plot([n["pose"]["x"], cxp], [n["pose"]["y"], cyp],
+                        ls=":", color=col, lw=0.8, alpha=0.7, zorder=3)
     for pa, pb in sc["place_adjacency"]:
         (x1, y1), (x2, y2) = cent[pa], cent[pb]
         ax.plot([x1, x2], [y1, y2], ls="--", color="#333333", lw=1.4,
@@ -731,7 +743,6 @@ def fig12(out):
     for p in places:
         ax.plot(*p["centroid"], "s", ms=6, color="#333333", zorder=4)
     keyset = set(sc["keyObjects"].values())
-    byname = {n["name"]: n for n in nodes.values()}
     for n in nodes.values():
         ver = str(n.get("status", "")).startswith("verified")
         ax.plot(n["pose"]["x"], n["pose"]["y"], "o",
@@ -752,6 +763,8 @@ def fig12(out):
                   if e["pred"] == pred)
         lbl = "isNextTo (intra-place, " if pred == "isNextTo" else f"{pred} ("
         ax.plot([], [], color=c, lw=widths[pred], label=f"{lbl}{n_e})")
+    ax.plot([], [], ls=":", color="#555555", lw=1.0,
+            label="isInsideOf (object → place)")
     ax.plot([], [], ls="--", color="#333333", lw=1.4,
             label=f"place isAdjacentTo ({len(sc['place_adjacency'])})")
     ax.plot([], [], "*", ms=12, color="#f2c200", mec="#b91c1c",
@@ -762,9 +775,9 @@ def fig12(out):
             label="unverified")
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
     ax.legend(fontsize=8.0, loc="lower right", framealpha=0.95)
-    ax.set_title(f"place-scoped TOSM relation map (T3, rev {rev}): intra-place"
-                 " object edges, place adjacency,\nand per-place key objects"
-                 " (isInsideOf = the region an object lies in)", fontsize=10.5)
+    ax.set_title(f"place-scoped TOSM relation map (T3, rev {rev}): isInsideOf"
+                 " containment, intra-place object edges,\nplace adjacency,"
+                 " and per-place key objects", fontsize=10.5)
     _save(fig, out, "fig12_relations_map.png")
 
 
