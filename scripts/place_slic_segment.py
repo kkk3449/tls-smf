@@ -65,13 +65,21 @@ def main():
     bcm = b["cell_m"]
     room = {tuple(c) for c in b["cells"]}
 
+    # Segmentation domain = the room interior delimited by the LiDAR-drawn
+    # outer boundary (interior obstacles are NOT carved out): SLIC tiles the
+    # whole floor plate, matching the place-as-area reading of the map.
     H, W = free.shape
-    ys, xs = np.nonzero(free)
     keep = np.zeros_like(free)
-    for y, x in zip(ys, xs):
-        wx, wy = ox + (x + 0.5) * res, oy + (y + 0.5) * res
-        if (int(round(wx / bcm)), int(round(wy / bcm))) in room:
-            keep[y, x] = True
+    jj, ii = np.mgrid[0:H, 0:W]
+    wx = ox + (ii + 0.5) * res
+    wy = oy + (jj + 0.5) * res
+    cx = np.round(wx / bcm).astype(int)
+    cy = np.round(wy / bcm).astype(int)
+    flat = set(room)
+    for j in range(H):
+        for i in range(W):
+            if (cx[j, i], cy[j, i]) in flat:
+                keep[j, i] = True
     mask = keep
     cm = res
     x0 = y0 = 0            # world coords come from map origin below

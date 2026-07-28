@@ -574,9 +574,7 @@ def fig11(out):
 
     H, W = crop.shape
     img = np.zeros((H, W, 3))
-    img[:] = 0.16                       # unknown: dark gray
-    img[crop >= 250] = 0.30             # free space outside regions
-    img[crop <= 50] = 0.0               # obstacles: black
+    img[:] = 0.16                       # outside the room: dark gray
     for p in places:
         rgb = [int(c) / 255 for c in p["color"].split(",")]
         cel = np.array(p["cells"])
@@ -620,8 +618,7 @@ def fig11(out):
     leg = ax.legend(fontsize=8.4, loc="lower right", framealpha=0.9)
     ax.set_title("object-grounded place layer (T3): SLIC superpixel regions"
                  " over the nav-stack grid map;\nLLM-derived names from"
-                 " verified-object ring codes (black = obstacles)",
-                 fontsize=10.5)
+                 " verified-object ring codes", fontsize=10.5)
     _save(fig, out, "fig11_place_map.png")
 
 
