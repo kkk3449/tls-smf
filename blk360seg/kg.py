@@ -40,7 +40,8 @@ def stable_id(rec, map_id=None, q=ANCHOR_Q):
 def _gate(rec):
     """Map a Stage-B record's verification status to KG ingestion status."""
     st = rec.get("properties", {}).get("verificationStatus")
-    if st in ("verified", "verified_escalated", "verified_majority"):
+    if st in ("verified", "verified_escalated", "verified_majority",
+              "verified_owner", "verified_recovery"):
         return st
     if rec.get("properties", {}).get("symbolicVerified") and st is None:
         return "verified"          # pre-escalation-era records
