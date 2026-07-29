@@ -743,7 +743,11 @@ def fig12(out):
     for p in places:
         ax.plot(*p["centroid"], "s", ms=6, color="#333333", zorder=4)
     keyset = set(sc["keyObjects"].values())
-    refuted = set(sc.get("ownerRefuted", []))
+    # cross out only phantom refutations; owner label-corrections (e.g. the
+    # poster stand) are real objects and carry their corrected type instead
+    refuted = {nm for nm in sc.get("ownerRefuted", [])
+               if nm in {n["name"] for n in nodes.values()}
+               and byname[nm].get("status") != "verified_owner"}
     for n in nodes.values():
         ver = str(n.get("status", "")).startswith("verified")
         ax.plot(n["pose"]["x"], n["pose"]["y"], "o",
@@ -782,8 +786,9 @@ def fig12(out):
             label="verified object")
     ax.plot([], [], "o", ms=5, color="white", mec="#333333",
             label="unverified")
-    ax.plot([], [], "x", ms=8, color="#b91c1c", mew=2.0,
-            label="owner-refuted phantom")
+    if refuted:
+        ax.plot([], [], "x", ms=8, color="#b91c1c", mew=2.0,
+                label="owner-refuted phantom")
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
     ax.legend(fontsize=8.0, loc="lower right", framealpha=0.95)
     ax.set_title(f"place-scoped TOSM relation map (T3, rev {rev}): isInsideOf"
@@ -793,6 +798,87 @@ def fig12(out):
 
 
 # ----------------------------------------------------------------- fig 13 ---
+def fig14(out):
+    """Hybrid structure-noise filter, before/after (T3).
+
+    Left: all 41 detected clusters; the ones the grid-map x geometry filter
+    flags are colored by rule (wall / ceiling / outside) and crossed out.
+    Right: the 26 surviving clusters with their post-recovery labels.
+    """
+    b = json.load(open(O("vis_n2_room_bounds.json")))
+    t3 = json.load(open(O("vis_sota_det",
+                          "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
+    T = np.load(O("vissota_to_visn2_T.npy"))
+    seg = _seg_points(t3, O("vis_sota_det"), max_pts=420, T=T)
+    flt = {r["name"]: r for r in
+           json.load(open(O("t3_structure_noise_filter.json")))["clusters"]}
+    adopted = json.load(open(O("clutter_recovery_t3", "recovery_adopted.json")))
+    relabel = {d: a["type"] for d, a in adopted.items()}
+    relabel["fire_extinguisher_051"] = "poster stand"   # owner correction
+
+    RULE = (("outside", "outside room", "#8e44ad"),
+            ("ceiling", "ceiling fixture/noise", "#e67e22"),
+            ("wall", "wall remnant / band", "#c0392b"))
+
+    def rule_of(why):
+        if why.startswith("outside"):
+            return "outside"
+        if why.startswith("ceiling"):
+            return "ceiling"
+        return "wall"
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 6.4), sharex=True,
+                             sharey=True)
+    for ax, mode in zip(axes, ("before", "after")):
+        _room_outline(ax, b)
+        n_kept = 0
+        for i, o in enumerate(t3):
+            p = seg.get(o["name"])
+            if p is None:
+                continue
+            r = flt[o["name"]]
+            if r["flag"] and mode == "after":
+                continue
+            if r["flag"]:
+                col = dict((k, c) for k, _, c in RULE)[rule_of(r["why"])]
+                ax.scatter(p[:, 0], p[:, 1], s=0.7, color=col, linewidths=0,
+                           zorder=4, alpha=0.85)
+                cx, cy = p.mean(0)
+                ax.plot(cx, cy, "x", ms=7, color=col, mew=1.8, zorder=5)
+            else:
+                n_kept += 1
+                ax.scatter(p[:, 0], p[:, 1], s=0.7, color=_pastel(i),
+                           linewidths=0, zorder=3)
+                lbl = relabel.get(o["name"],
+                                  o["type"] if o["type"] not in
+                                  ("clutter", "unknown") else None)
+                if mode == "after" and lbl:
+                    cx, cy = p.mean(0)
+                    ax.annotate(lbl, (cx, cy), textcoords="offset points",
+                                xytext=(3, 4), fontsize=6.4, color="#111111",
+                                zorder=6,
+                                path_effects=[__import__("matplotlib.patheffects",
+                                              fromlist=["withStroke"])
+                                              .withStroke(linewidth=1.8,
+                                                          foreground="white")])
+        ax.set_aspect("equal")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        if mode == "before":
+            n_fl = sum(1 for r in flt.values() if r["flag"])
+            ax.set_title(f"(a) detected clusters ({len(t3)}), "
+                         f"{n_fl} flagged by the hybrid filter", fontsize=10.5)
+            for _, lbl, c in RULE:
+                ax.plot([], [], "x", ms=7, color=c, mew=1.8, label=lbl)
+            ax.legend(fontsize=8.2, loc="lower right", framealpha=0.95)
+        else:
+            ax.set_title(f"(b) surviving clusters ({n_kept}) with "
+                         "recovery / owner-corrected labels", fontsize=10.5)
+    fig.suptitle("hybrid structure-noise filter (T3): lidar boundary-map "
+                 "registration × vertical-sheet geometry", fontsize=11.5)
+    _save(fig, out, "fig14_structure_filter.png")
+
+
 def fig13(out):
     """Baselines figure: Uni3D vocabulary ablation + Point-SAM refinement."""
     from PIL import Image
@@ -1006,7 +1092,8 @@ def fig9(out):
 
 FIGS = {"fig1": fig1, "fig2": fig2, "fig3": fig3, "fig4": fig4, "fig5": fig5,
         "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig9": fig9,
-        "fig10": fig10, "fig11": fig11, "fig12": fig12, "fig13": fig13}
+        "fig10": fig10, "fig11": fig11, "fig12": fig12, "fig13": fig13,
+        "fig14": fig14}
 
 
 def main():

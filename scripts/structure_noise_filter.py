@@ -143,12 +143,16 @@ def main():
             why = (f"wall remnant (hug {hug:.0%} within {args.wall_eps} m, "
                    f"vertical sheet {minor_ext:.2f} m thin)")
         elif (hug > args.wall_hug_frac and zspan > args.full_height
-              and local_thin < 0.3):
-            # floor-to-ceiling band hugging the wall line: a wall, whatever
-            # its global bbox says (a real wall-flush object like a monitor
-            # bank stays under ~2 m tall and has depth in its segments)
-            why = (f"full-height wall band (z-span {zspan:.1f} m, local "
-                   f"thickness {local_thin:.2f} m)")
+              and local_thin < 0.3
+              and float(t.max() - t.min()) > 2.0):
+            # LONG floor-to-ceiling band hugging the wall line: a wall,
+            # whatever its global bbox says. A real wall-flush object like a
+            # monitor bank stays under ~2 m tall with depth in its segments;
+            # a wall-mounted panel/conduit column is full-height but narrow
+            # (< 2 m along the wall), so the length condition spares it.
+            why = (f"full-height wall band (z-span {zspan:.1f} m, "
+                   f"{t.max() - t.min():.1f} m long, local thickness "
+                   f"{local_thin:.2f} m)")
         report.append({"name": o["name"], "type": o["type"],
                        "flag": bool(why), "why": why,
                        "wall_hug_frac": round(hug, 3),
