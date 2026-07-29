@@ -549,11 +549,17 @@ def fig11(out):
     places = d["semanticPlaces"]
     cm = d["cell_m"]
     try:
-        names = json.load(open(O("place_ring_naming.json")))["T3_slic"]
+        nb = json.load(open(O("place_ring_naming.json")))
+        names = nb.get("T3_slic_rev4") or nb["T3_slic"]
     except KeyError:
         names = {}
-    t3 = json.load(open(O("vis_sota_det",
-                          "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
+    # object markers from the KG's current revision, so owner-refuted
+    # phantoms drop out and corrected/recovered labels appear
+    _g = json.load(open(O("testroom_epochs_kg.json")))
+    t3 = [{"poseX": n["pose"]["x"], "poseY": n["pose"]["y"],
+           "type": n["type"],
+           "properties": {"verificationStatus": n.get("status", "")}}
+          for n in _g["nodes"] if n.get("presence") != "absent"]
 
     # nav-stack grid map for obstacle/unknown context
     ymap = os.environ.get("NAV_MAP_YAML",
@@ -655,7 +661,8 @@ def fig12(out):
     d = json.load(open(O("place_layer_T3_slic.json")))
     places = d["semanticPlaces"]
     try:
-        names = json.load(open(O("place_ring_naming.json")))["T3_slic"]
+        nb = json.load(open(O("place_ring_naming.json")))
+        names = nb.get("T3_slic_rev4") or nb["T3_slic"]
     except KeyError:
         names = {}
     g = json.load(open(O("testroom_epochs_kg.json")))
