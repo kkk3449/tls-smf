@@ -38,6 +38,13 @@ def main():
                     help="cut points more than this above the floor (m)")
     ap.add_argument("--floor-pct", type=float, default=1.0,
                     help="floor = this z-percentile of the input cloud")
+    ap.add_argument("--room-bounds", default=None,
+                    help="room-mask json (cells + cell_m); points outside "
+                         "the mask dilated by --room-margin are cut (door/"
+                         "window bleed past the room shell)")
+    ap.add_argument("--room-margin", type=float, default=0.35,
+                    help="dilation (m) of the room mask, so the wall shell "
+                         "itself survives the cut")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
@@ -60,8 +67,28 @@ def main():
 
     ceil_cut = xyz[:, 2] > floor_z + args.ceil_above
     keep = inside & ~ceil_cut
+
+    if args.room_bounds:
+        import json
+        from scipy.ndimage import binary_dilation
+        rb = json.load(open(args.room_bounds))
+        cells = np.array(rb["cells"], dtype=int)
+        cm = rb["cell_m"]
+        x0, y0 = cells[:, 0].min() - 4, cells[:, 1].min() - 4
+        mask = np.zeros((cells[:, 1].max() - y0 + 5,
+                         cells[:, 0].max() - x0 + 5), dtype=bool)
+        mask[cells[:, 1] - y0, cells[:, 0] - x0] = True
+        it = max(1, int(round(args.room_margin / cm)))
+        mask = binary_dilation(mask, iterations=it)
+        mi = np.clip((m[:, 0] / cm).astype(int) - x0, 0, mask.shape[1] - 1)
+        mj = np.clip((m[:, 1] / cm).astype(int) - y0, 0, mask.shape[0] - 1)
+        in_room = mask[mj, mi]
+        print(f"room-bounds cut: {int((keep & ~in_room).sum()):,} points "
+              f"beyond the room shell (+{args.room_margin} m margin)")
+        keep &= in_room
+
     print(f"floor z={floor_z:.3f}; cut ceiling-band {int(ceil_cut.sum()):,} "
-          f"+ outside-room {int((~inside).sum()):,} "
+          f"+ outside-grid {int((~inside).sum()):,} "
           f"-> keep {int(keep.sum()):,}/{n0:,}")
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
