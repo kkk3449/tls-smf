@@ -14,7 +14,13 @@ Wall sheets are left to the cluster-level hybrid filter after DBSCAN.
       --input outputs/vis_sota_det/clean.ply \
       --transform outputs/vissota_to_visn2_T.npy \
       --map /home/caselab/ammr_twin/map_vis_n2_1.yaml \
+      --room-bounds outputs/vis_n2_room_bounds.json \
       --out outputs/vis_sota_det2/clean_precut.ply
+
+--room-bounds is the STRICT test-room cut (owner 2026-08-01: room scoping
+belongs at the point level, before DBSCAN — without it, corridor/glazing
+bleed forms dozens of out-of-room clusters that every later stage must
+re-filter).
 """
 import argparse
 import os
