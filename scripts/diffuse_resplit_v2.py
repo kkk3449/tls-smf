@@ -195,6 +195,12 @@ def main():
         m[rec["name"]] = f
 
     T = np.load(TRANSFORM)
+    # canonical test-room mask: only content inside the test room is
+    # eligible, even before structure removal (owner 2026-07-31)
+    rb = json.load(open(os.path.join(ROOT, "outputs",
+                                     "vis_n2_room_bounds.json")))
+    rb_cells = {tuple(c) for c in rb["cells"]}
+    rb_cm = rb["cell_m"]
     img, res, ox, oy = load_gridmap(MAP)
     occ = img < 50
     room = ndimage.binary_erosion(
@@ -272,6 +278,10 @@ def main():
             amax = 12.0 if sfx.endswith("_desk") else EV_AREA
             if len(sp) < EV_PTS or carea > amax or ext[2] < EV_H:
                 continue
+            n2c = sp.mean(0)
+            if (int(np.floor(n2c[0] / rb_cm)),
+                    int(np.floor(n2c[1] / rb_cm))) not in rb_cells:
+                continue                # outside the test room
             zlo_rel = float(sp[:, 2].min() - floor_z)
             zhi_rel = float(sp[:, 2].max() - floor_z)
             lvl = height_level(zlo_rel, zhi_rel)

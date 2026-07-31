@@ -57,6 +57,22 @@ def load(p):
     return np.stack([v["x"], v["y"], v["z"]], 1)
 
 
+ROOM_BOUNDS = os.path.join(ROOT, "outputs", "vis_n2_room_bounds.json")
+
+
+def roombounds():
+    """The canonical test-room mask (owner 2026-07-31: even raw-condition
+    runs must only consider the test room — the wall-outline polygon also
+    admits annex space seen through the south glazing)."""
+    rb = json.load(open(ROOM_BOUNDS))
+    cells = {tuple(c) for c in rb["cells"]}
+    cm = rb["cell_m"]
+
+    def inside(x, y):
+        return (int(np.floor(x / cm)), int(np.floor(y / cm))) in cells
+    return inside
+
+
 def wall_tools():
     img, res, ox, oy = load_gridmap(MAP)
     occ = img < 50
@@ -182,6 +198,7 @@ def main():
     T = np.load(TRANSFORM)
     pn_all = (T[:3, :3] @ pts.T).T + T[:3, 3]
     room, d_wall, sample = wall_tools()
+    in_test_room = roombounds()
     zc = np.percentile(pn_all[:, 2], 99)      # ceiling height (n2)
     det4 = json.load(open(DET4))["semanticObjects"]
 
@@ -190,8 +207,14 @@ def main():
                       ("B", pn_all[:, 2] < zc - 0.35)):
         c = condition_candidates(pts[mask], pn_all[mask], room, d_wall,
                                  sample, args.blob_area, tag)
+        pre = len(c)
+        cn2 = {cc["name"]: (T[:3, :3] @ np.array(
+            [cc["cx"], cc["cy"], cc["cz"]]) + T[:3, 3]) for cc in c}
+        c = [cc for cc in c
+             if in_test_room(cn2[cc["name"]][0], cn2[cc["name"]][1])]
         conds[tag] = c
-        print(f"condition {tag}: {len(c)} candidates")
+        print(f"condition {tag}: {len(c)} candidates "
+              f"({pre - len(c)} outside the test room dropped)")
 
     support = []
     for o in det4:

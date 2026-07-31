@@ -93,6 +93,7 @@ def to_usda(graph, stage_name="TOSM", clouds=None, floor_offset=0.0,
             f'            double confidence = {o.get("confidence",0.0)}',
             f'            bool isKeyObject = {"true" if pr.get("isKeyObject") else "false"}',
             f'            bool isMovable = {"true" if pr.get("isMovable") else "false"}',
+            f'            string heightLevel = "{pr.get("heightLevel","")}"',
             f'            string color = "{o.get("color","")}"',
             f'            double3 pose_xyz = ({o["poseX"]}, {o["poseY"]}, '
             f'{pr.get("poseZ",0.0)})',
@@ -190,6 +191,8 @@ def to_usda(graph, stage_name="TOSM", clouds=None, floor_offset=0.0,
                 f'{"true" if pr.get("isKeyObject", False) else "false"}',
                 f'            custom bool tosm:isMovable = '
                 f'{"true" if pr.get("isMovable", False) else "false"}',
+                f'            custom string tosm:heightLevel = '
+                f'"{pr.get("heightLevel", "")}"',
                 f'            custom string tosm:color = "{o.get("color","")}"',
             ]
             if rels:
