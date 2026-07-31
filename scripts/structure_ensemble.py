@@ -168,6 +168,10 @@ def match(c, o):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--vlm", action="store_true")
+    ap.add_argument("--classify-matched", action="store_true",
+                    help="2-pass classify every A/B candidate linked to a "
+                         "det4 object and report per-object label "
+                         "stability across conditions (no KG writes)")
     ap.add_argument("--model", default="claude-sonnet-4-6")
     ap.add_argument("--blob-area", type=float, default=5.0)
     ap.add_argument("--max-vlm", type=int, default=10)
@@ -301,6 +305,100 @@ def main():
                   f"-> {r['vlm']['adopted'] or 'clutter'}")
         report["vlm"] = {"usage": vlm.usage_summary(), "records": recs}
         print(f"VLM cost ${report['vlm']['usage']['cost_usd']}")
+
+    if args.classify_matched:
+        # every A/B candidate linked (matched or near) to a det4 object gets
+        # the 2-pass consensus; per-object cross-condition label report
+        jobs = []
+        for t, cl in conds.items():
+            for c in cl:
+                link = next((o["name"] for o in det4 if match(c, o)), None)
+                if link is None:
+                    near = [o["name"] for o in det4
+                            if np.hypot(c["cx"] - o["poseX"],
+                                        c["cy"] - o["poseY"]) < 0.7]
+                    link = near[0] if near else None
+                if link:
+                    jobs.append((t, c, link))
+        print(f"classify-matched: {len(jobs)} condition-clusters "
+              f"linked to det4 objects")
+        # candidate idx refers into the condition's own cloud
+        cond_pts = {"A": pts, "B": pts[pn_all[:, 2] < zc - 0.35]}
+        recs = [(t, c, link, f"{t}_{c['name']}_of_{link}"[:60])
+                for t, c, link in jobs]
+        outrecs = []
+        for t, c, link, name in recs:
+            sp = cond_pts[t][c["idx"]]
+            fn = f"obj_{name}.ply"
+            el = PlyElement.describe(
+                np.array([tuple(p) for p in sp],
+                         dtype=[("x", "f4"), ("y", "f4"), ("z", "f4")]),
+                "vertex")
+            PlyData([el]).write(os.path.join(OUT, fn))
+            outrecs.append({"name": name, "type": "clutter", "id": 0,
+                            "poseX": c["cx"], "poseY": c["cy"],
+                            "dimensions": {"length": c["dims"][0],
+                                           "width": c["dims"][1],
+                                           "height": c["dims"][2]},
+                            "properties": {"imageFile": fn,
+                                           "poseZ": c["cz"],
+                                           "nPoints": c["n"],
+                                           "heightLevel": c["heightLevel"],
+                                           "cond": t, "det4": link}})
+        json.dump({"semanticObjects": outrecs},
+                  open(os.path.join(OUT, "semanticObjects_matched.json"),
+                       "w"), indent=1)
+        import subprocess
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "scripts",
+                                     "render_object_views.py"),
+                        "--semantic",
+                        os.path.join(OUT, "semanticObjects_matched.json"),
+                        "--objects-dir", OUT, "--out", OUT,
+                        "--size", "1024", "--point-size", "14"],
+                       check=True, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+        from blk360seg import vlm_stage_b as vb
+        from scripts.clutter_reverify import _SYS_RECOVERY
+        vlm = vb.SemanticVLM(model=args.model)
+        per_obj = {}
+        for r in outrecs:
+            views = [os.path.join(OUT, "views", r["name"],
+                                  f"view_{a:03d}.png")
+                     for a in (0, 90, 180, 270)]
+            views = [v for v in views if os.path.exists(v)]
+            if not views:
+                continue
+            out = {}
+            for tg, cands in (("open", []), ("domain", DOMAIN)):
+                content = vlm.build_symbolic_request(
+                    r, views, allowed_types=cands,
+                    height_level=r["properties"]["heightLevel"])
+                out[tg] = vlm._call(_SYS_RECOVERY, content,
+                                    vb.SYMBOLIC_TOOL)
+            a, b = out["open"]["corrected_type"], \
+                out["domain"]["corrected_type"]
+            lab = a if ((a == b) or (a in b) or (b in a)) else \
+                f"{a}|{b}"
+            per_obj.setdefault(r["properties"]["det4"], {})[
+                r["properties"]["cond"]] = lab
+            print(f"  {r['properties']['det4']:24s} "
+                  f"{r['properties']['cond']}: {lab}")
+        table = []
+        for o in det4:
+            if o["name"] not in per_obj:
+                continue
+            row = {"name": o["name"], "C": o["type"],
+                   **per_obj[o["name"]]}
+            labs = {row["C"]} | {v for k, v in row.items()
+                                 if k in ("A", "B")}
+            row["stable"] = len(labs) == 1
+            table.append(row)
+        report["cross_condition_labels"] = table
+        report["classify_usage"] = vlm.usage_summary()
+        print(f"cross-condition: {sum(1 for r in table if r['stable'])}"
+              f"/{len(table)} label-stable; "
+              f"cost ${report['classify_usage']['cost_usd']}")
 
     json.dump(report, open(os.path.join(OUT, "ensemble_report.json"), "w"),
               indent=1, default=str)
