@@ -112,7 +112,10 @@ def split_compound(pts, floor_z, tag):
     polemask = np.zeros(len(pts), bool)
     for k in np.unique(keys):
         m = keys == k
-        if pts[m, 2].max() - pts[m, 2].min() > 1.3:
+        zmn, zmx = pts[m, 2].min(), pts[m, 2].max()
+        # a pole/column is GROUNDED and tall; wall-mounted stacks (monitor
+        # columns starting ~1 m up) must not be eaten as poles
+        if zmx - zmn > 1.3 and zmn < floor_z + 0.35:
             polemask |= m
     if polemask.sum() > 100:
         lab = DBSCAN(eps=0.25, min_samples=20).fit_predict(
@@ -173,7 +176,10 @@ def split_compound(pts, floor_z, tag):
                     w = float(2.2 * np.sqrt(max(np.linalg.eigvalsh(
                         np.cov((spm[:, :2] - spm[:, :2].mean(0)).T))[1],
                         1e-9)))
-                    if w > 1.5:            # wall panel bank -> column split
+                    spanz = float(spm[:, 2].max() - spm[:, 2].min())
+                    if w > 1.2 or spanz > 0.75:
+                        # panel bank column split; narrow single columns
+                        # still get the stacked-row z cut
                         for sfx, pm in split_panel_bank(spm,
                                                         f"{tag}_{lname}{li}"):
                             out.append((sfx, lidx[m][pm]))
@@ -204,7 +210,7 @@ def split_panel_bank(sp, tag):
     bins = np.arange(u.min(), u.max() + 0.03, 0.03)
     h, _ = np.histogram(u[zb], bins=bins)
     nz = h[h > 0]
-    thr = max(5, 0.35 * (np.median(nz) if len(nz) else 0))
+    thr = max(4, 0.5 * (np.median(nz) if len(nz) else 0))
     low = h < thr
     cuts, i = [], 0
     while i < len(low):
@@ -212,14 +218,23 @@ def split_panel_bank(sp, tag):
             j = i
             while j < len(low) and low[j]:
                 j += 1
-            if j - i >= 3 and i > 0 and j < len(low):
+            if j - i >= 2 and i > 0 and j < len(low):
                 cuts.append((bins[i] + bins[j]) / 2)
             i = j
         else:
             i += 1
     edges = [u.min() - 0.01] + cuts + [u.max() + 0.01]
-    out = []
+    # merge slivers narrower than 0.3 m into their wider neighbour —
+    # spurious valleys (e.g. where a mount was removed) must not cut
+    # through a panel
+    merged = []
     for a, b in zip(edges[:-1], edges[1:]):
+        if merged and (b - a) < 0.30:
+            merged[-1] = (merged[-1][0], b)
+        else:
+            merged.append((a, b))
+    out = []
+    for a, b in merged:
         m = (u >= a) & (u < b)
         if m.sum() < 150:
             continue
