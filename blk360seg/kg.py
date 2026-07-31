@@ -65,7 +65,7 @@ def _node_from_record(rec, map_id, now):
         "presence": "present",              # present | absent
         "implicit": {k: pr.get(k) for k in
                      ("isKeyObject", "isMovable", "isOpen", "canBeOpen",
-                      "heightLevel")
+                      "heightLevel", "labelStability")
                      if pr.get(k) is not None},
         "provenance": {"source": pr.get("source", "DBSCAN+Uni3D+VLM"),
                        "voteShare": pr.get("voteShare"),
