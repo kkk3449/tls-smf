@@ -196,8 +196,23 @@ class SemanticVLM:
         }
 
     def build_symbolic_request(self, obj, image_paths, allowed_types=None,
-                               floor_z=None):
+                               floor_z=None, height_level=None):
         ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}
+        # Semantic height level (low/mid/high): measured from the scan, so it
+        # is a physical constraint the isolated render cannot convey — a
+        # "keyboard" cannot be at ceiling level, a fluorescent lamp cannot
+        # stand on the floor.
+        if height_level:
+            ctx["height_level"] = {
+                "level": height_level,
+                "definition": ("low = floor zone crossed by a mobile robot's "
+                               "2D-lidar scan plane; mid = elevated above the "
+                               "scan plane (desk/wall height); high = at or "
+                               "near the ceiling"),
+                "note": ("HARD constraint: reject any label physically "
+                         "impossible at this level (e.g. keyboard/chair at "
+                         "'high', ceiling lamp at 'low')."),
+            }
         # Pose context: mounting height is strong evidence the isolated render
         # cannot show (a dotted grid at 3.3 m is a ceiling light, never a
         # keyboard). floor_z = scene floor height in the same frame.

@@ -103,7 +103,8 @@ def main():
                                                  f2pre[t["file"]]))})
     # rescue target: the unverified monitor (large wall TV) — only when the
     # targets file doesn't already include it
-    if not any(j["det"] == "monitor_006" for j in jobs):
+    if "monitor_006" in byname and \
+            not any(j["det"] == "monitor_006" for j in jobs):
         mon = byname["monitor_006"]
         jobs.append({"key": "monitor_006", "det": "monitor_006", "obj": mon,
                      "cands": ["tv", "monitor", "display panel", "whiteboard"],
