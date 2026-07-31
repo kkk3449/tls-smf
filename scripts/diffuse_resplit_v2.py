@@ -161,6 +161,16 @@ def split_compound(pts, floor_z, tag):
                     if ov >= 0.6 and top >= zd - 0.30:
                         desk_idx.append(lidx[m])   # under-desk storage
                         continue
+                if lname == "above":
+                    spm = rp[lmask][m]
+                    w = float(2.2 * np.sqrt(max(np.linalg.eigvalsh(
+                        np.cov((spm[:, :2] - spm[:, :2].mean(0)).T))[1],
+                        1e-9)))
+                    if w > 1.5:            # wall panel bank -> column split
+                        for sfx, pm in split_panel_bank(spm,
+                                                        f"{tag}_{lname}{li}"):
+                            out.append((sfx, lidx[m][pm]))
+                        continue
                 out.append((f"{tag}_{lname}{li}", lidx[m]))
         out.append((f"{tag}_desk", np.concatenate(desk_idx)))
     else:
@@ -170,6 +180,57 @@ def split_compound(pts, floor_z, tag):
             if m.sum() >= 150:
                 out.append((f"{tag}_c{li}", rest_idx[m]))
     return out
+
+
+def split_panel_bank(sp, tag):
+    """Wall-mounted panel bank (width > 1.5 m above the support plane):
+    u-valley cuts along the wall in the panel z band, then a z-valley row
+    cut per column. Geometry-only generalization of the monitor-wall
+    resplit (owner GT there confirmed the result; here it runs untriggered
+    by any owner input)."""
+    ctr = sp[:, :2].mean(0)
+    xy = sp[:, :2] - ctr
+    _, vec = np.linalg.eigh(np.cov(xy.T))
+    u = xy @ vec[:, 1]
+    z = sp[:, 2]
+    zb = (z > z.min() + 0.10) & (z < z.max() - 0.05)
+    bins = np.arange(u.min(), u.max() + 0.03, 0.03)
+    h, _ = np.histogram(u[zb], bins=bins)
+    nz = h[h > 0]
+    thr = max(5, 0.35 * (np.median(nz) if len(nz) else 0))
+    low = h < thr
+    cuts, i = [], 0
+    while i < len(low):
+        if low[i]:
+            j = i
+            while j < len(low) and low[j]:
+                j += 1
+            if j - i >= 3 and i > 0 and j < len(low):
+                cuts.append((bins[i] + bins[j]) / 2)
+            i = j
+        else:
+            i += 1
+    edges = [u.min() - 0.01] + cuts + [u.max() + 0.01]
+    out = []
+    for a, b in zip(edges[:-1], edges[1:]):
+        m = (u >= a) & (u < b)
+        if m.sum() < 150:
+            continue
+        zz = z[m]
+        span = zz.max() - zz.min()
+        rows = [m]
+        if span > 0.75:                     # stacked rows?
+            hz, ez = np.histogram(zz, bins=24)
+            zcn = (ez[:-1] + ez[1:]) / 2
+            mid = (zcn > zz.min() + 0.3 * span) &                 (zcn < zz.min() + 0.7 * span)
+            if mid.any() and hz[mid].min() < 0.5 * hz.max():
+                zcut = zcn[mid][np.argmin(hz[mid])]
+                lo = m & (z < zcut)
+                hi = m & (z >= zcut)
+                if lo.sum() >= 120 and hi.sum() >= 120:
+                    rows = [lo, hi]
+        out += rows
+    return [(f"{tag}_p{i}", np.where(r)[0]) for i, r in enumerate(out)]
 
 
 def main():
@@ -229,8 +290,23 @@ def main():
     for rec in det:
         pts_s = load(m[rec["name"]])            # sota frame (output frame)
         fill, area = fill_area(pts_s[:, :2])
-        if not (fill < FILL_MAX and area > AREA_MIN):
+        diffuse = fill < FILL_MAX and area > AREA_MIN
+        # wall-compound gate: long wall-flush cluster mixing wall-band
+        # points with protruding content (the monitor-wall signature)
+        pn_probe = (T[:3, :3] @ pts_s.T).T + T[:3, 3]
+        dwp = sample(d_wall, pn_probe)
+        hug = float((dwp < 0.12).mean())
+        offw = int((dwp >= 0.12).sum())
+        xyp = pn_probe[:, :2] - pn_probe[:, :2].mean(0)
+        span = float(2.2 * np.sqrt(max(np.linalg.eigvalsh(
+            np.cov(xyp.T))[1], 1e-9)))
+        wallcomp = (hug >= 0.25 and offw >= 250 and span >= 2.0
+                    and not diffuse)
+        if not (diffuse or wallcomp):
             continue
+        if wallcomp:
+            print(f"  [wall-compound] {rec['name']}: hug={hug:.2f} "
+                  f"offwall={offw} span={span:.1f}m")
         pil = [load(sp) for sp in glob.glob(
             os.path.join(PILOT, f"obj_{rec['name']}_s*.ply"))]
         if pil:
