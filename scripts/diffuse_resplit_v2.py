@@ -179,10 +179,20 @@ def main():
     ap.add_argument("--wall-band", type=float, default=0.10)
     ap.add_argument("--compound-area", type=float, default=4.0)
     ap.add_argument("--render-size", type=int, default=1024)
+    ap.add_argument("--det-dir", default=None, help="detection dir (default det2)")
+    ap.add_argument("--det-json", default=None)
+    ap.add_argument("--pilot-dir", default=None, help="prior subs dir to subtract (optional)")
+    ap.add_argument("--out-dir", default=None)
+    global DET, PILOT, OUT
     args = ap.parse_args()
+    if args.det_dir:
+        DET = args.det_dir
+    if args.pilot_dir is not None:
+        PILOT = args.pilot_dir
+    if args.out_dir:
+        OUT = args.out_dir
     os.makedirs(OUT, exist_ok=True)
-
-    det = json.load(open(os.path.join(
+    det = json.load(open(args.det_json or os.path.join(
         DET, "semanticObjects.lf_esc.json")))["semanticObjects"]
     files = sorted(glob.glob(os.path.join(DET, "obj_*.ply")))
     cents = {f: load(f)[:, :2].mean(0) for f in files}

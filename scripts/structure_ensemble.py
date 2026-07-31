@@ -190,8 +190,14 @@ def main():
                          "stability across conditions (no KG writes)")
     ap.add_argument("--model", default="claude-sonnet-4-6")
     ap.add_argument("--blob-area", type=float, default=5.0)
+    ap.add_argument("--det", default=None,
+                    help="detections json to fuse against (default: det4)")
+    ap.add_argument("--out-dir", default=None)
     ap.add_argument("--max-vlm", type=int, default=10)
+    global OUT
     args = ap.parse_args()
+    if args.out_dir:
+        OUT = args.out_dir
     os.makedirs(OUT, exist_ok=True)
 
     pts = load(CLEAN)
@@ -200,7 +206,7 @@ def main():
     room, d_wall, sample = wall_tools()
     in_test_room = roombounds()
     zc = np.percentile(pn_all[:, 2], 99)      # ceiling height (n2)
-    det4 = json.load(open(DET4))["semanticObjects"]
+    det4 = json.load(open(args.det or DET4))["semanticObjects"]
 
     conds = {}
     for tag, mask in (("A", np.ones(len(pts), bool)),
