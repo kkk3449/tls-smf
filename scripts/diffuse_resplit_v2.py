@@ -186,12 +186,61 @@ def split_compound(pts, floor_z, tag):
                         continue
                 out.append((f"{tag}_{lname}{li}", lidx[m]))
         out.append((f"{tag}_desk", np.concatenate(desk_idx)))
+        out = _square_up_panels(pts, out)
     else:
         lab = DBSCAN(eps=0.18, min_samples=30).fit_predict(rp[:, :2])
         for li in set(lab) - {-1}:
             m = lab == li
             if m.sum() >= 150:
                 out.append((f"{tag}_c{li}", rest_idx[m]))
+    return out
+
+
+def _square_up_panels(pts, out):
+    """Final cleanup pass: re-assign every compound point that falls inside
+    (or within 6 cm of) a panel unit's box back to that unit. Support-post
+    extraction and layer clustering otherwise leave vertical bite marks and
+    holes on the panel rectangles; this restores complete units without any
+    owner input (plain instance-segmentation finishing)."""
+    import re
+    units = [i for i, (nm, _) in enumerate(out)
+             if re.match(r"^p\d+$", nm.rsplit("_", 1)[-1])]
+    if not units:
+        return out
+    boxes = []
+    for i in units:
+        q = pts[out[i][1]]
+        boxes.append((q[:, 0].min() - 0.06, q[:, 0].max() + 0.06,
+                      q[:, 1].min() - 0.06, q[:, 1].max() + 0.06,
+                      q[:, 2].min() - 0.05, q[:, 2].max() + 0.05))
+    assigned = np.zeros(len(pts), bool)
+    for _, idx in out:
+        assigned[idx] = True
+    pool = []                       # (source piece index or -1, point ids)
+    for i, (nm, idx) in enumerate(out):
+        if "_pole" in nm:
+            pool.append((i, idx))
+    pool.append((-1, np.where(~assigned)[0]))
+    taken = {i: [] for i in units}
+    for src, idxs in pool:
+        if not len(idxs):
+            continue
+        q = pts[idxs]
+        claimed = np.zeros(len(idxs), bool)
+        for u, (x0, x1, y0, y1, z0, z1) in zip(units, boxes):
+            m = (~claimed & (q[:, 0] >= x0) & (q[:, 0] <= x1)
+                 & (q[:, 1] >= y0) & (q[:, 1] <= y1)
+                 & (q[:, 2] >= z0) & (q[:, 2] <= z1))
+            if m.any():
+                taken[u].append(idxs[m])
+                claimed |= m
+        if src >= 0 and claimed.any():
+            out[src] = (out[src][0],
+                        out[src][1][~np.isin(out[src][1], idxs[claimed])])
+    for u in units:
+        if taken[u]:
+            out[u] = (out[u][0], np.unique(np.concatenate(
+                [out[u][1]] + taken[u])))
     return out
 
 
