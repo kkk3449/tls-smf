@@ -71,6 +71,13 @@ def load(p):
     return np.stack([v["x"], v["y"], v["z"]], 1)
 
 
+def load_rgb(p):
+    v = PlyData.read(p)["vertex"]
+    if "red" in (v.data.dtype.names or ()):
+        return np.stack([v["red"], v["green"], v["blue"]], 1)
+    return None
+
+
 def fill_area(xy):
     lo, hi = xy.min(0), xy.max(0)
     area = max(1e-3, (hi - lo)[0] * (hi - lo)[1])
@@ -309,9 +316,11 @@ def main():
                   f"offwall={offw} span={span:.1f}m")
         pil = [load(sp) for sp in glob.glob(
             os.path.join(PILOT, f"obj_{rec['name']}_s*.ply"))]
+        resid_rows = np.arange(len(pts_s))
         if pil:
             d, _ = cKDTree(np.vstack(pil)).query(pts_s, k=1, workers=8)
-            pts_s = pts_s[d > 1e-4]
+            resid_rows = np.where(d > 1e-4)[0]
+            pts_s = pts_s[resid_rows]
         pts = (T[:3, :3] @ pts_s.T).T + T[:3, 3]   # n2 frame (geometry)
         ins = sample(room, pts)
         dw = sample(d_wall, pts)
@@ -374,10 +383,21 @@ def main():
             name = f"{rec['name']}_v2_{sfx}"
             sps = pts_s[k][cm]           # same rows, sota frame
             fn = f"obj_{name}.ply"
-            el = PlyElement.describe(
-                np.array([tuple(p) for p in sps],
-                         dtype=[("x", "f4"), ("y", "f4"), ("z", "f4")]),
-                "vertex")
+            rgb_src = load_rgb(m[rec["name"]])
+            if rgb_src is not None:
+                # carry source RGB (xyz-only plys render white in Isaac)
+                rgbs = rgb_src[resid_rows][k][cm]
+                arr = np.empty(len(sps), dtype=[("x", "f4"), ("y", "f4"),
+                                                ("z", "f4"), ("red", "u1"),
+                                                ("green", "u1"),
+                                                ("blue", "u1")])
+                arr["x"], arr["y"], arr["z"] = sps[:, 0], sps[:, 1], sps[:, 2]
+                arr["red"], arr["green"], arr["blue"] =                     rgbs[:, 0], rgbs[:, 1], rgbs[:, 2]
+            else:
+                arr = np.array([tuple(p) for p in sps],
+                               dtype=[("x", "f4"), ("y", "f4"),
+                                      ("z", "f4")])
+            el = PlyElement.describe(arr, "vertex")
             PlyData([el]).write(os.path.join(OUT, fn))
             slo, shi = sps.min(0), sps.max(0)
             subs.append({
