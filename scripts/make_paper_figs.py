@@ -44,54 +44,87 @@ def _save(fig, out, name):
 
 # ------------------------------------------------------------------ fig 1 ---
 def fig1(out):
-    fig, ax = plt.subplots(figsize=(11.5, 4.6))
+    fig, ax = plt.subplots(figsize=(13.2, 6.0))
     ax.axis("off")
 
-    def box(x, y, w, h, text, color, fs=8.6):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.012",
+    def box(x, y, w, h, text, color, fs=8.0):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.008",
                                     fc="white", ec=color, lw=1.8))
         ax.text(x + w / 2, y + h / 2, text, ha="center", va="center",
                 fontsize=fs, color="black")
 
     def arrow(x1, y1, x2, y2, color="black", style="-|>", ls="-"):
         ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle=style,
-                                     mutation_scale=13, color=color,
-                                     lw=1.4, linestyle=ls))
+                                     mutation_scale=12, color=color,
+                                     lw=1.3, linestyle=ls))
 
-    y, h = 0.52, 0.30
-    box(0.010, y, 0.105, h, "Registered\nTLS scan\n(E57)", "gray")
-    box(0.135, y, 0.140, h, "Preprocessing\nvoxel + seeded\nRANSAC planes", DET)
-    box(0.295, y, 0.150, h, "Object decomposition\nDBSCAN + giant-split\n+ soffit-remnant filter", DET)
-    box(0.465, y, 0.140, h, "Explicit modeling\npose / extents / color\n+ Uni3D provisional", DET)
-    ax.text(0.535, y - 0.045, "provisional label: stochastic", ha="center",
-            fontsize=7.6, color=STO)
-    box(0.625, y, 0.150, h, "Multi-view VLM\nverification\n4-view late fusion", STO)
-    box(0.795, y, 0.095, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
-    box(0.905, y, 0.088, h, "Queryable\nTOSM KG\n(Neo4j)", "gray")
+    OWN = "#6b46c1"     # owner / human evidence
+    y, h = 0.58, 0.24
+    box(0.005, y, 0.088, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray")
+    box(0.106, y, 0.116, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET)
+    box(0.235, y, 0.126, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET)
+    box(0.374, y, 0.116, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET)
+    ax.text(0.432, y - 0.032, "provisional: stochastic", ha="center",
+            fontsize=7.0, color=STO)
+    box(0.503, y, 0.120, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO)
+    box(0.636, y, 0.082, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
+    box(0.731, y, 0.078, h, "Semantic KG\n(single DB,\nrevisioned)", "gray")
+    box(0.845, y - 0.06, 0.096, h + 0.12,
+        "Consumers of the\none DB\n\u2022 console UI\n\u2022 mission mediator\n"
+        "\u2022 Isaac twin\n   (auto-derived,\n    watch + reload)", "gray", fs=7.4)
 
-    for x1, x2 in [(0.115, 0.135), (0.275, 0.295), (0.445, 0.465),
-                   (0.605, 0.625), (0.775, 0.795), (0.890, 0.905)]:
+    for x1, x2 in [(0.093, 0.106), (0.222, 0.235), (0.361, 0.374),
+                   (0.490, 0.503), (0.623, 0.636), (0.718, 0.731),
+                   (0.809, 0.845)]:
         arrow(x1, y + h / 2, x2, y + h / 2)
 
-    # escalation loop
-    box(0.625, 0.08, 0.150, 0.22,
-        "Automatic escalation\n8-view + zoom re-query\nsplit vote only", STO)
-    arrow(0.680, y, 0.680, 0.30, STO)
-    arrow(0.740, 0.30, 0.740, y, STO)
-    ax.text(0.700, 0.035, "unresolved → ingested as 'unverified' "
-            "(confidence exposed)", fontsize=8, color=STO)
+    # --- structure-condition ensemble (bottom-left) -------------------------
+    box(0.014, 0.14, 0.168, 0.24,
+        "Structure-condition ensemble\nraw / no-ceiling geometry passes\n"
+        "new candidates $\\rightarrow$ VLM consensus\n"
+        "label stability $\\rightarrow$ owner queue", DET, fs=7.2)
+    arrow(0.049, y, 0.075, 0.38, DET)
+    arrow(0.182, 0.26, 0.225, 0.26, DET)
+    ax.text(0.098, 0.105, "condition-varied detection", ha="center",
+            fontsize=7.0, color=DET)
 
-    # update loop
-    arrow(0.950, y + h, 0.950, 0.955, DET)
-    arrow(0.950, 0.955, 0.070, 0.955, DET)
-    arrow(0.070, 0.955, 0.070, y + h, DET)
-    ax.text(0.50, 0.975, "incremental update: re-scan → identical backbone → "
-            "match (mint-once IDs) → upsert diff (unchanged / updated / moved / "
-            "inserted / absent)", ha="center", fontsize=8.6, color=DET)
-    # legend
+    # --- re-split gates loop -------------------------------------------------
+    box(0.225, 0.14, 0.184, 0.24,
+        "Re-split gates (automatic)\ndiffuseness: fill<0.3, area>5 m$^2$\n"
+        "wall-compound: hug$\\geq$0.25, $\\geq$2 m\n"
+        "wall strip + support plane\n+ panel cut + square-up", DET, fs=7.2)
+    arrow(0.278, y, 0.278, 0.38, DET)
+    arrow(0.356, 0.38, 0.356, y, DET)
+
+    # --- escalation loop -----------------------------------------------------
+    box(0.478, 0.17, 0.120, 0.18,
+        "Automatic escalation\n8-view + zoom re-query\nsplit vote only", STO, fs=7.2)
+    arrow(0.523, y, 0.523, 0.35, STO)
+    arrow(0.578, 0.35, 0.578, y, STO)
+    ax.text(0.538, 0.125, "unresolved $\\rightarrow$ 'unverified' (exposed)",
+            ha="center", fontsize=7.0, color=STO)
+
+    # --- owner feedback loop -------------------------------------------------
+    box(0.646, 0.14, 0.168, 0.24,
+        "Owner feedback\n(highest-trust, time-variant)\n"
+        "refute / restore / correct\nlabels, geometry, attributes\n"
+        "$\\rightarrow$ new KG revision", OWN, fs=7.2)
+    arrow(0.748, y, 0.748, 0.38, OWN)
+    arrow(0.778, 0.38, 0.778, y, OWN)
+
+    # --- incremental update loop --------------------------------------------
+    arrow(0.770, y + h, 0.770, 0.945, DET)
+    arrow(0.770, 0.945, 0.049, 0.945, DET)
+    arrow(0.049, 0.945, 0.049, y + h, DET)
+    ax.text(0.41, 0.965, "incremental update: re-scan $\\rightarrow$ identical "
+            "backbone $\\rightarrow$ match (mint-once IDs) $\\rightarrow$ upsert diff "
+            "(unchanged / updated / moved / inserted / absent)",
+            ha="center", fontsize=8.2, color=DET)
+
     ax.plot([], [], color=DET, lw=3, label="deterministic (seeded, byte-identical re-runs)")
     ax.plot([], [], color=STO, lw=3, label="stochastic (controlled by voting + gating)")
-    ax.legend(loc="lower left", fontsize=8.4, frameon=False)
+    ax.plot([], [], color=OWN, lw=3, label="owner-in-the-loop (revisioned, provenance kept)")
+    ax.legend(loc="lower left", fontsize=7.8, frameon=False, bbox_to_anchor=(0.0, -0.04))
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     _save(fig, out, "fig1_architecture.png")
 
