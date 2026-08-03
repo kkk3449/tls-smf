@@ -147,8 +147,16 @@ _PRICE_OUT_PER_MTOK = 15.0
 class SemanticVLM:
     def __init__(self, model="claude-sonnet-4-6", api_key=None, max_tokens=512,
                  price_in=_PRICE_IN_PER_MTOK, price_out=_PRICE_OUT_PER_MTOK):
-        import anthropic
-        self.client = anthropic.Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
+        # provider by model name: gpt-*/o3*/o4* -> OpenAI, else Anthropic
+        self.provider = "openai" if model.split("-")[0] in ("gpt", "o3", "o4") \
+            else "anthropic"
+        if self.provider == "anthropic":
+            import anthropic
+            self.client = anthropic.Anthropic(
+                api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
+        else:
+            self.client = None
+            self._openai_key = api_key or os.environ.get("OPENAI_API_KEY")
         self.model = model
         self.max_tokens = max_tokens
         self.price_in = price_in
@@ -158,6 +166,8 @@ class SemanticVLM:
                       "cache_read_tokens": 0, "cache_write_tokens": 0}
 
     def _call(self, system, content, tool):
+        if self.provider == "openai":
+            return self._call_openai(system, content, tool)
         resp = self.client.messages.create(
             model=self.model, max_tokens=self.max_tokens, system=system,
             tools=[tool], tool_choice={"type": "tool", "name": tool["name"]},
@@ -176,6 +186,55 @@ class SemanticVLM:
             if block.type == "tool_use":
                 return dict(block.input)
         raise RuntimeError("no tool_use in response")
+
+    def _call_openai(self, system, content, tool):
+        """Same forced-tool contract via OpenAI chat completions. Content
+        blocks (Anthropic format) are adapted; usage is accumulated in the
+        same counters (cache fields stay 0)."""
+        import requests
+        oc = []
+        for b in content:
+            if b["type"] == "image":
+                src = b["source"]
+                oc.append({"type": "image_url", "image_url": {
+                    "url": f"data:{src['media_type']};base64,{src['data']}"}})
+            else:
+                oc.append({"type": "text", "text": b["text"]})
+        body = {
+            "model": self.model,
+            "messages": [{"role": "system", "content": system},
+                         {"role": "user", "content": oc}],
+            "tools": [{"type": "function", "function": {
+                "name": tool["name"],
+                "description": tool.get("description", ""),
+                "parameters": tool["input_schema"]}}],
+            "tool_choice": {"type": "function",
+                            "function": {"name": tool["name"]}},
+            "max_completion_tokens": max(self.max_tokens, 2048),
+        }
+        for attempt in range(3):
+            r = requests.post("https://api.openai.com/v1/chat/completions",
+                              headers={"Authorization":
+                                       f"Bearer {self._openai_key}"},
+                              json=body, timeout=180)
+            d = r.json()
+            if "error" in d:
+                msg = d["error"].get("message", "")
+                if "max_completion_tokens" in msg and attempt == 0:
+                    body["max_tokens"] = body.pop("max_completion_tokens")
+                    continue
+                raise RuntimeError(f"openai error: {msg[:300]}")
+            u = d.get("usage", {})
+            self.usage["calls"] += 1
+            self.usage["input_tokens"] += u.get("prompt_tokens", 0)
+            self.usage["output_tokens"] += u.get("completion_tokens", 0)
+            tc = d["choices"][0]["message"].get("tool_calls") or []
+            if tc:
+                import json as _json
+                return _json.loads(tc[0]["function"]["arguments"])
+            if attempt < 2:
+                continue
+            raise RuntimeError("no tool call in openai response")
 
     def cost_usd(self):
         """Estimated cost so far from accumulated usage (input + output only;
