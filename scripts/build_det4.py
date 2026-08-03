@@ -79,7 +79,7 @@ def height_level(bot_rel, top_rel):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--timestamp", default="2026-07-31T14:00:00")
     args = ap.parse_args()
 

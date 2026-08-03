@@ -57,7 +57,7 @@ def fill_area(xy):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--vlm", action="store_true")
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
 

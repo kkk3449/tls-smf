@@ -138,15 +138,23 @@ def _img_block(path):
             "source": {"type": "base64", "media_type": "image/png", "data": data}}
 
 
-# Claude Sonnet standard pricing (USD per million tokens). Override via
-# SemanticVLM(price_in=..., price_out=...) if the rate changes.
+# Vendor list pricing, USD per million tokens (in, out), as of 2026-08.
+# Unknown models fall back to Sonnet-class rates; override via
+# SemanticVLM(price_in=..., price_out=...) if a rate changes.
+_MODEL_PRICES = {
+    "claude-sonnet-5": (3.0, 15.0),      # standard rate (intro promo 2/10)
+    "claude-sonnet-4-6": (3.0, 15.0),
+    "claude-opus-5": (5.0, 25.0),
+    "claude-haiku-4-5": (1.0, 5.0),
+    "gpt-5.6-luna": (0.20, 1.20),        # post 2026-07-30 price cut
+}
 _PRICE_IN_PER_MTOK = 3.0
 _PRICE_OUT_PER_MTOK = 15.0
 
 
 class SemanticVLM:
-    def __init__(self, model="claude-sonnet-4-6", api_key=None, max_tokens=512,
-                 price_in=_PRICE_IN_PER_MTOK, price_out=_PRICE_OUT_PER_MTOK):
+    def __init__(self, model="claude-sonnet-5", api_key=None, max_tokens=512,
+                 price_in=None, price_out=None):
         # provider by model name: gpt-*/o3*/o4* -> OpenAI, else Anthropic
         self.provider = "openai" if model.split("-")[0] in ("gpt", "o3", "o4") \
             else "anthropic"
@@ -159,8 +167,10 @@ class SemanticVLM:
             self._openai_key = api_key or os.environ.get("OPENAI_API_KEY")
         self.model = model
         self.max_tokens = max_tokens
-        self.price_in = price_in
-        self.price_out = price_out
+        dflt = _MODEL_PRICES.get(model, (_PRICE_IN_PER_MTOK,
+                                         _PRICE_OUT_PER_MTOK))
+        self.price_in = dflt[0] if price_in is None else price_in
+        self.price_out = dflt[1] if price_out is None else price_out
         # Cumulative token-usage accounting across every _call on this instance.
         self.usage = {"calls": 0, "input_tokens": 0, "output_tokens": 0,
                       "cache_read_tokens": 0, "cache_write_tokens": 0}

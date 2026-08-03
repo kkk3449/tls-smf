@@ -330,7 +330,7 @@ def main():
                     help="raw Stage-A semanticObjects.json (llm_only context)")
     ap.add_argument("--graph", required=True, help="kg_upsert graph json")
     ap.add_argument("--out", required=True)
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--conditions",
                     default="llm_only,ungated,verified_only,gated")
     ap.add_argument("--dry-run", action="store_true",

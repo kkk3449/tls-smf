@@ -60,7 +60,7 @@ def main():
     ap.add_argument("--det-dir", required=True)
     ap.add_argument("--subs-dir", default=None)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--cands-csv", default=None,
                     help="classification.csv to draw candidate shortlists "
                          "from (default: <det-dir>/classification.csv)")

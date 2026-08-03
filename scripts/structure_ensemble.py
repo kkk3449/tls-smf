@@ -188,7 +188,7 @@ def main():
                     help="2-pass classify every A/B candidate linked to a "
                          "det4 object and report per-object label "
                          "stability across conditions (no KG writes)")
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--blob-area", type=float, default=5.0)
     ap.add_argument("--det", default=None,
                     help="detections json to fuse against (default: det4)")

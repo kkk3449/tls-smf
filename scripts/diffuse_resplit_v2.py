@@ -307,7 +307,7 @@ def split_panel_bank(sp, tag):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--vlm", action="store_true")
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--wall-band", type=float, default=0.10)
     ap.add_argument("--compound-area", type=float, default=4.0)
     ap.add_argument("--render-size", type=int, default=1024)

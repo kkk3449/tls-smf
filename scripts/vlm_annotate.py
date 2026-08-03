@@ -12,7 +12,7 @@ both forced-tool-use on the object's 4-view render.
 Options:
   --dry-run     build + print the request for object 0, call NO API (no key needed)
   --limit N     only process the first N objects (cost control)
-  --model       default claude-sonnet-4-6
+  --model       default claude-sonnet-5
 """
 import argparse
 import json
@@ -29,7 +29,7 @@ def main():
     ap.add_argument("--input", required=True, help="semanticObjects.json from Stage A")
     ap.add_argument("--objects-dir", required=True, help="dir holding views/ (image paths are relative to it)")
     ap.add_argument("--out", default=None)
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--select", default=None,
                     help="comma-sep names/ids/imageFiles to process only (e.g. stair_008,obj_0001.ply)")

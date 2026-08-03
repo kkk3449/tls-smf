@@ -73,7 +73,7 @@ def main():
     ap.add_argument("--views-dir", required=True,
                     help="root containing views/<object_name>/view_XXX.png")
     ap.add_argument("--out", required=True)
-    ap.add_argument("--model", default="claude-sonnet-4-6")
+    ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--escalate", action="store_true")
     ap.add_argument("--resolve-share", type=float, default=0.6,
                     help="post-escalation fused share needed for "
