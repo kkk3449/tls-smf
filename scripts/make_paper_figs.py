@@ -44,7 +44,7 @@ def _save(fig, out, name):
 
 # ------------------------------------------------------------------ fig 1 ---
 def fig1(out):
-    fig, ax = plt.subplots(figsize=(13.2, 6.0))
+    fig, ax = plt.subplots(figsize=(13.6, 6.2))
     ax.axis("off")
 
     def box(x, y, w, h, text, color, fs=8.0):
@@ -60,63 +60,77 @@ def fig1(out):
 
     OWN = "#6b46c1"     # owner / human evidence
     y, h = 0.58, 0.24
-    box(0.005, y, 0.088, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray")
-    box(0.106, y, 0.116, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET)
-    box(0.235, y, 0.126, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET)
-    box(0.374, y, 0.116, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET)
-    ax.text(0.432, y - 0.032, "provisional: stochastic", ha="center",
+    box(0.005, y, 0.086, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray")
+    box(0.102, y, 0.112, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET)
+    box(0.226, y, 0.124, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET)
+    box(0.362, y, 0.112, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET)
+    ax.text(0.418, y - 0.032, "provisional: stochastic", ha="center",
             fontsize=7.0, color=STO)
-    box(0.503, y, 0.120, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO)
-    box(0.636, y, 0.082, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
-    box(0.731, y, 0.078, h, "Semantic KG\n(single DB,\nrevisioned)", "gray")
-    box(0.845, y - 0.06, 0.096, h + 0.12,
-        "Consumers of the\none DB\n\u2022 console UI\n\u2022 mission mediator\n"
-        "\u2022 Isaac twin\n   (auto-derived,\n    watch + reload)", "gray", fs=7.4)
+    box(0.486, y, 0.116, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO)
+    box(0.614, y, 0.080, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
+    box(0.706, y, 0.096, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray")
 
-    for x1, x2 in [(0.093, 0.106), (0.222, 0.235), (0.361, 0.374),
-                   (0.490, 0.503), (0.623, 0.636), (0.718, 0.731),
-                   (0.809, 0.845)]:
+    for x1, x2 in [(0.091, 0.102), (0.214, 0.226), (0.350, 0.362),
+                   (0.474, 0.486), (0.602, 0.614), (0.694, 0.706)]:
         arrow(x1, y + h / 2, x2, y + h / 2)
 
+    # --- consumers of the one DB (right column) -----------------------------
+    cx, cw = 0.836, 0.156
+    box(cx, 0.74, cw, 0.155,
+        "Management console (web UI)\nlive tables, overlays, missions;\n"
+        "owner edit buttons", OWN, fs=7.4)
+    box(cx, 0.545, cw, 0.135,
+        "Mission mediator + BT\nsemantic goals $\\rightarrow$ Nav2\n"
+        "(hot-reload on DB change)", DET, fs=7.4)
+    box(cx, 0.35, cw, 0.135,
+        "Isaac Sim twin\nauto-derived stage\n(watch + reload)", DET, fs=7.4)
+    arrow(0.802, y + 0.19, cx, 0.815)          # DB -> console (read)
+    arrow(0.802, y + h / 2 - 0.04, cx, 0.615)  # DB -> mediator
+    arrow(0.802, y + 0.02, cx, 0.42)           # DB -> twin
+    # owner edits flow back through the console (purple)
+    arrow(cx + 0.01, 0.74, 0.79, y + 0.10, OWN)
+    ax.text(0.845, 0.70, "owner edits $\\rightarrow$ revision", fontsize=6.8,
+            color=OWN, ha="center", rotation=13)
+
     # --- structure-condition ensemble (bottom-left) -------------------------
-    box(0.014, 0.14, 0.168, 0.24,
+    box(0.014, 0.14, 0.162, 0.24,
         "Structure-condition ensemble\nraw / no-ceiling geometry passes\n"
         "new candidates $\\rightarrow$ VLM consensus\n"
         "label stability $\\rightarrow$ owner queue", DET, fs=7.2)
-    arrow(0.049, y, 0.075, 0.38, DET)
-    arrow(0.182, 0.26, 0.225, 0.26, DET)
-    ax.text(0.098, 0.105, "condition-varied detection", ha="center",
+    arrow(0.046, y, 0.070, 0.38, DET)
+    arrow(0.176, 0.26, 0.216, 0.26, DET)
+    ax.text(0.094, 0.105, "condition-varied detection", ha="center",
             fontsize=7.0, color=DET)
 
     # --- re-split gates loop -------------------------------------------------
-    box(0.225, 0.14, 0.184, 0.24,
+    box(0.216, 0.14, 0.178, 0.24,
         "Re-split gates (automatic)\ndiffuseness: fill<0.3, area>5 m$^2$\n"
         "wall-compound: hug$\\geq$0.25, $\\geq$2 m\n"
         "wall strip + support plane\n+ panel cut + square-up", DET, fs=7.2)
-    arrow(0.278, y, 0.278, 0.38, DET)
-    arrow(0.356, 0.38, 0.356, y, DET)
+    arrow(0.262, y, 0.262, 0.38, DET)
+    arrow(0.338, 0.38, 0.338, y, DET)
 
     # --- escalation loop -----------------------------------------------------
-    box(0.478, 0.17, 0.120, 0.18,
+    box(0.462, 0.17, 0.116, 0.18,
         "Automatic escalation\n8-view + zoom re-query\nsplit vote only", STO, fs=7.2)
-    arrow(0.523, y, 0.523, 0.35, STO)
-    arrow(0.578, 0.35, 0.578, y, STO)
-    ax.text(0.538, 0.125, "unresolved $\\rightarrow$ 'unverified' (exposed)",
+    arrow(0.505, y, 0.505, 0.35, STO)
+    arrow(0.558, 0.35, 0.558, y, STO)
+    ax.text(0.520, 0.125, "unresolved $\\rightarrow$ 'unverified' (exposed)",
             ha="center", fontsize=7.0, color=STO)
 
-    # --- owner feedback loop -------------------------------------------------
-    box(0.646, 0.14, 0.168, 0.24,
-        "Owner feedback\n(highest-trust, time-variant)\n"
-        "refute / restore / correct\nlabels, geometry, attributes\n"
-        "$\\rightarrow$ new KG revision", OWN, fs=7.2)
-    arrow(0.748, y, 0.748, 0.38, OWN)
-    arrow(0.778, 0.38, 0.778, y, OWN)
+    # --- owner feedback (through the console) --------------------------------
+    box(0.616, 0.14, 0.186, 0.20,
+        "Owner feedback (highest-trust,\ntime-variant evidence)\n"
+        "refute / restore / correct labels,\ngeometry, attributes", OWN, fs=7.2)
+    arrow(0.756, 0.34, 0.876, 0.735, OWN)
+    ax.text(0.795, 0.47, "via console", fontsize=6.8, color=OWN,
+            ha="center", rotation=52)
 
     # --- incremental update loop --------------------------------------------
-    arrow(0.770, y + h, 0.770, 0.945, DET)
-    arrow(0.770, 0.945, 0.049, 0.945, DET)
-    arrow(0.049, 0.945, 0.049, y + h, DET)
-    ax.text(0.41, 0.965, "incremental update: re-scan $\\rightarrow$ identical "
+    arrow(0.754, y + h, 0.754, 0.955, DET)
+    arrow(0.754, 0.955, 0.046, 0.955, DET)
+    arrow(0.046, 0.955, 0.046, y + h, DET)
+    ax.text(0.40, 0.972, "incremental update: re-scan $\\rightarrow$ identical "
             "backbone $\\rightarrow$ match (mint-once IDs) $\\rightarrow$ upsert diff "
             "(unchanged / updated / moved / inserted / absent)",
             ha="center", fontsize=8.2, color=DET)
@@ -124,7 +138,7 @@ def fig1(out):
     ax.plot([], [], color=DET, lw=3, label="deterministic (seeded, byte-identical re-runs)")
     ax.plot([], [], color=STO, lw=3, label="stochastic (controlled by voting + gating)")
     ax.plot([], [], color=OWN, lw=3, label="owner-in-the-loop (revisioned, provenance kept)")
-    ax.legend(loc="lower left", fontsize=7.8, frameon=False, bbox_to_anchor=(0.0, -0.04))
+    ax.legend(loc="lower left", fontsize=7.8, frameon=False, bbox_to_anchor=(0.0, -0.05))
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     _save(fig, out, "fig1_architecture.png")
 
