@@ -60,19 +60,19 @@ def fig1(out):
 
     OWN = "#6b46c1"     # owner / human evidence
     y, h = 0.58, 0.24
-    # clear gaps (0.018) between stages so the row reads as discrete blocks
-    box(0.005, y, 0.082, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray")
-    box(0.105, y, 0.106, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET)
-    box(0.229, y, 0.118, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET)
-    box(0.365, y, 0.106, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET)
-    ax.text(0.418, y - 0.032, "provisional: stochastic", ha="center",
+    # clear gaps (0.030) between stages so the row reads as discrete blocks
+    box(0.005, y, 0.074, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray", fs=7.2)
+    box(0.109, y, 0.094, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET, fs=7.2)
+    box(0.233, y, 0.106, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET, fs=7.2)
+    box(0.369, y, 0.094, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET, fs=7.2)
+    ax.text(0.416, y - 0.032, "provisional: stochastic", ha="center",
             fontsize=7.0, color=STO)
-    box(0.489, y, 0.112, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO)
-    box(0.619, y, 0.076, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
-    box(0.713, y, 0.092, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray")
+    box(0.493, y, 0.100, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO, fs=7.2)
+    box(0.623, y, 0.068, h, "Confidence-\ngated upsert\n(mint-once ID)", DET, fs=7.2)
+    box(0.721, y, 0.084, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray", fs=7.2)
 
-    for x1, x2 in [(0.087, 0.105), (0.211, 0.229), (0.347, 0.365),
-                   (0.471, 0.489), (0.601, 0.619), (0.695, 0.713)]:
+    for x1, x2 in [(0.079, 0.109), (0.203, 0.233), (0.339, 0.369),
+                   (0.463, 0.493), (0.593, 0.623), (0.691, 0.721)]:
         arrow(x1, y + h / 2, x2, y + h / 2)
 
     # --- consumers of the one DB (right column) -----------------------------
@@ -108,7 +108,7 @@ def fig1(out):
         "new candidates $\\rightarrow$ VLM consensus\n"
         "label stability $\\rightarrow$ owner queue", DET, fs=7.2)
     arrow(0.046, y, 0.070, 0.38, DET)
-    arrow(0.176, 0.26, 0.229, 0.26, DET)
+    arrow(0.176, 0.26, 0.233, 0.26, DET)
     ax.text(0.094, 0.105, "condition-varied detection", ha="center",
             fontsize=7.0, color=DET)
 
@@ -118,7 +118,7 @@ def fig1(out):
         "wall-compound: hug$\\geq$0.25, $\\geq$2 m\n"
         "wall strip + support plane\n+ panel cut + square-up", DET, fs=7.2)
     arrow(0.262, y, 0.262, 0.38, DET)
-    arrow(0.338, 0.38, 0.338, y, DET)
+    arrow(0.330, 0.38, 0.330, y, DET)
 
     # --- escalation loop -----------------------------------------------------
     box(0.462, 0.17, 0.116, 0.18,
