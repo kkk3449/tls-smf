@@ -60,37 +60,47 @@ def fig1(out):
 
     OWN = "#6b46c1"     # owner / human evidence
     y, h = 0.58, 0.24
-    box(0.005, y, 0.086, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray")
-    box(0.102, y, 0.112, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET)
-    box(0.226, y, 0.124, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET)
-    box(0.362, y, 0.112, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET)
+    # clear gaps (0.018) between stages so the row reads as discrete blocks
+    box(0.005, y, 0.082, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray")
+    box(0.105, y, 0.106, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET)
+    box(0.229, y, 0.118, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET)
+    box(0.365, y, 0.106, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET)
     ax.text(0.418, y - 0.032, "provisional: stochastic", ha="center",
             fontsize=7.0, color=STO)
-    box(0.486, y, 0.116, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO)
-    box(0.614, y, 0.080, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
-    box(0.706, y, 0.096, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray")
+    box(0.489, y, 0.112, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO)
+    box(0.619, y, 0.076, h, "Confidence-\ngated upsert\n(mint-once ID)", DET)
+    box(0.713, y, 0.092, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray")
 
-    for x1, x2 in [(0.091, 0.102), (0.214, 0.226), (0.350, 0.362),
-                   (0.474, 0.486), (0.602, 0.614), (0.694, 0.706)]:
+    for x1, x2 in [(0.087, 0.105), (0.211, 0.229), (0.347, 0.365),
+                   (0.471, 0.489), (0.601, 0.619), (0.695, 0.713)]:
         arrow(x1, y + h / 2, x2, y + h / 2)
 
     # --- consumers of the one DB (right column) -----------------------------
-    cx, cw = 0.836, 0.156
-    box(cx, 0.74, cw, 0.155,
+    # Owner feedback sits directly under the console it flows through, so the
+    # purple path never crosses the mediator / twin boxes.
+    cx, cw = 0.836, 0.152
+    box(cx, 0.775, cw, 0.14,
         "Management console (web UI)\nlive tables, overlays, missions;\n"
         "owner edit buttons", OWN, fs=7.4)
-    box(cx, 0.545, cw, 0.135,
+    box(cx, 0.565, cw, 0.165,
+        "Owner feedback (highest-trust,\ntime-variant evidence)\n"
+        "refute / restore / correct\nlabels, geometry, attributes", OWN, fs=7.2)
+    box(cx, 0.36, cw, 0.135,
         "Mission mediator + BT\nsemantic goals $\\rightarrow$ Nav2\n"
         "(hot-reload on DB change)", DET, fs=7.4)
-    box(cx, 0.35, cw, 0.135,
+    box(cx, 0.155, cw, 0.135,
         "Isaac Sim twin\nauto-derived stage\n(watch + reload)", DET, fs=7.4)
-    arrow(0.802, y + 0.19, cx, 0.815)          # DB -> console (read)
-    arrow(0.802, y + h / 2 - 0.04, cx, 0.615)  # DB -> mediator
-    arrow(0.802, y + 0.02, cx, 0.42)           # DB -> twin
-    # owner edits flow back through the console (purple)
-    arrow(cx + 0.01, 0.74, 0.79, y + 0.10, OWN)
-    ax.text(0.845, 0.70, "owner edits $\\rightarrow$ revision", fontsize=6.8,
-            color=OWN, ha="center", rotation=13)
+    arrow(0.805, y + 0.21, cx, 0.845)          # DB -> console (read)
+    # DB -> mediator / twin: trunk down from the DB box, then branch right
+    # (keeps the corridor next to the consumer column free of diagonals)
+    ax.plot([0.759, 0.759], [y - 0.005, 0.222], color="black", lw=1.3)
+    arrow(0.759, 0.428, cx, 0.428)             # -> mediator
+    arrow(0.759, 0.222, cx, 0.222)             # -> twin
+    # owner evidence enters via the console; edits return as revisions
+    arrow(cx + cw / 2, 0.73, cx + cw / 2, 0.775, OWN)
+    arrow(0.838, 0.885, 0.785, y + h + 0.002, OWN)
+    ax.text(0.845, 0.937, "owner edits $\\rightarrow$ revision", fontsize=6.6,
+            color=OWN, ha="center")
 
     # --- structure-condition ensemble (bottom-left) -------------------------
     box(0.014, 0.14, 0.162, 0.24,
@@ -98,7 +108,7 @@ def fig1(out):
         "new candidates $\\rightarrow$ VLM consensus\n"
         "label stability $\\rightarrow$ owner queue", DET, fs=7.2)
     arrow(0.046, y, 0.070, 0.38, DET)
-    arrow(0.176, 0.26, 0.216, 0.26, DET)
+    arrow(0.176, 0.26, 0.229, 0.26, DET)
     ax.text(0.094, 0.105, "condition-varied detection", ha="center",
             fontsize=7.0, color=DET)
 
@@ -117,14 +127,6 @@ def fig1(out):
     arrow(0.558, 0.35, 0.558, y, STO)
     ax.text(0.520, 0.125, "unresolved $\\rightarrow$ 'unverified' (exposed)",
             ha="center", fontsize=7.0, color=STO)
-
-    # --- owner feedback (through the console) --------------------------------
-    box(0.616, 0.14, 0.186, 0.20,
-        "Owner feedback (highest-trust,\ntime-variant evidence)\n"
-        "refute / restore / correct labels,\ngeometry, attributes", OWN, fs=7.2)
-    arrow(0.756, 0.34, 0.876, 0.735, OWN)
-    ax.text(0.795, 0.47, "via console", fontsize=6.8, color=OWN,
-            ha="center", rotation=52)
 
     # --- incremental update loop --------------------------------------------
     arrow(0.754, y + h, 0.754, 0.955, DET)
