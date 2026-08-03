@@ -211,6 +211,10 @@ class SemanticVLM:
             "tool_choice": {"type": "function",
                             "function": {"name": tool["name"]}},
             "max_completion_tokens": max(self.max_tokens, 2048),
+            # reasoning models require this for function tools on
+            # chat.completions; also matches the Anthropic runs, which use
+            # no extended thinking (fair cross-vendor comparison)
+            "reasoning_effort": "none",
         }
         for attempt in range(3):
             r = requests.post("https://api.openai.com/v1/chat/completions",
@@ -222,6 +226,10 @@ class SemanticVLM:
                 msg = d["error"].get("message", "")
                 if "max_completion_tokens" in msg and attempt == 0:
                     body["max_tokens"] = body.pop("max_completion_tokens")
+                    continue
+                if "reasoning_effort" in msg and "not supported" in msg \
+                        and "reasoning_effort" in body:
+                    body.pop("reasoning_effort")
                     continue
                 raise RuntimeError(f"openai error: {msg[:300]}")
             u = d.get("usage", {})
