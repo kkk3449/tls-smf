@@ -61,7 +61,7 @@ def fig1(out):
     OWN = "#6b46c1"     # owner / human evidence
     y, h = 0.58, 0.24
     # clear gaps (0.030) between stages so the row reads as discrete blocks
-    box(0.005, y, 0.074, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray", fs=7.2)
+    box(0.012, y, 0.070, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray", fs=7.2)
     box(0.109, y, 0.094, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET, fs=7.2)
     box(0.233, y, 0.106, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET, fs=7.2)
     box(0.369, y, 0.094, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET, fs=7.2)
@@ -71,14 +71,14 @@ def fig1(out):
     box(0.623, y, 0.068, h, "Confidence-\ngated upsert\n(mint-once ID)", DET, fs=7.2)
     box(0.721, y, 0.084, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray", fs=7.2)
 
-    for x1, x2 in [(0.079, 0.109), (0.203, 0.233), (0.339, 0.369),
+    for x1, x2 in [(0.082, 0.109), (0.203, 0.233), (0.339, 0.369),
                    (0.463, 0.493), (0.593, 0.623), (0.691, 0.721)]:
         arrow(x1, y + h / 2, x2, y + h / 2)
 
     # --- consumers of the one DB (right column) -----------------------------
     # Owner feedback sits directly under the console it flows through, so the
     # purple path never crosses the mediator / twin boxes.
-    cx, cw = 0.836, 0.152
+    cx, cw = 0.848, 0.144
     box(cx, 0.775, cw, 0.14,
         "Management console (web UI)\nlive tables, overlays, missions;\n"
         "owner edit buttons", OWN, fs=7.4)
@@ -90,17 +90,18 @@ def fig1(out):
         "(hot-reload on DB change)", DET, fs=7.4)
     box(cx, 0.155, cw, 0.135,
         "Isaac Sim twin\nauto-derived stage\n(watch + reload)", DET, fs=7.4)
-    arrow(0.805, y + 0.21, cx, 0.845)          # DB -> console (read)
+    # DB <-> console: parallel horizontal pair (read down, edits back up)
+    arrow(0.805, 0.788, cx, 0.788)             # DB -> console (read)
+    arrow(cx, 0.812, 0.805, 0.812, OWN)        # console -> DB (owner edits)
+    ax.text(cx + cw / 2, 0.937, "owner edits $\\rightarrow$ revision",
+            fontsize=6.6, color=OWN, ha="center")
     # DB -> mediator / twin: trunk down from the DB box, then branch right
     # (keeps the corridor next to the consumer column free of diagonals)
     ax.plot([0.759, 0.759], [y - 0.005, 0.222], color="black", lw=1.3)
     arrow(0.759, 0.428, cx, 0.428)             # -> mediator
     arrow(0.759, 0.222, cx, 0.222)             # -> twin
-    # owner evidence enters via the console; edits return as revisions
+    # owner evidence enters via the console
     arrow(cx + cw / 2, 0.73, cx + cw / 2, 0.775, OWN)
-    arrow(0.838, 0.885, 0.785, y + h + 0.002, OWN)
-    ax.text(0.845, 0.937, "owner edits $\\rightarrow$ revision", fontsize=6.6,
-            color=OWN, ha="center")
 
     # --- structure-condition ensemble (bottom-left) -------------------------
     box(0.014, 0.14, 0.162, 0.24,
