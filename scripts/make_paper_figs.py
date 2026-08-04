@@ -1160,10 +1160,86 @@ def fig9(out):
     _save(fig, out, "fig9_two_epoch_update.png")
 
 
+# ----------------------------------------------------------------- fig 16 ---
+def fig16(out):
+    """Mission behavior tree, org-chart layout with orthogonal connectors."""
+    fig, ax = plt.subplots(figsize=(11.8, 6.0))
+    ax.axis("off")
+    REA = "#dd6b20"     # reactive layer (every tick)
+    DEL = "#2b6cb0"     # deliberative mission execution
+    KGC = "#2f855a"     # semantic mediator / knowledge graph
+
+    BH = 0.115
+    def node(cx, y0, w, text, color, fs=7.6, lw=1.8):
+        ax.add_patch(FancyBboxPatch((cx - w / 2, y0), w, BH,
+                                    boxstyle="round,pad=0.006",
+                                    fc="white", ec=color, lw=lw))
+        ax.text(cx, y0 + BH / 2, text, ha="center", va="center", fontsize=fs)
+        return cx, y0
+
+    def drop(px, py0, kids, color, ls="-"):
+        """Orthogonal parent->children: stub down, bus, arrow into each top."""
+        bus = py0 - 0.045
+        ax.plot([px, px], [py0, bus], color=color, lw=1.3, ls=ls)
+        xs = [k[0] for k in kids]
+        ax.plot([min(xs + [px]), max(xs + [px])], [bus, bus],
+                color=color, lw=1.3, ls=ls)
+        for kx, ky0 in kids:
+            ax.add_patch(FancyArrowPatch((kx, bus), (kx, ky0 + BH),
+                                         arrowstyle="-|>", mutation_scale=11,
+                                         color=color, lw=1.3, linestyle=ls))
+
+    yR, y1, y2, y3, y4 = 0.85, 0.615, 0.38, 0.38, 0.03
+    yME = 0.205
+    root = node(0.50, yR, 0.20, "Root\n? Selector", "black")
+    rea = node(0.24, y1, 0.24, "ReactiveLayer\n$\\rightarrow$ Sequence (no memory)", REA)
+    goh = node(0.78, y1, 0.22, "GoHome\n$\\rightarrow$ Sequence (memory)", REA)
+    drop(*root, [rea, goh], REA)
+
+    bat = node(0.085, y2, 0.15, "BatteryOK\n(charge hold @home)", REA, fs=7.0)
+    noi = node(0.25, y2, 0.155, "NoHomeInterrupt\n(preempt + cancel)", REA, fs=7.0)
+    saf = node(0.415, y2, 0.145, "MissionSafe\n(FailureIsSuccess)", "#718096", fs=7.0)
+    drop(*rea, [bat, noi, saf], REA)
+
+    rh = node(0.635, y3, 0.13, "ResolveHome\nrobot layer", KGC, fs=7.0)
+    nh = node(0.78, y3, 0.13, "NavigateHome\nNav2 action", DEL, fs=7.0)
+    hd = node(0.925, y3, 0.12, "HomeDone", REA, fs=7.0)
+    drop(*goh, [rh, nh, hd], REA)
+
+    me = node(0.415, yME, 0.21, "MissionExecutor\n$\\rightarrow$ Sequence (memory)", DEL)
+    ax.add_patch(FancyArrowPatch((0.415, y2), (0.415, yME + BH),
+                                 arrowstyle="-|>", mutation_scale=11,
+                                 color=DEL, lw=1.3))
+    wf = node(0.10, y4, 0.16, "WaitForCommand\n/semantic_command", DEL, fs=7.0)
+    rg = node(0.30, y4, 0.185, "ResolveSemanticGoal\nTOSM mediator $\\rightarrow$ KG", KGC, fs=7.0)
+    ng = node(0.50, y4, 0.15, "NavigateToGoal\nNav2 action", DEL, fs=7.0)
+    ag = node(0.665, y4, 0.14, "AdvanceGoal\n(per-goal loop)", DEL, fs=7.0)
+    drop(*me, [wf, rg, ng, ag], DEL)
+
+    # knowledge graph feeding both resolvers (dashed green)
+    kg = node(0.875, yME - 0.01, 0.225,
+              "TOSM KG (objects / places / robots)\nverified-gated resolve\n"
+              "hot-reload on owner edits", KGC, fs=7.0)
+    ax.add_patch(FancyArrowPatch((0.762, 0.245), (0.395, 0.145 + 0.003),
+                                 arrowstyle="-|>", mutation_scale=10,
+                                 color=KGC, lw=1.2, linestyle="--"))
+    ax.add_patch(FancyArrowPatch((0.83, yME + BH - 0.01), (0.655, y3 - 0.005),
+                                 arrowstyle="-|>", mutation_scale=10,
+                                 color=KGC, lw=1.2, linestyle="--"))
+
+    ax.plot([], [], color=REA, lw=3, label="reactive layer (every tick)")
+    ax.plot([], [], color=DEL, lw=3, label="deliberative mission execution")
+    ax.plot([], [], color=KGC, lw=3, label="semantic mediator / knowledge graph")
+    ax.legend(loc="upper left", fontsize=7.6, frameon=False,
+              bbox_to_anchor=(0.0, 1.0))
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    _save(fig, out, "fig16_bt_tree.png")
+
+
 FIGS = {"fig1": fig1, "fig2": fig2, "fig3": fig3, "fig4": fig4, "fig5": fig5,
         "fig6": fig6, "fig7": fig7, "fig8": fig8, "fig9": fig9,
         "fig10": fig10, "fig11": fig11, "fig12": fig12, "fig13": fig13,
-        "fig14": fig14}
+        "fig14": fig14, "fig16": fig16}
 
 
 def main():
