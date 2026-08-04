@@ -1193,19 +1193,19 @@ def fig16(out):
 
     yR, y1, y2, y3, y4 = 0.85, 0.615, 0.38, 0.38, 0.03
     yME = 0.23
-    root = node(0.50, yR, 0.20, "Root\n? Selector", "black")
-    rea = node(0.24, y1, 0.24, "ReactiveLayer\n$\\rightarrow$ Sequence (no memory)", REA)
+    root = node(0.50, yR, 0.20, "Root\nSelector", "black")
+    rea = node(0.245, y1, 0.24, "ReactiveLayer\n$\\rightarrow$ Sequence (no memory)", REA)
     goh = node(0.78, y1, 0.22, "GoHome\n$\\rightarrow$ Sequence (memory)", REA)
     drop(*root, [rea, goh], REA)
 
-    bat = node(0.085, y2, 0.15, "BatteryOK\n(charge hold @home)", REA, fs=7.0)
-    noi = node(0.25, y2, 0.155, "NoHomeInterrupt\n(preempt + cancel)", REA, fs=7.0)
-    saf = node(0.415, y2, 0.145, "MissionSafe\n(FailureIsSuccess)", "#718096", fs=7.0)
+    bat = node(0.075, y2, 0.14, "BatteryOK\n(charge hold @home)", REA, fs=7.0)
+    noi = node(0.245, y2, 0.145, "NoHomeInterrupt\n(preempt + cancel)", REA, fs=7.0)
+    saf = node(0.415, y2, 0.14, "MissionSafe\n(FailureIsSuccess)", "#718096", fs=7.0)
     drop(*rea, [bat, noi, saf], REA)
 
-    rh = node(0.635, y3, 0.13, "ResolveHome\nrobot layer", KGC, fs=7.0)
-    nh = node(0.78, y3, 0.13, "NavigateHome\nNav2 action", DEL, fs=7.0)
-    hd = node(0.925, y3, 0.12, "HomeDone", REA, fs=7.0)
+    rh = node(0.63, y3, 0.12, "ResolveHome\nrobot layer", KGC, fs=7.0)
+    nh = node(0.78, y3, 0.12, "NavigateHome\nNav2 action", DEL, fs=7.0)
+    hd = node(0.93, y3, 0.11, "HomeDone", REA, fs=7.0)
     drop(*goh, [rh, nh, hd], REA)
 
     me = node(0.415, yME, 0.21, "MissionExecutor\n$\\rightarrow$ Sequence (memory)", DEL)
@@ -1215,7 +1215,7 @@ def fig16(out):
     wf = node(0.10, y4, 0.16, "WaitForCommand\n/semantic_command", DEL, fs=7.0)
     rg = node(0.30, y4, 0.185, "ResolveSemanticGoal\nTOSM mediator $\\rightarrow$ KG", KGC, fs=7.0)
     ng = node(0.50, y4, 0.15, "NavigateToGoal\nNav2 action", DEL, fs=7.0)
-    ag = node(0.665, y4, 0.14, "AdvanceGoal\n(per-goal loop)", DEL, fs=7.0)
+    ag = node(0.675, y4, 0.14, "AdvanceGoal\n(per-goal loop)", DEL, fs=7.0)
     drop(*me, [wf, rg, ng, ag], DEL)
 
     # knowledge graph feeding both resolvers (dashed green, orthogonal
@@ -1225,15 +1225,15 @@ def fig16(out):
               "hot-reload on owner edits", KGC, fs=7.0)
     kgy0, kgy1 = yME - 0.01, yME - 0.01 + BH
     # under the leaf row into ResolveSemanticGoal's bottom edge
-    ax.plot([0.875, 0.875, 0.30], [kgy0, 0.012, 0.012],
+    ax.plot([0.875, 0.875, 0.30], [kgy0, -0.018, -0.018],
             color=KGC, lw=1.2, ls="--")
-    ax.add_patch(FancyArrowPatch((0.30, 0.012), (0.30, y4),
+    ax.add_patch(FancyArrowPatch((0.30, -0.018), (0.30, y4),
                                  arrowstyle="-|>", mutation_scale=10,
                                  color=KGC, lw=1.2, linestyle="--"))
-    # short elbow up into ResolveHome's bottom edge
-    ax.plot([0.80, 0.80, 0.635], [kgy1, 0.3575, 0.3575],
+    # elbow up into ResolveHome's bottom edge
+    ax.plot([0.80, 0.80, 0.63], [kgy1, 0.343, 0.343],
             color=KGC, lw=1.2, ls="--")
-    ax.add_patch(FancyArrowPatch((0.635, 0.3575), (0.635, y3),
+    ax.add_patch(FancyArrowPatch((0.63, 0.343), (0.63, y3),
                                  arrowstyle="-|>", mutation_scale=10,
                                  color=KGC, lw=1.2, linestyle="--"))
 
@@ -1242,7 +1242,7 @@ def fig16(out):
     ax.plot([], [], color=KGC, lw=3, label="semantic mediator / knowledge graph")
     ax.legend(loc="upper left", fontsize=7.6, frameon=False,
               bbox_to_anchor=(0.0, 1.0))
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax.set_xlim(0, 1); ax.set_ylim(-0.04, 1)
     _save(fig, out, "fig16_bt_tree.png")
 
 
