@@ -1178,8 +1178,10 @@ def fig16(out):
         return cx, y0
 
     def drop(px, py0, kids, color, ls="-"):
-        """Orthogonal parent->children: stub down, bus, arrow into each top."""
-        bus = py0 - 0.045
+        """Orthogonal parent->children: stub down, bus, arrow into each top.
+        Bus sits midway between parent bottom and child tops so the entry
+        arrows keep a visible vertical run."""
+        bus = (py0 + max(k[1] for k in kids) + BH) / 2
         ax.plot([px, px], [py0, bus], color=color, lw=1.3, ls=ls)
         xs = [k[0] for k in kids]
         ax.plot([min(xs + [px]), max(xs + [px])], [bus, bus],
@@ -1190,7 +1192,7 @@ def fig16(out):
                                          color=color, lw=1.3, linestyle=ls))
 
     yR, y1, y2, y3, y4 = 0.85, 0.615, 0.38, 0.38, 0.03
-    yME = 0.205
+    yME = 0.23
     root = node(0.50, yR, 0.20, "Root\n? Selector", "black")
     rea = node(0.24, y1, 0.24, "ReactiveLayer\n$\\rightarrow$ Sequence (no memory)", REA)
     goh = node(0.78, y1, 0.22, "GoHome\n$\\rightarrow$ Sequence (memory)", REA)
@@ -1216,14 +1218,22 @@ def fig16(out):
     ag = node(0.665, y4, 0.14, "AdvanceGoal\n(per-goal loop)", DEL, fs=7.0)
     drop(*me, [wf, rg, ng, ag], DEL)
 
-    # knowledge graph feeding both resolvers (dashed green)
+    # knowledge graph feeding both resolvers (dashed green, orthogonal
+    # routes that stay clear of the tree connectors)
     kg = node(0.875, yME - 0.01, 0.225,
               "TOSM KG (objects / places / robots)\nverified-gated resolve\n"
               "hot-reload on owner edits", KGC, fs=7.0)
-    ax.add_patch(FancyArrowPatch((0.762, 0.245), (0.395, 0.145 + 0.003),
+    kgy0, kgy1 = yME - 0.01, yME - 0.01 + BH
+    # under the leaf row into ResolveSemanticGoal's bottom edge
+    ax.plot([0.875, 0.875, 0.30], [kgy0, 0.012, 0.012],
+            color=KGC, lw=1.2, ls="--")
+    ax.add_patch(FancyArrowPatch((0.30, 0.012), (0.30, y4),
                                  arrowstyle="-|>", mutation_scale=10,
                                  color=KGC, lw=1.2, linestyle="--"))
-    ax.add_patch(FancyArrowPatch((0.83, yME + BH - 0.01), (0.655, y3 - 0.005),
+    # short elbow up into ResolveHome's bottom edge
+    ax.plot([0.80, 0.80, 0.635], [kgy1, 0.3575, 0.3575],
+            color=KGC, lw=1.2, ls="--")
+    ax.add_patch(FancyArrowPatch((0.635, 0.3575), (0.635, y3),
                                  arrowstyle="-|>", mutation_scale=10,
                                  color=KGC, lw=1.2, linestyle="--"))
 
