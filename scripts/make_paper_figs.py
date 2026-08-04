@@ -1242,7 +1242,7 @@ def fig16(out):
     ax.plot([], [], color=KGC, lw=3, label="semantic mediator / knowledge graph")
     ax.legend(loc="upper left", fontsize=7.6, frameon=False,
               bbox_to_anchor=(0.0, 1.0))
-    ax.set_xlim(0, 1); ax.set_ylim(-0.04, 1)
+    ax.set_xlim(-0.012, 1); ax.set_ylim(-0.04, 1)
     _save(fig, out, "fig16_bt_tree.png")
 
 
