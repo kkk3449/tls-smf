@@ -44,7 +44,7 @@ def _save(fig, out, name):
 
 # ------------------------------------------------------------------ fig 1 ---
 def fig1(out):
-    fig, ax = plt.subplots(figsize=(13.6, 6.2))
+    fig, ax = plt.subplots(figsize=(13.6, 6.6))
     ax.axis("off")
 
     def box(x, y, w, h, text, color, fs=8.0):
@@ -60,6 +60,19 @@ def fig1(out):
 
     OWN = "#6b46c1"     # owner / human evidence
     y, h = 0.58, 0.24
+
+    # EMDCS-style titled containers (fieldset look: title sits on the border)
+    def container(x0, y0, x1, y1, title, tx):
+        ax.add_patch(Rectangle((x0, y0), x1 - x0, y1 - y0, fc="none",
+                               ec="#999999", lw=1.1, zorder=0))
+        ax.text(tx, y1, title, fontsize=7.8, color="#555555", ha="left",
+                va="center", zorder=3,
+                bbox=dict(fc="white", ec="none", pad=1.2))
+
+    container(0.004, 0.075, 0.818, 0.88,
+              "TLS-SMF modeling pipeline — deterministic backbone + "
+              "gated VLM verification", 0.10)
+    container(0.840, 0.075, 0.998, 0.965, "semantic-DB consumers", 0.856)
     # clear gaps (0.030) between stages so the row reads as discrete blocks
     box(0.012, y, 0.070, h, "Registered\nTLS scan (E57)\n+ room bounds", "gray", fs=7.2)
     box(0.109, y, 0.094, h, "Preprocessing\nvoxel + planes +\nroom-scope precut", DET, fs=7.2)
@@ -79,29 +92,29 @@ def fig1(out):
     # Owner feedback sits directly under the console it flows through, so the
     # purple path never crosses the mediator / twin boxes.
     cx, cw = 0.848, 0.144
-    box(cx, 0.775, cw, 0.14,
+    box(cx, 0.76, cw, 0.14,
         "Management console (web UI)\nlive tables, overlays, missions;\n"
         "owner edit buttons", OWN, fs=7.4)
-    box(cx, 0.565, cw, 0.165,
+    box(cx, 0.555, cw, 0.165,
         "Owner feedback (highest-trust,\ntime-variant evidence)\n"
         "refute / restore / correct\nlabels, geometry, attributes", OWN, fs=7.2)
-    box(cx, 0.36, cw, 0.135,
+    box(cx, 0.355, cw, 0.135,
         "Mission mediator + BT\nsemantic goals $\\rightarrow$ Nav2\n"
         "(hot-reload on DB change)", DET, fs=7.4)
-    box(cx, 0.155, cw, 0.135,
+    box(cx, 0.15, cw, 0.135,
         "Isaac Sim twin\nauto-derived stage\n(watch + reload)", DET, fs=7.4)
     # DB <-> console: parallel horizontal pair (read down, edits back up)
     arrow(0.805, 0.788, cx, 0.788)             # DB -> console (read)
     arrow(cx, 0.812, 0.805, 0.812, OWN)        # console -> DB (owner edits)
-    ax.text(cx + cw / 2, 0.937, "owner edits $\\rightarrow$ revision",
+    ax.text(cx + cw / 2, 0.925, "owner edits $\\rightarrow$ revision",
             fontsize=6.6, color=OWN, ha="center")
     # DB -> mediator / twin: trunk down from the DB box, then branch right
     # (keeps the corridor next to the consumer column free of diagonals)
-    ax.plot([0.759, 0.759], [y - 0.005, 0.222], color="black", lw=1.3)
-    arrow(0.759, 0.428, cx, 0.428)             # -> mediator
-    arrow(0.759, 0.222, cx, 0.222)             # -> twin
+    ax.plot([0.759, 0.759], [y - 0.005, 0.218], color="black", lw=1.3)
+    arrow(0.759, 0.422, cx, 0.422)             # -> mediator
+    arrow(0.759, 0.218, cx, 0.218)             # -> twin
     # owner evidence enters via the console
-    arrow(cx + cw / 2, 0.73, cx + cw / 2, 0.775, OWN)
+    arrow(cx + cw / 2, 0.72, cx + cw / 2, 0.76, OWN)
 
     # --- structure-condition ensemble (bottom-left) -------------------------
     box(0.014, 0.14, 0.162, 0.24,
@@ -129,11 +142,11 @@ def fig1(out):
     ax.text(0.520, 0.125, "unresolved $\\rightarrow$ 'unverified' (exposed)",
             ha="center", fontsize=7.0, color=STO)
 
-    # --- incremental update loop --------------------------------------------
-    arrow(0.754, y + h, 0.754, 0.955, DET)
-    arrow(0.754, 0.955, 0.046, 0.955, DET)
-    arrow(0.046, 0.955, 0.046, y + h, DET)
-    ax.text(0.40, 0.972, "incremental update: re-scan $\\rightarrow$ identical "
+    # --- incremental update loop (outside the pipeline container) -----------
+    arrow(0.754, y + h, 0.754, 1.005, DET)
+    arrow(0.754, 1.005, 0.046, 1.005, DET)
+    arrow(0.046, 1.005, 0.046, y + h, DET)
+    ax.text(0.40, 1.028, "incremental update: re-scan $\\rightarrow$ identical "
             "backbone $\\rightarrow$ match (mint-once IDs) $\\rightarrow$ upsert diff "
             "(unchanged / updated / moved / inserted / absent)",
             ha="center", fontsize=8.2, color=DET)
@@ -142,7 +155,7 @@ def fig1(out):
     ax.plot([], [], color=STO, lw=3, label="stochastic (controlled by voting + gating)")
     ax.plot([], [], color=OWN, lw=3, label="owner-in-the-loop (revisioned, provenance kept)")
     ax.legend(loc="lower left", fontsize=7.8, frameon=False, bbox_to_anchor=(0.0, -0.05))
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1.05)
     _save(fig, out, "fig1_architecture.png")
 
 
