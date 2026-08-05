@@ -38,6 +38,7 @@ def type_match(pred, gt):
     # tolerate common synonyms so the analysis measures verification, not
     # vocabulary; the pairs mirror the audit's grading practice
     syn = [{"tv", "television", "display", "monitor", "screen"},
+           {"chair", "office chair", "armchair"},
            {"mobile robot", "agv", "robot"},
            # owner: mobile manipulator with occluded wheels — robot arm ok
            {"mobile manipulator", "robot arm", "robotic arm", "robot"},
