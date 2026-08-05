@@ -163,18 +163,37 @@ def fig1(out):
 def fig2(out):
     import open3d as o3d
     from PIL import Image
-    stages = [("fig6_raw.png", "(a) registered TLS scan"),
-              ("fig6_nowall.png", "(b) structure removed"),
-              ("fig6_seg.png", "(c) object instances"),
-              ("fig6_tosm.png", "(d) TOSM knowledge graph")]
-    fig, axes = plt.subplots(1, 5, figsize=(16, 3.4),
-                             gridspec_kw={"width_ratios": [1, 1, 1, 1, 1.15]})
-    for ax, (f, t) in zip(axes, stages):
-        ax.imshow(Image.open(O(f)))
+
+    def _pad_to_aspect(f, target=1.39):
+        """White-pad an image to a common aspect so row-1 titles align."""
+        im = Image.open(O(f)).convert("RGB")
+        w, h = im.size
+        if w / h < target:
+            W = int(round(h * target))
+            canvas = Image.new("RGB", (W, h), "white")
+            canvas.paste(im, ((W - w) // 2, 0))
+            return canvas
+        return im
+
+    # 3-row layout (3/1/1): the three squarish pipeline stages on top, the
+    # two wide panels (TOSM card strip, soffit front view) a full row each.
+    fig = plt.figure(figsize=(10.2, 9.4))
+    gs = fig.add_gridspec(3, 3, height_ratios=[0.72, 1.18, 0.94],
+                          hspace=0.18, wspace=0.05)
+    top = [("fig6_raw.png", "(a) registered TLS scan"),
+           ("fig6_nowall.png", "(b) structural planes removed"),
+           ("fig6_instances.png", "(c) object instances")]
+    for i, (f, t) in enumerate(top):
+        ax = fig.add_subplot(gs[0, i])
+        ax.imshow(_pad_to_aspect(f))
         ax.set_title(t, fontsize=10)
         ax.axis("off")
-    # soffit inset: front view of showroom clean cloud, strips red
-    ax = axes[4]
+    ax = fig.add_subplot(gs[1, :])
+    ax.imshow(Image.open(O("fig6_tosm_strip.png")))
+    ax.set_title("(d) TOSM knowledge-graph records", fontsize=10)
+    ax.axis("off")
+    # soffit panel: front view of showroom clean cloud, remnant bands red
+    ax = fig.add_subplot(gs[2, :])
     pc = o3d.io.read_point_cloud(O("showroom_det", "clean.ply"))
     p = np.asarray(pc.points)
     rng = np.random.default_rng(0)
@@ -184,8 +203,8 @@ def fig2(out):
         q = np.asarray(o3d.io.read_point_cloud(
             O("showroom_det", f"obj_{i:04d}.ply")).points)
         ax.scatter(q[:, 0], q[:, 2], s=1.2, c=BAD, linewidths=0)
-    ax.set_title("(e) ceiling-soffit remnants\n(filtered at Stage A)",
-                 fontsize=10, color=BAD)
+    ax.set_title("(e) ceiling-soffit remnants (red) removed by the "
+                 "structure-remnant filter", fontsize=10, color=BAD)
     ax.set_aspect("equal")
     ax.set_xticks([]); ax.set_yticks([])
     _save(fig, out, "fig2_pipeline.png")

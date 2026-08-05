@@ -162,12 +162,28 @@ def fig_vlm():
     print("wrote", out)
 
 
-def fig_tosm():
+def fig_instances():
+    """Standalone instance-decomposition render (DBSCAN+Uni3D colors)."""
+    src = os.path.join(OUT, "stage2_no_wall_objects_split/scene_classified.ply")
+    pc = o3d.io.read_point_cloud(src)
+    img = render_pc(pc, point_size=4.5)
+    plt.figure(figsize=(7, 5.6))
+    plt.imshow(img)
+    plt.axis("off")
+    plt.tight_layout()
+    out = os.path.join(OUT, "fig6_instances.png")
+    plt.savefig(out, dpi=130, bbox_inches="tight")
+    plt.close()
+    print("wrote", out)
+
+
+def fig_tosm(rows=2, cols=2, want=None, out_name="fig6_tosm.png",
+             figsize=None, letter=True):
     """Completed TOSM semantic-object records: render + Symbolic/Explicit card."""
     OD = os.path.join(OUT, "stage2_no_wall_objects_split")
     m = json.load(open(os.path.join(OD, "semanticObjects.annotated.json")))
     objs = {o["name"]: o for o in m["semanticObjects"]}
-    want = ["mobile_robot_002", "machine_004", "tv_039", "chair_005"]
+    want = want or ["mobile_robot_002", "machine_004", "tv_039", "chair_005"]
     sel = [objs[n] for n in want if n in objs]
 
     def card_text(o):
@@ -201,8 +217,7 @@ def fig_tosm():
         ]
         return lines
 
-    rows, cols = 2, 2
-    fig = plt.figure(figsize=(13.2, 9.2))
+    fig = plt.figure(figsize=figsize or (cols * 6.6, rows * 4.6))
     gs = fig.add_gridspec(rows, cols, wspace=0.04, hspace=0.16)
     for k, o in enumerate(sel):
         sub = gs[k // cols, k % cols].subgridspec(1, 2, width_ratios=[1.0, 1.15],
@@ -215,7 +230,8 @@ def fig_tosm():
             img = mpimg.imread(p)
             ax_im.imshow(_autocrop((img * 255).astype(np.uint8)
                                    if img.dtype != np.uint8 else img))
-        ax_im.set_title(f"({chr(97 + k)}) {o['name']}", fontsize=12, loc="left")
+        head = f"({chr(97 + k)}) {o['name']}" if letter else o["name"]
+        ax_im.set_title(head, fontsize=12, loc="left")
         ax_im.axis("off")
         ax_tx.axis("off")
         y = 0.97
@@ -234,7 +250,7 @@ def fig_tosm():
             spine.set_visible(True)
             spine.set_color("0.75")
     plt.tight_layout()
-    out = os.path.join(OUT, "fig6_tosm.png")
+    out = os.path.join(OUT, out_name)
     plt.savefig(out, dpi=130, bbox_inches="tight", facecolor="white")
     plt.close()
     print("wrote", out)
@@ -248,7 +264,12 @@ if __name__ == "__main__":
         fig_nowall()
     if "seg" in targets:
         fig_segmentation()
+    if "instances" in targets:
+        fig_instances()
     if "vlm" in targets:
         fig_vlm()
     if "tosm" in targets:
         fig_tosm()
+    if "tosm_strip" in targets:
+        fig_tosm(rows=1, cols=2, want=["mobile_robot_002", "machine_004"],
+                 out_name="fig6_tosm_strip.png", letter=False)
