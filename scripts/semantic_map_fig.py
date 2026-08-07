@@ -290,8 +290,10 @@ def draw_panel(ax, img, labels, used, title):
         else:
             handles.append(Patch(fc=c))
             labels_txt.append(t)
-    handles += [Patch(fc=CLUTTER), Patch(fc=UNVERIFIED)]
-    labels_txt += ["clutter (verified)", "unverified (gated)"]
+    handles += [Patch(fc=CLUTTER), Patch(fc=UNVERIFIED),
+                Patch(fc="white", ec="#aaaaaa", lw=0.8)]
+    labels_txt += ["clutter (verified)", "unverified (gated)",
+                   "\u201ctype?\u201d gated top vote"]
     ax.legend(handles, labels_txt, loc="lower left",
               bbox_to_anchor=(0.0, 1.005), ncol=3, fontsize=12.5,
               frameon=False, borderaxespad=0, handlelength=1.4,
