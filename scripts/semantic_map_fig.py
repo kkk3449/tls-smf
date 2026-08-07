@@ -160,6 +160,9 @@ def pad_to_aspect(img, labels, aspect):
 
 PHANTOM_TYPES = {"keyboard"}   # verified labels the owner refuted (no such
                                # object exists in either scene)
+GATED_CALLOUT = {"door", "motor", "robotic arm", "tv", "machine",
+                 "control panel"}   # gated clusters worth naming by their
+                                    # own (withheld) top vote
 
 
 def load_objs(lf, objdir, ids=None):
@@ -178,6 +181,12 @@ def load_objs(lf, objdir, ids=None):
         geoms.append(q)
         pts = np.asarray(q.points)
         zs.append(pts[:, 2].min())
+        st = o["properties"].get("verificationStatus", "")
+        if not st.startswith("verified") and \
+                o["type"].strip().lower() in GATED_CALLOUT:
+            c = pts.mean(0)
+            phantoms.append((c[0], c[1], pts[:, 2].max() + 0.12,
+                             f"gated:{o['type'].strip().lower()}"))
         if label in PHANTOM_TYPES:
             c = pts.mean(0)
             phantoms.append((c[0], c[1], pts[:, 2].max() + 0.15,
@@ -256,6 +265,12 @@ def draw_panel(ax, img, labels, used, title):
         if txt.startswith("phantom:"):
             ax.annotate("$\\times$", (x, y), ha="center", va="center",
                         fontsize=18, fontweight="bold", color="#c53030")
+            continue
+        if txt.startswith("gated:"):
+            ax.annotate(f"{txt[6:]}?", (x, y), ha="center", va="center",
+                        fontsize=10.5, style="italic", color="#555555",
+                        bbox=dict(boxstyle="round,pad=0.15", fc="white",
+                                  ec="#aaaaaa", lw=0.5, alpha=0.8))
             continue
         ax.annotate(txt, (x, y), ha="center", fontsize=12.5,
                     style="italic", color="#333333",
