@@ -221,17 +221,24 @@ def draw_panel(ax, img, labels, used, title):
 def main():
     img_a, used_a, lab_a = panel_a()
     img_b, used_b, lab_b = panel_b()
+    # equal displayed height, top-aligned: width ratios = image aspects
+    asp_a = img_a.shape[1] / img_a.shape[0]
+    asp_b = img_b.shape[1] / img_b.shape[0]
     fig = plt.figure(figsize=(13.8, 6.4))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.12, 1.0], wspace=0.02,
+    gs = fig.add_gridspec(1, 2, width_ratios=[asp_a, asp_b], wspace=0.02,
                           left=0.004, right=0.996, top=0.86, bottom=0.01)
-    draw_panel(fig.add_subplot(gs[0, 0]), img_a, lab_a, used_a,
-               "(a) robot hall: place layer + verified objects")
-    draw_panel(fig.add_subplot(gs[0, 1]), img_b, lab_b, used_b,
-               "(b) cafeteria: place layer + verified objects")
+    for k, (img, lab, used, title) in enumerate(
+            [(img_a, lab_a, used_a,
+              "(a) robot hall: place layer + verified objects"),
+             (img_b, lab_b, used_b,
+              "(b) cafeteria: place layer + verified objects")]):
+        ax = fig.add_subplot(gs[0, k])
+        ax.set_anchor("NW" if k == 0 else "NE")
+        draw_panel(ax, img, lab, used, title)
     for d in (OUT, FIGS):
         os.makedirs(d, exist_ok=True)
         p = os.path.join(d, "fig19_semantic_map.png")
-        fig.savefig(p, dpi=185)
+        fig.savefig(p, dpi=185, bbox_inches="tight")
         print("->", p)
 
 

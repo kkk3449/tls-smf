@@ -68,7 +68,7 @@ def main():
                        zorder=5)
         if i in LABELS:
             ax.annotate(LABELS[i], (cx, cy), textcoords="offset points",
-                        xytext=(0, 7), fontsize=7.6, ha="center",
+                        xytext=(0, 7), fontsize=8.7, ha="center",
                         color="#222222", zorder=6)
     for i in NOISE:                     # small dot marker for carpet noise
         f = os.path.join(ROOT, "outputs", "cafe8f_objects",
@@ -81,14 +81,14 @@ def main():
                label="sofa fragment / merge (7, all absorbed)")
     ax.scatter([], [], marker="o", facecolors="none", edgecolors="#777777",
                s=52, lw=1.1, label="carpet floor-noise cluster (7)")
-    ax.legend(loc="upper left", fontsize=8.4, frameon=False)
+    ax.legend(loc="upper left", fontsize=9.7, frameon=False)
     ax.set_ylim(-4.4, 4.8)
     ax.set_aspect("equal")
     ax.set_xticks([]); ax.set_yticks([])
     for s in ax.spines.values():
         s.set_visible(False)
     ax.set_title("(a) cafeteria clusters (28) after yaw alignment and "
-                 "room crop", fontsize=10.5, loc="left")
+                 "room crop", fontsize=12.1, loc="left")
 
     # ---------- (b) render-source pairs ----------
     gsb = gs[0, 1].subgridspec(2, 2, hspace=0.05, wspace=0.02)
@@ -108,11 +108,11 @@ def main():
             for s in axi.spines.values():
                 s.set_color("#cccccc")
             if r == 0:
-                axi.set_title(collab, fontsize=9)
+                axi.set_title(collab, fontsize=10.3)
             if c == 0:
-                axi.set_ylabel(rowlab, fontsize=8.6)
+                axi.set_ylabel(rowlab, fontsize=9.9)
     fig.text(gs[0, 1].get_position(fig).x0 - 0.005,
-             0.955, "(b) render source only", fontsize=10.5)
+             0.955, "(b) render source only", fontsize=12.1)
 
     # ---------- (c) 2x2 grouped bars ----------
     axc = fig.add_subplot(gs[0, 2])
@@ -130,12 +130,12 @@ def main():
             x = gi * 1.15 + bi * 0.2
             v = vals[gi]
             axc.bar(x, v, width=0.16, color=col, alpha=alpha)
-            axc.text(x, v + 1.5, f"{v:.0f}", ha="center", fontsize=7.6,
+            axc.text(x, v + 1.5, f"{v:.0f}", ha="center", fontsize=8.7,
                      color="#333333")
     axc.set_xticks([0.3 + i * 1.15 for i in range(2)])
-    axc.set_xticklabels(groups, fontsize=9)
+    axc.set_xticklabels(groups, fontsize=10.3)
     axc.set_ylim(0, 100)
-    axc.set_ylabel("% (confirmed GT)", fontsize=9)
+    axc.set_ylabel("% (confirmed GT)", fontsize=10.3)
     axc.spines[["top", "right"]].set_visible(False)
     axc.grid(axis="y", lw=0.3, alpha=0.4)
     handles = [plt.Rectangle((0, 0), 1, 1, color=C46, alpha=0.55),
@@ -144,8 +144,8 @@ def main():
                plt.Rectangle((0, 0), 1, 1, color=CS5)]
     axc.legend(handles, ["4-6 / voxel", "4-6 / full-res",
                          "S5 / voxel", "S5 / full-res"],
-               fontsize=7.8, frameon=False, loc="upper left")
-    axc.set_title("(c) verifier $\\times$ render source", fontsize=10.5,
+               fontsize=9.0, frameon=False, loc="upper left")
+    axc.set_title("(c) verifier $\\times$ render source", fontsize=12.1,
                   loc="left")
 
     for path in (os.path.join(OUT, "fig17_cafe_stress.png"),

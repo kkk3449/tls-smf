@@ -65,7 +65,7 @@ def fig1(out):
     def container(x0, y0, x1, y1, title, tx):
         ax.add_patch(Rectangle((x0, y0), x1 - x0, y1 - y0, fc="none",
                                ec="#999999", lw=1.1, zorder=0))
-        ax.text(tx, y1, title, fontsize=7.8, color="#555555", ha="left",
+        ax.text(tx, y1, title, fontsize=9.0, color="#555555", ha="left",
                 va="center", zorder=3,
                 bbox=dict(fc="white", ec="none", pad=1.2))
 
@@ -79,7 +79,7 @@ def fig1(out):
     box(0.233, y, 0.106, h, "Object decomposition\nDBSCAN + giant-split\n+ remnant filter", DET, fs=7.2)
     box(0.369, y, 0.094, h, "Explicit modeling\npose/extents/color\n+ Uni3D provisional", DET, fs=7.2)
     ax.text(0.416, y - 0.032, "provisional: stochastic", ha="center",
-            fontsize=7.0, color=STO)
+            fontsize=8.0, color=STO)
     box(0.493, y, 0.100, h, "Multi-view VLM\nverification, 4-view\nlate fusion +\nheight-level prior", STO, fs=7.2)
     box(0.623, y, 0.068, h, "Confidence-\ngated upsert\n(mint-once ID)", DET, fs=7.2)
     box(0.721, y, 0.084, h, "Semantic DB\nTOSM KG (json)\nsingle store,\nrevisioned", "gray", fs=7.2)
@@ -107,7 +107,7 @@ def fig1(out):
     arrow(0.805, 0.788, cx, 0.788)             # DB -> console (read)
     arrow(cx, 0.812, 0.805, 0.812, OWN)        # console -> DB (owner edits)
     ax.text(cx + cw / 2, 0.925, "owner edits $\\rightarrow$ revision",
-            fontsize=6.6, color=OWN, ha="center")
+            fontsize=7.6, color=OWN, ha="center")
     # DB -> mediator / twin: trunk down from the DB box, then branch right
     # (keeps the corridor next to the consumer column free of diagonals)
     ax.plot([0.759, 0.759], [y - 0.005, 0.218], color="black", lw=1.3)
@@ -124,7 +124,7 @@ def fig1(out):
     arrow(0.046, y, 0.070, 0.38, DET)
     arrow(0.176, 0.26, 0.233, 0.26, DET)
     ax.text(0.094, 0.105, "condition-varied detection", ha="center",
-            fontsize=7.0, color=DET)
+            fontsize=8.0, color=DET)
 
     # --- re-split gates loop -------------------------------------------------
     box(0.216, 0.14, 0.178, 0.24,
@@ -140,7 +140,7 @@ def fig1(out):
     arrow(0.505, y, 0.505, 0.35, STO)
     arrow(0.558, 0.35, 0.558, y, STO)
     ax.text(0.520, 0.125, "unresolved $\\rightarrow$ 'unverified' (exposed)",
-            ha="center", fontsize=7.0, color=STO)
+            ha="center", fontsize=8.0, color=STO)
 
     # --- incremental update loop (outside the pipeline container) -----------
     arrow(0.754, y + h, 0.754, 1.005, DET)
@@ -149,12 +149,12 @@ def fig1(out):
     ax.text(0.40, 1.028, "incremental update: re-scan $\\rightarrow$ identical "
             "backbone $\\rightarrow$ match (mint-once IDs) $\\rightarrow$ upsert diff "
             "(unchanged / updated / moved / inserted / absent)",
-            ha="center", fontsize=8.2, color=DET)
+            ha="center", fontsize=9.4, color=DET)
 
     ax.plot([], [], color=DET, lw=3, label="deterministic (seeded, byte-identical re-runs)")
     ax.plot([], [], color=STO, lw=3, label="stochastic (controlled by voting + gating)")
     ax.plot([], [], color=OWN, lw=3, label="owner-in-the-loop (revisioned, provenance kept)")
-    ax.legend(loc="lower left", fontsize=7.8, frameon=False, bbox_to_anchor=(0.0, -0.05))
+    ax.legend(loc="lower left", fontsize=9.0, frameon=False, bbox_to_anchor=(0.0, -0.05))
     ax.set_xlim(0, 1); ax.set_ylim(0, 1.05)
     _save(fig, out, "fig1_architecture.png")
 
@@ -289,18 +289,18 @@ def fig4(out):
         if os.path.exists(fp):
             axi.imshow(Image.open(fp))
         axi.axis("off")
-        axi.set_title(title, fontsize=10.5, color=col, loc="left")
+        axi.set_title(title, fontsize=12.1, color=col, loc="left")
         axt = fig.add_axes([0.215 + ci * 0.5, 0.02, 0.27, 0.88])
         axt.axis("off")
         y = 0.98
         for section, rows in fields(o):
-            axt.text(0.0, y, section, fontsize=10, color="#1a56a0",
+            axt.text(0.0, y, section, fontsize=11.5, color="#1a56a0",
                      style="italic", weight="bold", va="top")
             y -= 0.085
             for k, v in rows:
-                axt.text(0.06, y, k, fontsize=8.6, color="#333333",
+                axt.text(0.06, y, k, fontsize=9.9, color="#333333",
                          family="monospace", va="top")
-                axt.text(0.34, y, v, fontsize=8.6, color="#111111",
+                axt.text(0.34, y, v, fontsize=9.9, color="#111111",
                          family="monospace", va="top", wrap=True)
                 y -= 0.072
             y -= 0.030
@@ -388,13 +388,13 @@ def fig7(out):
         ax.bar(x + 0.19, hal, 0.36, color=BAD, label="hallucination rate")
         for i, t in enumerate(trap):
             ax.text(i, max(acc[i], hal[i]) + 2.5,
-                    f"traps {t['correct']}/{t['n']}", ha="center", fontsize=8.4)
-        ax.set_xticks(x, labels, fontsize=8.6)
+                    f"traps {t['correct']}/{t['n']}", ha="center", fontsize=9.7)
+        ax.set_xticks(x, labels, fontsize=9.9)
         ax.set_ylim(0, 100)
         ax.set_ylabel("[%]")
-        ax.set_title(f"{scene} (n={s[conds[0]]['n']} queries)", fontsize=10.5)
+        ax.set_title(f"{scene} (n={s[conds[0]]['n']} queries)", fontsize=12.1)
         ax.grid(axis="y", alpha=0.3)
-        ax.legend(fontsize=8.4)
+        ax.legend(fontsize=9.7)
     _save(fig, out, "fig7_query_benchmark.png")
 
 
@@ -412,7 +412,7 @@ def _room_outline(ax, b, color="#555555", lw=1.4, tag=None):
     ax.contour(*np.meshgrid(X, Y), grid, levels=[0.5], colors=color,
                linewidths=lw, zorder=2)
     if tag:
-        ax.text(X[0] + 0.3, Y.max() - 0.2, tag, fontsize=7.2, color=color,
+        ax.text(X[0] + 0.3, Y.max() - 0.2, tag, fontsize=8.3, color=color,
                 style="italic", va="top")
 
 
@@ -944,7 +944,7 @@ def fig14(out):
                 if mode == "after" and lbl:
                     cx, cy = p.mean(0)
                     ax.annotate(lbl, (cx, cy), textcoords="offset points",
-                                xytext=(3, 4), fontsize=6.4, color="#111111",
+                                xytext=(3, 4), fontsize=7.4, color="#111111",
                                 zorder=6,
                                 path_effects=[__import__("matplotlib.patheffects",
                                               fromlist=["withStroke"])
@@ -956,15 +956,15 @@ def fig14(out):
         if mode == "before":
             n_fl = sum(1 for r in flt.values() if r["flag"])
             ax.set_title(f"(a) detected clusters ({len(t3)}), "
-                         f"{n_fl} flagged by the hybrid filter", fontsize=10.5)
+                         f"{n_fl} flagged by the hybrid filter", fontsize=12.1)
             for _, lbl, c in RULE:
                 ax.plot([], [], "x", ms=7, color=c, mew=1.8, label=lbl)
-            ax.legend(fontsize=8.2, loc="lower right", framealpha=0.95)
+            ax.legend(fontsize=9.4, loc="lower right", framealpha=0.95)
         else:
             ax.set_title(f"(b) surviving clusters ({n_kept}) with "
-                         "recovery / owner-corrected labels", fontsize=10.5)
+                         "recovery / owner-corrected labels", fontsize=12.1)
     fig.suptitle("hybrid structure-noise filter (T3): lidar boundary-map "
-                 "registration × vertical-sheet geometry", fontsize=11.5)
+                 "registration × vertical-sheet geometry", fontsize=13.2)
     _save(fig, out, "fig14_structure_filter.png")
 
 
@@ -1035,7 +1035,7 @@ def fig10(out):
             O("showroom_det", f"obj_{i:04d}.ply")).points)
         ax.scatter(q[:, 1], q[:, 2], s=2.0, c=BAD, linewidths=0)
     ax.set_title("(a) multi-level ceiling soffits\n→ 'keyboard' phantoms "
-                 "(escalation-verified)", fontsize=9.6)
+                 "(escalation-verified)", fontsize=11.0)
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
 
     # (b) vis_n2 hanging strip verified as door handle
@@ -1052,7 +1052,7 @@ def fig10(out):
     ax.scatter(p[:, 0], p[:, 2], s=0.5, c="lightgray", linewidths=0)
     ax.scatter(q[:, 0], q[:, 2], s=3.0, c=BAD, linewidths=0)
     ax.set_title("(b) hanging chain/ghost returns\n→ 'door handle' "
-                 "(unanimous verified)", fontsize=9.6)
+                 "(unanimous verified)", fontsize=11.0)
     ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
 
     # (c) clutter absorption: red robot
@@ -1062,7 +1062,7 @@ def fig10(out):
     if os.path.exists(fp):
         ax.imshow(Image.open(fp))
     ax.set_title("(c) clutter absorption: partially\ndisassembled robot "
-                 "→ 'clutter' (unanimous)", fontsize=9.6)
+                 "→ 'clutter' (unanimous)", fontsize=11.0)
     ax.axis("off")
 
     # (d) banner mislabeled but correctly gated
@@ -1076,7 +1076,7 @@ def fig10(out):
     if os.path.exists(fp):
         ax.imshow(Image.open(fp))
     ax.set_title("(d) exhibition banner → 'refrigerator'\nsplit vote "
-                 "→ correctly gated unverified", fontsize=9.6)
+                 "→ correctly gated unverified", fontsize=11.0)
     ax.axis("off")
     _save(fig, out, "fig10_error_taxonomy.png")
 
