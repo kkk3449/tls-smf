@@ -137,6 +137,25 @@ def flat_cells(cells, z, color):
     return pc(np.array([[x, y, z] for x, y in cells]), color)
 
 
+def pad_to_aspect(img, labels, aspect):
+    """Center-pad with the background color to the exact target aspect."""
+    h, w = img.shape[:2]
+    bg = img[2, 2]
+    if w / h < aspect:                     # too narrow -> pad width
+        nw = int(round(h * aspect))
+        px = (nw - w) // 2
+        canvas = np.tile(bg, (h, nw, 1)).astype(img.dtype)
+        canvas[:, px:px + w] = img
+        labels = [(x + px, y, t) for x, y, t in labels]
+    else:                                  # too wide -> pad height
+        nh = int(round(w / aspect))
+        py = (nh - h) // 2
+        canvas = np.tile(bg, (nh, w, 1)).astype(img.dtype)
+        canvas[py:py + h] = img
+        labels = [(x, y + py, t) for x, y, t in labels]
+    return canvas, labels
+
+
 def load_objs(lf, objdir, ids=None):
     geoms, used, zs = [], {}, []
     for i, o in lf.items():
@@ -177,6 +196,11 @@ def panel_a():
         cx, cy = plc["centroid"]
         labels3d.append((cx, cy, floor_z, plc["name"]))
     img, lab = render(geoms, labels3d, azim=-115, elev=40, zoom=0.80)
+    nudge = {"displaying_section_003": (-300, 6),
+             "tv_section_005": (70, 14),
+             "hardware_section_004": (30, -30)}
+    lab = [(x + nudge.get(t, (0, 0))[0], y + nudge.get(t, (0, 0))[1], t)
+           for x, y, t in lab]
     return img, used, lab
 
 
@@ -194,7 +218,8 @@ def panel_b():
         geoms.insert(0, flat_cells(plc["cells"], floor_z, pal(k % 9)[:3]))
         cx, cy = plc["centroid"]
         labels3d.append((cx, cy, floor_z, plc["name"]))
-    img, lab = render(geoms, labels3d, azim=-60, elev=42, zoom=0.70,
+    img, lab = render(geoms, labels3d, azim=-35, elev=50, zoom=0.80,
+                      size=(2400, 2000),
                       floor_idx=frozenset(range(len(places))))
     return img, used, lab
 
@@ -202,10 +227,10 @@ def panel_b():
 def draw_panel(ax, img, labels, used, title):
     ax.imshow(img)
     ax.axis("off")
-    ax.set_title(title, fontsize=11.5, loc="left", pad=30)
+    ax.set_title(title, fontsize=15, loc="left", pad=44)
     for x, y, txt in labels:
         if 0 <= x <= img.shape[1] and 0 <= y <= img.shape[0]:
-            ax.annotate(txt, (x, y), ha="center", fontsize=8.6,
+            ax.annotate(txt, (x, y), ha="center", fontsize=11.5,
                         style="italic", color="#333333",
                         bbox=dict(boxstyle="round,pad=0.18", fc="white",
                                   ec="#999999", lw=0.5, alpha=0.85))
@@ -213,7 +238,7 @@ def draw_panel(ax, img, labels, used, title):
     handles += [Patch(fc=CLUTTER, label="clutter (verified)"),
                 Patch(fc=UNVERIFIED, label="unverified (gated)")]
     ax.legend(handles=handles, loc="lower left",
-              bbox_to_anchor=(0.0, 1.005), ncol=4, fontsize=7.8,
+              bbox_to_anchor=(0.0, 1.005), ncol=4, fontsize=10.5,
               frameon=False, borderaxespad=0, handlelength=1.2,
               columnspacing=0.9)
 
@@ -221,12 +246,18 @@ def draw_panel(ax, img, labels, used, title):
 def main():
     img_a, used_a, lab_a = panel_a()
     img_b, used_b, lab_b = panel_b()
-    # equal displayed height, top-aligned: width ratios = image aspects
+    # identical panel size: pad both to a common aspect, equal widths
     asp_a = img_a.shape[1] / img_a.shape[0]
     asp_b = img_b.shape[1] / img_b.shape[0]
-    fig = plt.figure(figsize=(13.8, 6.4))
-    gs = fig.add_gridspec(1, 2, width_ratios=[asp_a, asp_b], wspace=0.02,
-                          left=0.004, right=0.996, top=0.86, bottom=0.01)
+    print(f"aspects a={asp_a:.2f} b={asp_b:.2f}")
+    target = max(asp_a, asp_b)
+    img_a, lab_a = pad_to_aspect(img_a, lab_a, target)
+    img_b, lab_b = pad_to_aspect(img_b, lab_b, target)
+    fig = plt.figure(figsize=(13.8, 13.8 / 2 / target + 1.0))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 1], wspace=0.02,
+                          left=0.004, right=0.996,
+                          top=1 - 0.9 / (13.8 / 2 / target + 1.0),
+                          bottom=0.01)
     for k, (img, lab, used, title) in enumerate(
             [(img_a, lab_a, used_a,
               "(a) robot hall: place layer + verified objects"),
