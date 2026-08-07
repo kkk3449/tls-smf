@@ -18,6 +18,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+from matplotlib.legend_handler import HandlerTuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -209,8 +211,7 @@ def panel_a():
     img, lab = render(geoms, labels3d, azim=-115, elev=40, zoom=0.80)
     nudge = {"displaying_section_003": (-300, 6),
              "tv_section_005": (70, 14),
-             "hardware_section_004": (30, -30),
-             "phantom:keyboard": (40, -62)}
+             "hardware_section_004": (30, -30)}
     lab = [(x + nudge.get(t, (0, 0))[0], y + nudge.get(t, (0, 0))[1], t)
            for x, y, t in lab]
     return img, used, lab
@@ -234,9 +235,6 @@ def panel_b():
     img, lab = render(geoms, labels3d, azim=-35, elev=50, zoom=0.80,
                       size=(2400, 2000),
                       floor_idx=frozenset(range(len(places))))
-    nudge = {"control_console_area_003": (-300, 64)}
-    lab = [(x + nudge.get(t, (0, 0))[0], y + nudge.get(t, (0, 0))[1], t)
-           for x, y, t in lab]
     return img, used, lab
 
 
@@ -256,24 +254,30 @@ def draw_panel(ax, img, labels, used, title):
         if not (0 <= x <= img.shape[1] and 0 <= y <= img.shape[0]):
             continue
         if txt.startswith("phantom:"):
-            x, y = declash(x, y)
-            ax.annotate(f"$\\times$ {txt[8:]}", (x, y), ha="center",
-                        va="center", fontsize=11.5, style="italic",
-                        fontweight="bold", color="#c53030",
-                        bbox=dict(boxstyle="round,pad=0.18", fc="white",
-                                  ec="#c53030", lw=0.8, alpha=0.9))
+            ax.annotate("$\\times$", (x, y), ha="center", va="center",
+                        fontsize=18, fontweight="bold", color="#c53030")
             continue
         ax.annotate(txt, (x, y), ha="center", fontsize=12.5,
                     style="italic", color="#333333",
                     bbox=dict(boxstyle="round,pad=0.18", fc="white",
                               ec="#999999", lw=0.5, alpha=0.85))
-    handles = [Patch(fc=c, label=t) for t, c in sorted(used.items())]
-    handles += [Patch(fc=CLUTTER, label="clutter (verified)"),
-                Patch(fc=UNVERIFIED, label="unverified (gated)")]
-    ax.legend(handles=handles, loc="lower left",
+    xmark = Line2D([], [], marker="x", color="#c53030", ls="",
+                   markersize=9, markeredgewidth=2.4)
+    handles, labels_txt = [], []
+    for t, c in sorted(used.items()):
+        if "(phantom)" in t:
+            handles.append((Patch(fc=c), xmark))
+            labels_txt.append(t)
+        else:
+            handles.append(Patch(fc=c))
+            labels_txt.append(t)
+    handles += [Patch(fc=CLUTTER), Patch(fc=UNVERIFIED)]
+    labels_txt += ["clutter (verified)", "unverified (gated)"]
+    ax.legend(handles, labels_txt, loc="lower left",
               bbox_to_anchor=(0.0, 1.005), ncol=3, fontsize=12.5,
-              frameon=False, borderaxespad=0, handlelength=1.1,
-              columnspacing=0.8, handletextpad=0.5)
+              frameon=False, borderaxespad=0, handlelength=1.4,
+              columnspacing=0.8, handletextpad=0.5,
+              handler_map={tuple: HandlerTuple(ndivide=None)})
 
 
 def main():
