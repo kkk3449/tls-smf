@@ -1,0 +1,1407 @@
+{
+ "objects": [
+  {
+   "id": "0",
+   "name": "clutter_000",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "merged row of equipment/desks along wall",
+   "poseX": -1.5107,
+   "poseY": 4.6145,
+   "dimensions": {
+    "length": 6.255,
+    "width": 2.044,
+    "height": 3.324
+   },
+   "properties": {
+    "poseZ": 0.4305
+   }
+  },
+  {
+   "id": "1",
+   "name": "clutter_001",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "merged floor row",
+   "poseX": 2.6855,
+   "poseY": 3.7555,
+   "dimensions": {
+    "length": 6.692,
+    "width": 1.337,
+    "height": 1.955
+   },
+   "properties": {
+    "poseZ": -0.314
+   }
+  },
+  {
+   "id": "2",
+   "name": "fire_extinguisher_002",
+   "gt_type": "fire extinguisher",
+   "gt_quality": "plausible",
+   "gt_note": "slender vertical, wall-mounted ~1m",
+   "poseX": 3.2899,
+   "poseY": 4.425,
+   "dimensions": {
+    "length": 0.299,
+    "width": 0.283,
+    "height": 0.843
+   },
+   "properties": {
+    "poseZ": 0.4034
+   }
+  },
+  {
+   "id": "3",
+   "name": "clutter_003",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "large floor-standing mass, candidates machine/rack",
+   "poseX": 4.8956,
+   "poseY": 0.632,
+   "dimensions": {
+    "length": 3.198,
+    "width": 1.064,
+    "height": 3.275
+   },
+   "properties": {
+    "poseZ": 0.4828
+   }
+  },
+  {
+   "id": "4",
+   "name": "clutter_004",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "small gridded panel, candidates panel/radiator",
+   "poseX": 4.3375,
+   "poseY": 0.7363,
+   "dimensions": {
+    "length": 0.315,
+    "width": 0.279,
+    "height": 0.624
+   },
+   "properties": {
+    "poseZ": 0.0323
+   }
+  },
+  {
+   "id": "5",
+   "name": "clutter_005",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "sparse fragments on shelf",
+   "poseX": -2.1447,
+   "poseY": 4.7199,
+   "dimensions": {
+    "length": 0.384,
+    "width": 0.291,
+    "height": 0.311
+   },
+   "properties": {
+    "poseZ": 0.745
+   }
+  },
+  {
+   "id": "6",
+   "name": "robotic_arm_006",
+   "gt_type": "steel beam",
+   "gt_quality": "plausible",
+   "gt_note": "overhead gantry/beam structure",
+   "poseX": -4.1762,
+   "poseY": -3.6714,
+   "dimensions": {
+    "length": 8.984,
+    "width": 5.305,
+    "height": 3.614
+   },
+   "properties": {
+    "poseZ": 0.7056
+   }
+  },
+  {
+   "id": "7",
+   "name": "wall_007",
+   "gt_type": "wall",
+   "gt_quality": "confirmed",
+   "gt_note": "wall segment with window openings",
+   "poseX": -7.1697,
+   "poseY": -0.3729,
+   "dimensions": {
+    "length": 3.937,
+    "width": 1.164,
+    "height": 3.645
+   },
+   "properties": {
+    "poseZ": 0.6921
+   }
+  },
+  {
+   "id": "8",
+   "name": "clutter_008",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -7.9693,
+   "poseY": 0.2845,
+   "dimensions": {
+    "length": 0.81,
+    "width": 0.603,
+    "height": 0.453
+   },
+   "properties": {
+    "poseZ": 0.471
+   }
+  },
+  {
+   "id": "9",
+   "name": "clutter_009",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "merged pile",
+   "poseX": -7.101,
+   "poseY": -2.7629,
+   "dimensions": {
+    "length": 3.876,
+    "width": 2.345,
+    "height": 1.779
+   },
+   "properties": {
+    "poseZ": -0.233
+   }
+  },
+  {
+   "id": "10",
+   "name": "clutter_010",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor pile",
+   "poseX": -4.3435,
+   "poseY": 2.3024,
+   "dimensions": {
+    "length": 1.622,
+    "width": 1.249,
+    "height": 0.509
+   },
+   "properties": {
+    "poseZ": -0.8981
+   }
+  },
+  {
+   "id": "11",
+   "name": "chair_011",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "poseX": 2.4188,
+   "poseY": -1.047,
+   "dimensions": {
+    "length": 1.089,
+    "width": 0.821,
+    "height": 0.838
+   },
+   "properties": {
+    "poseZ": -0.5429
+   }
+  },
+  {
+   "id": "12",
+   "name": "chair_012",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "gt_note": "office chair, clear silhouette",
+   "poseX": -7.72,
+   "poseY": -2.6261,
+   "dimensions": {
+    "length": 0.68,
+    "width": 0.613,
+    "height": 0.798
+   },
+   "properties": {
+    "poseZ": -0.5407
+   }
+  },
+  {
+   "id": "13",
+   "name": "door_013",
+   "gt_type": "door",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: part of a door (test-room entrance)",
+   "poseX": -0.8366,
+   "poseY": -5.0791,
+   "dimensions": {
+    "length": 1.126,
+    "width": 0.22,
+    "height": 1.471
+   },
+   "properties": {
+    "poseZ": -0.3234
+   }
+  },
+  {
+   "id": "14",
+   "name": "clutter_014",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "flat floor debris",
+   "poseX": -5.4655,
+   "poseY": 1.3495,
+   "dimensions": {
+    "length": 0.953,
+    "width": 0.545,
+    "height": 0.146
+   },
+   "properties": {
+    "poseZ": -0.8703
+   }
+  },
+  {
+   "id": "15",
+   "name": "clutter_015",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -8.38,
+   "poseY": -4.3335,
+   "dimensions": {
+    "length": 1.532,
+    "width": 0.816,
+    "height": 1.069
+   },
+   "properties": {
+    "poseZ": -0.339
+   }
+  },
+  {
+   "id": "16",
+   "name": "clutter_016",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 3.6729,
+   "poseY": -0.002,
+   "dimensions": {
+    "length": 1.757,
+    "width": 0.668,
+    "height": 0.523
+   },
+   "properties": {
+    "poseZ": -0.7022
+   }
+  },
+  {
+   "id": "17",
+   "name": "chair_017",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "gt_note": "office chair",
+   "poseX": -3.785,
+   "poseY": -6.1762,
+   "dimensions": {
+    "length": 0.586,
+    "width": 0.619,
+    "height": 0.617
+   },
+   "properties": {
+    "poseZ": -0.4522
+   }
+  },
+  {
+   "id": "18",
+   "name": "clutter_018",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "gt_note": "small stand-like object (lamp/stand?)",
+   "poseX": 4.2335,
+   "poseY": 3.0757,
+   "dimensions": {
+    "length": 0.512,
+    "width": 0.499,
+    "height": 0.55
+   },
+   "properties": {
+    "poseZ": -0.8564
+   }
+  },
+  {
+   "id": "19",
+   "name": "stair_019",
+   "gt_type": "ceiling remnant",
+   "gt_quality": "confirmed",
+   "structure_artifact": true,
+   "gt_note": "sloped strip on ceiling line z~2.4",
+   "poseX": -3.3724,
+   "poseY": -7.6881,
+   "dimensions": {
+    "length": 0.83,
+    "width": 0.366,
+    "height": 0.146
+   },
+   "properties": {
+    "poseZ": 2.4056
+   }
+  },
+  {
+   "id": "20",
+   "name": "clutter_020",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 2.9975,
+   "poseY": -1.063,
+   "dimensions": {
+    "length": 0.689,
+    "width": 0.381,
+    "height": 0.431
+   },
+   "properties": {
+    "poseZ": -0.748
+   }
+  },
+  {
+   "id": "21",
+   "name": "clutter_021",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "small rack of items",
+   "poseX": -8.9162,
+   "poseY": -4.9598,
+   "dimensions": {
+    "length": 0.494,
+    "width": 0.222,
+    "height": 0.323
+   },
+   "properties": {
+    "poseZ": -0.567
+   }
+  },
+  {
+   "id": "23",
+   "name": "clutter_023",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -9.4495,
+   "poseY": -4.5065,
+   "dimensions": {
+    "length": 0.442,
+    "width": 0.351,
+    "height": 0.247
+   },
+   "properties": {
+    "poseZ": -0.611
+   }
+  },
+  {
+   "id": "24",
+   "name": "clutter_024",
+   "gt_type": "pipe",
+   "gt_quality": "plausible",
+   "gt_note": "vertical cylinder w/ branches, bottom 1.2m AGL",
+   "poseX": -1.845,
+   "poseY": -6.7465,
+   "dimensions": {
+    "length": 0.498,
+    "width": 0.368,
+    "height": 1.132
+   },
+   "properties": {
+    "poseZ": 0.801
+   }
+  },
+  {
+   "id": "25",
+   "name": "clutter_025",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "sparse fragments",
+   "poseX": -9.1765,
+   "poseY": -4.3733,
+   "dimensions": {
+    "length": 0.293,
+    "width": 0.239,
+    "height": 0.364
+   },
+   "properties": {
+    "poseZ": -1.2356
+   }
+  },
+  {
+   "id": "26",
+   "name": "clutter_026",
+   "gt_type": "above-ceiling content",
+   "gt_quality": "confirmed",
+   "structure_artifact": true,
+   "gt_note": "dark mass above ceiling plane (through-opening)",
+   "poseX": 0.9947,
+   "poseY": 2.7367,
+   "dimensions": {
+    "length": 0.937,
+    "width": 0.635,
+    "height": 0.579
+   },
+   "properties": {
+    "poseZ": 2.5483
+   }
+  },
+  {
+   "id": "27",
+   "name": "motor_027",
+   "gt_type": "mobile manipulator",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: mobile manipulator (wheels occluded; 'robot arm'/'robot' also acceptable)",
+   "poseX": 0.588,
+   "poseY": 0.783,
+   "dimensions": {
+    "length": 1.732,
+    "width": 1.242,
+    "height": 1.556
+   },
+   "properties": {
+    "poseZ": -0.1809
+   }
+  },
+  {
+   "id": "28",
+   "name": "chair_028",
+   "gt_type": "chair",
+   "gt_quality": "plausible",
+   "gt_note": "chair merged with neighbors",
+   "poseX": 2.1235,
+   "poseY": 0.9215,
+   "dimensions": {
+    "length": 1.111,
+    "width": 0.917,
+    "height": 0.837
+   },
+   "properties": {
+    "poseZ": -0.5431
+   }
+  },
+  {
+   "id": "29",
+   "name": "clutter_029",
+   "gt_type": "above-ceiling content",
+   "gt_quality": "confirmed",
+   "structure_artifact": true,
+   "gt_note": "fragments above ceiling plane z2.5-3.7",
+   "poseX": -1.5933,
+   "poseY": 0.443,
+   "dimensions": {
+    "length": 1.6,
+    "width": 0.896,
+    "height": 1.513
+   },
+   "properties": {
+    "poseZ": 2.9872
+   }
+  },
+  {
+   "id": "30",
+   "name": "motor_030",
+   "gt_type": "mobile manipulator",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: mobile manipulator (wheels occluded; 'robot arm'/'robot' also acceptable)",
+   "poseX": -4.3317,
+   "poseY": 0.3035,
+   "dimensions": {
+    "length": 1.567,
+    "width": 1.328,
+    "height": 1.463
+   },
+   "properties": {
+    "poseZ": -0.3147
+   }
+  },
+  {
+   "id": "31",
+   "name": "shelving_unit_031",
+   "gt_type": "shelf",
+   "gt_quality": "plausible",
+   "gt_note": "long wall-mounted shelf/cabinet row",
+   "poseX": -12.792,
+   "poseY": 4.8427,
+   "dimensions": {
+    "length": 4.57,
+    "width": 0.597,
+    "height": 2.053
+   },
+   "properties": {
+    "poseZ": 1.506
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "32",
+   "name": "clutter_032",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "fragments on shelf",
+   "poseX": -12.1779,
+   "poseY": 4.6278,
+   "dimensions": {
+    "length": 0.858,
+    "width": 0.413,
+    "height": 0.528
+   },
+   "properties": {
+    "poseZ": 1.1817
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "33",
+   "name": "mat_033",
+   "gt_type": "ceiling remnant",
+   "gt_quality": "confirmed",
+   "structure_artifact": true,
+   "gt_note": "horizontal 1cm patch ON ceiling plane z=2.5",
+   "poseX": -12.9462,
+   "poseY": 4.168,
+   "dimensions": {
+    "length": 0.656,
+    "width": 0.53,
+    "height": 0.014
+   },
+   "properties": {
+    "poseZ": 2.5255
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "34",
+   "name": "ladder_034",
+   "gt_type": "panel",
+   "gt_quality": "plausible",
+   "gt_note": "flat green board leaning",
+   "poseX": -13.2663,
+   "poseY": 3.5915,
+   "dimensions": {
+    "length": 1.213,
+    "width": 0.295,
+    "height": 0.637
+   },
+   "properties": {
+    "poseZ": 0.841
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "35",
+   "name": "clutter_035",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "vertical rods + panel, 1.45m AGL",
+   "poseX": -10.722,
+   "poseY": 5.8047,
+   "dimensions": {
+    "length": 0.468,
+    "width": 0.599,
+    "height": 0.761
+   },
+   "properties": {
+    "poseZ": 0.8337
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "36",
+   "name": "ramp_036",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "banded rectangle just below ceiling (screen/vent?)",
+   "poseX": -15.4507,
+   "poseY": 2.2285,
+   "dimensions": {
+    "length": 1.208,
+    "width": 0.018,
+    "height": 0.496
+   },
+   "properties": {
+    "poseZ": 2.2674
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "37",
+   "name": "shelf_037",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "wedge under ceiling",
+   "poseX": -16.545,
+   "poseY": 1.0595,
+   "dimensions": {
+    "length": 1.595,
+    "width": 0.336,
+    "height": 0.514
+   },
+   "properties": {
+    "poseZ": 2.2745
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "38",
+   "name": "door_038",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "wall-mounted sloped panel 1.4-2.0m",
+   "poseX": -15.3685,
+   "poseY": 2.2322,
+   "dimensions": {
+    "length": 1.256,
+    "width": 0.344,
+    "height": 1.021
+   },
+   "properties": {
+    "poseZ": 1.5187
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "39",
+   "name": "clutter_039",
+   "gt_type": "box",
+   "gt_quality": "plausible",
+   "gt_note": "stacked green boxes/bins",
+   "poseX": -14.6407,
+   "poseY": 2.2115,
+   "dimensions": {
+    "length": 0.793,
+    "width": 0.356,
+    "height": 0.819
+   },
+   "properties": {
+    "poseZ": 0.942
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "40",
+   "name": "shelf_040",
+   "gt_type": "out of room",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: outside the test room — out of modeling scope",
+   "poseX": -16.462,
+   "poseY": 1.1805,
+   "dimensions": {
+    "length": 1.223,
+    "width": 0.216,
+    "height": 0.789
+   },
+   "properties": {
+    "poseZ": 1.668
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "41",
+   "name": "clutter_041",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "gt_note": "sparse diagonal patch",
+   "poseX": -16.34,
+   "poseY": 0.8435,
+   "dimensions": {
+    "length": 0.53,
+    "width": 0.224,
+    "height": 0.327
+   },
+   "properties": {
+    "poseZ": 0.818
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "42",
+   "name": "clutter_042",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -16.602,
+   "poseY": 1.0203,
+   "dimensions": {
+    "length": 0.574,
+    "width": 0.215,
+    "height": 0.199
+   },
+   "properties": {
+    "poseZ": 1.002
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "43",
+   "name": "clutter_043",
+   "gt_type": "ceiling remnant",
+   "gt_quality": "confirmed",
+   "structure_artifact": true,
+   "gt_note": "horizontal 3cm patch ON ceiling plane z=2.5",
+   "poseX": -14.5912,
+   "poseY": 0.8805,
+   "dimensions": {
+    "length": 1.031,
+    "width": 0.755,
+    "height": 0.031
+   },
+   "properties": {
+    "poseZ": 2.502
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "44",
+   "name": "clutter_044",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "gt_note": "vertical fragments column",
+   "poseX": -16.7965,
+   "poseY": 0.0245,
+   "dimensions": {
+    "length": 1.046,
+    "width": 0.435,
+    "height": 1.321
+   },
+   "properties": {
+    "poseZ": 1.162
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "45",
+   "name": "stair_045",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "sloped band on large white structure",
+   "poseX": -18.513,
+   "poseY": -0.8398,
+   "dimensions": {
+    "length": 2.63,
+    "width": 0.214,
+    "height": 0.712
+   },
+   "properties": {
+    "poseZ": 1.6805
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "46",
+   "name": "clutter_046",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "dotted patch at ceiling line (remnant suspect)",
+   "poseX": -18.0085,
+   "poseY": -0.3718,
+   "dimensions": {
+    "length": 0.696,
+    "width": 0.202,
+    "height": 0.325
+   },
+   "properties": {
+    "poseZ": 2.371
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "47",
+   "name": "clutter_047",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "folded plane pieces ~2m",
+   "poseX": 11.7645,
+   "poseY": -4.653,
+   "dimensions": {
+    "length": 1.051,
+    "width": 0.787,
+    "height": 1.064
+   },
+   "properties": {
+    "poseZ": 1.5175
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "48",
+   "name": "clutter_048",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "mass extending below main floor (pit/lower level)",
+   "poseX": -4.5801,
+   "poseY": -4.9992,
+   "dimensions": {
+    "length": 1.604,
+    "width": 1.147,
+    "height": 1.982
+   },
+   "properties": {
+    "poseZ": -1.0455
+   }
+  },
+  {
+   "id": "49",
+   "name": "steel_beam_049",
+   "gt_type": "roof/ceiling remnant",
+   "gt_quality": "confirmed",
+   "structure_artifact": true,
+   "gt_note": "8m sloped roof plane + ceiling band",
+   "poseX": -7.4715,
+   "poseY": -5.277,
+   "dimensions": {
+    "length": 8.154,
+    "width": 2.737,
+    "height": 2.14
+   },
+   "properties": {
+    "poseZ": 1.4565
+   }
+  },
+  {
+   "id": "50",
+   "name": "refrigerator_050",
+   "gt_type": "banner",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: exhibition banner (LF refrigerator was wrong; correctly gated unverified)",
+   "poseX": -10.0595,
+   "poseY": -3.6105,
+   "dimensions": {
+    "length": 1.096,
+    "width": 1.217,
+    "height": 1.808
+   },
+   "properties": {
+    "poseZ": -0.0303
+   }
+  },
+  {
+   "id": "51",
+   "name": "clutter_051",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "solid wedge at floor (ramp/tarp?)",
+   "poseX": -9.385,
+   "poseY": -2.1532,
+   "dimensions": {
+    "length": 1.762,
+    "width": 0.668,
+    "height": 1.423
+   },
+   "properties": {
+    "poseZ": -0.1109
+   }
+  },
+  {
+   "id": "52",
+   "name": "clutter_052",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "scattered small items",
+   "poseX": -8.927,
+   "poseY": -2.1358,
+   "dimensions": {
+    "length": 0.362,
+    "width": 0.258,
+    "height": 0.325
+   },
+   "properties": {
+    "poseZ": -0.6564
+   }
+  },
+  {
+   "id": "53",
+   "name": "clutter_053",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "small table with items",
+   "poseX": -6.393,
+   "poseY": -5.3777,
+   "dimensions": {
+    "length": 0.691,
+    "width": 0.658,
+    "height": 0.825
+   },
+   "properties": {
+    "poseZ": -0.6461
+   }
+  },
+  {
+   "id": "54",
+   "name": "handrail_054",
+   "gt_type": "handrail",
+   "gt_quality": "confirmed",
+   "gt_note": "sloped thin rail",
+   "poseX": 0.3871,
+   "poseY": -3.905,
+   "dimensions": {
+    "length": 2.336,
+    "width": 0.096,
+    "height": 0.575
+   },
+   "properties": {
+    "poseZ": 0.5128
+   }
+  },
+  {
+   "id": "55",
+   "name": "chair_055",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "fragments on top of partition (LF chair esc = suspect phantom)",
+   "poseX": 0.0508,
+   "poseY": -4.3923,
+   "dimensions": {
+    "length": 1.287,
+    "width": 0.35,
+    "height": 0.544
+   },
+   "properties": {
+    "poseZ": 1.6106
+   }
+  },
+  {
+   "id": "56",
+   "name": "chair_056",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "fragments on top of partition (LF chair esc = suspect phantom)",
+   "poseX": 0.7762,
+   "poseY": -3.6327,
+   "dimensions": {
+    "length": 0.813,
+    "width": 0.347,
+    "height": 0.465
+   },
+   "properties": {
+    "poseZ": 1.6311
+   }
+  },
+  {
+   "id": "58",
+   "name": "shelf_058",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "large sloped grid/mesh structure (safety net?)",
+   "poseX": 1.196,
+   "poseY": -9.998,
+   "dimensions": {
+    "length": 8.212,
+    "width": 0.589,
+    "height": 1.676
+   },
+   "properties": {
+    "poseZ": 1.0965
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "59",
+   "name": "stair_059",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "vertical grid patch under ceiling (mesh family)",
+   "poseX": 7.9025,
+   "poseY": -16.6985,
+   "dimensions": {
+    "length": 1.253,
+    "width": 0.193,
+    "height": 0.75
+   },
+   "properties": {
+    "poseZ": 1.5654
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "64",
+   "name": "clutter_064",
+   "gt_type": "table",
+   "gt_quality": "plausible",
+   "gt_note": "table top with legs | owner: outside the room",
+   "poseX": -6.1363,
+   "poseY": -8.8562,
+   "dimensions": {
+    "length": 1.676,
+    "width": 1.059,
+    "height": 1.489
+   },
+   "properties": {
+    "poseZ": 0.0152
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "65",
+   "name": "chair_065",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "poseX": -6.868,
+   "poseY": -9.9747,
+   "dimensions": {
+    "length": 1.141,
+    "width": 0.56,
+    "height": 0.421
+   },
+   "properties": {
+    "poseZ": 0.6488
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "66",
+   "name": "clutter_066",
+   "gt_type": "poster stand",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: poster stand",
+   "poseX": -5.161,
+   "poseY": -8.8015,
+   "dimensions": {
+    "length": 0.304,
+    "width": 0.295,
+    "height": 0.647
+   },
+   "properties": {
+    "poseZ": 0.0419
+   }
+  },
+  {
+   "id": "67",
+   "name": "clutter_067",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -6.6925,
+   "poseY": -9.369,
+   "dimensions": {
+    "length": 0.648,
+    "width": 0.297,
+    "height": 0.329
+   },
+   "properties": {
+    "poseZ": 0.489
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "68",
+   "name": "clutter_068",
+   "gt_type": "robot",
+   "gt_quality": "confirmed",
+   "poseX": -5.9525,
+   "poseY": -7.8965,
+   "dimensions": {
+    "length": 0.689,
+    "width": 0.484,
+    "height": 0.237
+   },
+   "properties": {
+    "poseZ": -0.9368
+   },
+   "gt_note": "owner: red robot, partially disassembled"
+  },
+  {
+   "id": "69",
+   "name": "clutter_069",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "gt_note": "pile with machine parts",
+   "poseX": 0.7685,
+   "poseY": -1.0482,
+   "dimensions": {
+    "length": 1.816,
+    "width": 0.912,
+    "height": 1.18
+   },
+   "properties": {
+    "poseZ": -0.3665
+   }
+  },
+  {
+   "id": "70",
+   "name": "clutter_070",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "crate with contents",
+   "poseX": 0.404,
+   "poseY": -2.2225,
+   "dimensions": {
+    "length": 1.21,
+    "width": 0.975,
+    "height": 0.532
+   },
+   "properties": {
+    "poseZ": -0.6925
+   }
+  },
+  {
+   "id": "71",
+   "name": "clutter_071",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "poseX": 1.373,
+   "poseY": -1.7395,
+   "dimensions": {
+    "length": 1.1,
+    "width": 0.911,
+    "height": 0.887
+   },
+   "properties": {
+    "poseZ": -0.5168
+   }
+  },
+  {
+   "id": "72",
+   "name": "clutter_072",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 1.429,
+   "poseY": -2.416,
+   "dimensions": {
+    "length": 1.415,
+    "width": 0.547,
+    "height": 0.354
+   },
+   "properties": {
+    "poseZ": -0.7845
+   }
+  },
+  {
+   "id": "73",
+   "name": "clutter_073",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 0.6916,
+   "poseY": -3.1884,
+   "dimensions": {
+    "length": 0.631,
+    "width": 0.541,
+    "height": 0.389
+   },
+   "properties": {
+    "poseZ": -0.907
+   }
+  },
+  {
+   "id": "74",
+   "name": "clutter_074",
+   "gt_type": "clutter",
+   "gt_quality": "plausible",
+   "gt_note": "narrow vertical fragment strip",
+   "poseX": 0.9416,
+   "poseY": -0.384,
+   "dimensions": {
+    "length": 0.415,
+    "width": 0.127,
+    "height": 0.557
+   },
+   "properties": {
+    "poseZ": -0.6318
+   }
+  },
+  {
+   "id": "75",
+   "name": "keyboard_075",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "owner: NOT a keyboard (keyboards are on desks, not floor) — LF keyboard verified_escalated 0.70 = owner-refuted phantom",
+   "poseX": -0.2221,
+   "poseY": -1.88,
+   "dimensions": {
+    "length": 0.535,
+    "width": 0.222,
+    "height": 0.065
+   },
+   "properties": {
+    "poseZ": -0.922
+   }
+  },
+  {
+   "id": "76",
+   "name": "display_076",
+   "gt_type": "tv",
+   "gt_quality": "confirmed",
+   "gt_note": "owner rule: single large panel = TV, multiple small = monitors; this is single large 1.7x1.1",
+   "poseX": -8.1353,
+   "poseY": -11.0855,
+   "dimensions": {
+    "length": 1.685,
+    "width": 0.171,
+    "height": 1.088
+   },
+   "properties": {
+    "poseZ": 1.2422
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "77",
+   "name": "ramp_077",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "dotted band hanging under ceiling (mesh/cables)",
+   "poseX": 5.75,
+   "poseY": -15.3613,
+   "dimensions": {
+    "length": 3.312,
+    "width": 0.148,
+    "height": 0.652
+   },
+   "properties": {
+    "poseZ": 1.6125
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "78",
+   "name": "clutter_078",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -5.9065,
+   "poseY": -6.203,
+   "dimensions": {
+    "length": 0.785,
+    "width": 0.733,
+    "height": 0.859
+   },
+   "properties": {
+    "poseZ": -0.659
+   }
+  },
+  {
+   "id": "79",
+   "name": "chair_079",
+   "gt_type": "chair",
+   "gt_quality": "plausible",
+   "gt_note": "chair-like, oversized bbox (merged?)",
+   "poseX": -7.5143,
+   "poseY": -5.991,
+   "dimensions": {
+    "length": 1.53,
+    "width": 1.077,
+    "height": 1.049
+   },
+   "properties": {
+    "poseZ": -0.5877
+   }
+  },
+  {
+   "id": "80",
+   "name": "plant_080",
+   "gt_type": "plant",
+   "gt_quality": "plausible",
+   "gt_note": "flat green turf mat",
+   "poseX": -0.2435,
+   "poseY": -3.7331,
+   "dimensions": {
+    "length": 1.087,
+    "width": 0.697,
+    "height": 0.152
+   },
+   "properties": {
+    "poseZ": -0.8815
+   }
+  },
+  {
+   "id": "81",
+   "name": "clutter_081",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 0.6185,
+   "poseY": 3.219,
+   "dimensions": {
+    "length": 1.18,
+    "width": 1.112,
+    "height": 0.802
+   },
+   "properties": {
+    "poseZ": -0.5552
+   }
+  },
+  {
+   "id": "82",
+   "name": "trash_can_082",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "floating dotted column 1.4-2.5m (chain/ghost?)",
+   "poseX": -22.0055,
+   "poseY": -6.959,
+   "dimensions": {
+    "length": 0.253,
+    "width": 0.205,
+    "height": 1.067
+   },
+   "properties": {
+    "poseZ": 1.99
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "83",
+   "name": "door_handle_083",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "hanging dotted strip 1.2-2.5m (chain/ghost); LF door_handle unanimous = suspect phantom",
+   "poseX": -21.533,
+   "poseY": -7.502,
+   "dimensions": {
+    "length": 0.262,
+    "width": 0.032,
+    "height": 1.329
+   },
+   "properties": {
+    "poseZ": 1.857
+   },
+   "out_of_scope": true
+  },
+  {
+   "id": "85",
+   "name": "clutter_085",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -8.3277,
+   "poseY": -5.2065,
+   "dimensions": {
+    "length": 0.58,
+    "width": 0.383,
+    "height": 0.237
+   },
+   "properties": {
+    "poseZ": -0.8206
+   }
+  },
+  {
+   "id": "86",
+   "name": "clutter_086",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "column below main floor level",
+   "poseX": -9.67,
+   "poseY": -2.5315,
+   "dimensions": {
+    "length": 0.718,
+    "width": 0.783,
+    "height": 1.185
+   },
+   "properties": {
+    "poseZ": -1.422
+   }
+  },
+  {
+   "id": "88",
+   "name": "clutter_088",
+   "gt_type": "unknown",
+   "gt_quality": "unknown",
+   "gt_note": "small vertical stick fragment ~1.5m",
+   "poseX": 2.2629,
+   "poseY": 5.322,
+   "dimensions": {
+    "length": 0.163,
+    "width": 0.141,
+    "height": 0.597
+   },
+   "properties": {
+    "poseZ": 1.5475
+   }
+  }
+ ],
+ "relations": [],
+ "notes": [
+  "2026-07-21 render audit (assistant-read, owner unconfirmed): unknowns stay unknown per user instruction; no key-object flags.",
+  "artifacts: 19,26,29,33,43,49 = ceiling/roof remnants or above-ceiling through-opening content (Stage-A filter only catches vertical soffits; horizontal/sloped patches remain)",
+  "2026-07-21 owner answers: 27/30 mobile manipulator, 50 banner, 75 not-keyboard (phantom refuted), 76 tv; 13/40 pending location check",
+  "2026-07-21 owner: id13=door part, id40=outside test room; semantic model to be scoped to the test room behind that door",
+  "2026-07-21 room scope: semantic model restricted to the test room behind door id13 (floor-connectivity flood from id27); 25 objects outside scope (corridor/adjacent areas)",
+  "2026-07-21 owner: 66=poster stand, 68=red robot (disassembling), 64=outside room; out-of-room objects excluded from evaluation"
+ ]
+}

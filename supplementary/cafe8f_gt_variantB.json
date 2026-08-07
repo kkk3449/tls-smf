@@ -1,0 +1,490 @@
+{
+ "objects": [
+  {
+   "id": "0",
+   "name": "barrel_000",
+   "gt_type": "banner",
+   "gt_quality": "confirmed",
+   "gt_note": "홍보판넬(광고물) — owner",
+   "poseX": 4.8357,
+   "poseY": 1.3509,
+   "dimensions": {
+    "length": 0.989,
+    "width": 0.238,
+    "height": 1.516
+   },
+   "properties": {
+    "poseZ": 1.2667
+   }
+  },
+  {
+   "id": "1",
+   "name": "machine_001",
+   "gt_type": "machine",
+   "gt_quality": "plausible",
+   "gt_note": "merged row: trash bin+water purifier+vending machines+box+planter; dominant vending machines — 'machine' per showroom precedent (industrial robot graded machine)",
+   "poseX": 4.3197,
+   "poseY": 1.2182,
+   "dimensions": {
+    "length": 4.352,
+    "width": 1.734,
+    "height": 3.001
+   },
+   "properties": {
+    "poseZ": 0.2158
+   }
+  },
+  {
+   "id": "2",
+   "name": "clutter_002",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor noise — owner",
+   "poseX": 3.2227,
+   "poseY": -0.4798,
+   "dimensions": {
+    "length": 0.46,
+    "width": 0.298,
+    "height": 0.045
+   },
+   "properties": {
+    "poseZ": -0.9711
+   }
+  },
+  {
+   "id": "3",
+   "name": "ducting_003",
+   "gt_type": "sofa",
+   "gt_quality": "plausible",
+   "gt_note": "merged: sofa+table+planter row, sofa dominant — owner",
+   "poseX": 1.4429,
+   "poseY": 2.6015,
+   "dimensions": {
+    "length": 4.976,
+    "width": 1.812,
+    "height": 1.448
+   },
+   "properties": {
+    "poseZ": -0.3092
+   }
+  },
+  {
+   "id": "4",
+   "name": "electrical cabinet_004",
+   "gt_type": "planter",
+   "gt_quality": "confirmed",
+   "gt_note": "planter partition upper part — owner",
+   "poseX": -1.9227,
+   "poseY": 2.8073,
+   "dimensions": {
+    "length": 1.493,
+    "width": 0.907,
+    "height": 0.887
+   },
+   "properties": {
+    "poseZ": 0.005
+   }
+  },
+  {
+   "id": "5",
+   "name": "clutter_005",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor noise — owner",
+   "poseX": -0.9098,
+   "poseY": 3.3674,
+   "dimensions": {
+    "length": 0.543,
+    "width": 0.437,
+    "height": 0.397
+   },
+   "properties": {
+    "poseZ": -0.9825
+   }
+  },
+  {
+   "id": "6",
+   "name": "clutter_006",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor noise — owner",
+   "poseX": 2.4357,
+   "poseY": 1.9964,
+   "dimensions": {
+    "length": 0.912,
+    "width": 0.606,
+    "height": 0.14
+   },
+   "properties": {
+    "poseZ": -1.0215
+   }
+  },
+  {
+   "id": "7",
+   "name": "ladder_007",
+   "gt_type": "sofa",
+   "gt_quality": "plausible",
+   "gt_note": "merged: sofa+table part — owner",
+   "poseX": -3.7961,
+   "poseY": 2.7279,
+   "dimensions": {
+    "length": 1.535,
+    "width": 0.981,
+    "height": 0.771
+   },
+   "properties": {
+    "poseZ": -0.572
+   }
+  },
+  {
+   "id": "8",
+   "name": "ladder_008",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor noise — owner",
+   "poseX": 2.079,
+   "poseY": 3.4034,
+   "dimensions": {
+    "length": 0.608,
+    "width": 0.457,
+    "height": 0.275
+   },
+   "properties": {
+    "poseZ": -1.0922
+   }
+  },
+  {
+   "id": "9",
+   "name": "clutter_009",
+   "gt_type": "sofa",
+   "gt_quality": "unknown",
+   "gt_note": "sofa lower part — owner",
+   "poseX": -1.2215,
+   "poseY": 2.2442,
+   "dimensions": {
+    "length": 0.51,
+    "width": 0.399,
+    "height": 0.344
+   },
+   "properties": {
+    "poseZ": -0.7943
+   }
+  },
+  {
+   "id": "10",
+   "name": "ladder_010",
+   "gt_type": "sofa",
+   "gt_quality": "unknown",
+   "gt_note": "sofa upper part — owner",
+   "poseX": 3.8561,
+   "poseY": 2.9654,
+   "dimensions": {
+    "length": 1.175,
+    "width": 0.637,
+    "height": 0.173
+   },
+   "properties": {
+    "poseZ": -0.2827
+   }
+  },
+  {
+   "id": "11",
+   "name": "clutter_011",
+   "gt_type": "sofa",
+   "gt_quality": "unknown",
+   "gt_note": "sofa lower part — owner",
+   "poseX": -1.0042,
+   "poseY": 3.0742,
+   "dimensions": {
+    "length": 0.511,
+    "width": 0.212,
+    "height": 0.28
+   },
+   "properties": {
+    "poseZ": -0.7125
+   }
+  },
+  {
+   "id": "12",
+   "name": "clutter_012",
+   "gt_type": "sofa",
+   "gt_quality": "unknown",
+   "gt_note": "sofa upper part — owner",
+   "poseX": -4.4112,
+   "poseY": 3.334,
+   "dimensions": {
+    "length": 0.43,
+    "width": 0.174,
+    "height": 0.212
+   },
+   "properties": {
+    "poseZ": -0.2945
+   }
+  },
+  {
+   "id": "13",
+   "name": "clutter_013",
+   "gt_type": "sofa",
+   "gt_quality": "unknown",
+   "gt_note": "sofa lower part — owner (LF keyboard = phantom-style miss)",
+   "poseX": -2.7444,
+   "poseY": 3.1492,
+   "dimensions": {
+    "length": 0.424,
+    "width": 0.015,
+    "height": 0.277
+   },
+   "properties": {
+    "poseZ": -0.7105
+   }
+  },
+  {
+   "id": "14",
+   "name": "clutter_014",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor noise — owner",
+   "poseX": 1.4939,
+   "poseY": 1.9076,
+   "dimensions": {
+    "length": 0.583,
+    "width": 0.402,
+    "height": 0.095
+   },
+   "properties": {
+    "poseZ": -0.999
+   }
+  },
+  {
+   "id": "15",
+   "name": "clutter_015",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "owner: 객체없음 (no object) — LF unanimous keyboard = phantom",
+   "poseX": -2.6237,
+   "poseY": 2.2969,
+   "dimensions": {
+    "length": 0.561,
+    "width": 0.373,
+    "height": 0.249
+   },
+   "properties": {
+    "poseZ": -0.727
+   }
+  },
+  {
+   "id": "16",
+   "name": "clutter_016",
+   "gt_type": "ceiling remnant",
+   "gt_quality": "confirmed",
+   "gt_note": "ceiling noise — owner",
+   "poseX": 0.0277,
+   "poseY": -0.9015,
+   "dimensions": {
+    "length": 0.514,
+    "width": 0.585,
+    "height": 0.273
+   },
+   "properties": {
+    "poseZ": 2.2664
+   },
+   "structure_artifact": true
+  },
+  {
+   "id": "17",
+   "name": "stair_017",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "gt_note": "green office chair — owner",
+   "poseX": 0.3452,
+   "poseY": -0.1994,
+   "dimensions": {
+    "length": 0.671,
+    "width": 0.597,
+    "height": 0.699
+   },
+   "properties": {
+    "poseZ": -0.4978
+   }
+  },
+  {
+   "id": "18",
+   "name": "ladder_018",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "gt_note": "chair (+floor fragments) — owner",
+   "poseX": 0.7531,
+   "poseY": 0.9935,
+   "dimensions": {
+    "length": 1.166,
+    "width": 1.0,
+    "height": 0.744
+   },
+   "properties": {
+    "poseZ": -0.4783
+   }
+  },
+  {
+   "id": "19",
+   "name": "clutter_019",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "gt_note": "chair — owner (LF unanimous clutter = unanimous-but-wrong)",
+   "poseX": 1.6625,
+   "poseY": 0.1377,
+   "dimensions": {
+    "length": 0.744,
+    "width": 0.637,
+    "height": 0.751
+   },
+   "properties": {
+    "poseZ": -0.473
+   }
+  },
+  {
+   "id": "20",
+   "name": "clutter_020",
+   "gt_type": "table",
+   "gt_quality": "unknown",
+   "gt_note": "table pedestal column (part of table) — owner",
+   "poseX": 0.9428,
+   "poseY": 0.313,
+   "dimensions": {
+    "length": 0.647,
+    "width": 0.252,
+    "height": 0.309
+   },
+   "properties": {
+    "poseZ": -0.3644
+   }
+  },
+  {
+   "id": "21",
+   "name": "cable tray_021",
+   "gt_type": "wall remnant",
+   "gt_quality": "confirmed",
+   "gt_note": "wall pillar — owner",
+   "poseX": -6.3983,
+   "poseY": -3.9979,
+   "dimensions": {
+    "length": 0.399,
+    "width": 0.088,
+    "height": 2.828
+   },
+   "properties": {
+    "poseZ": 0.5925
+   },
+   "structure_artifact": true
+  },
+  {
+   "id": "22",
+   "name": "electrical cabinet_022",
+   "gt_type": "planter",
+   "gt_quality": "confirmed",
+   "gt_note": "planter partition — owner",
+   "poseX": -4.2036,
+   "poseY": 0.1491,
+   "dimensions": {
+    "length": 1.525,
+    "width": 0.8,
+    "height": 1.23
+   },
+   "properties": {
+    "poseZ": -0.2125
+   }
+  },
+  {
+   "id": "23",
+   "name": "clutter_023",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "merged table+chairs group — clutter per vis_n2 merged-pile practice",
+   "poseX": -2.5194,
+   "poseY": 0.0831,
+   "dimensions": {
+    "length": 2.344,
+    "width": 1.711,
+    "height": 0.987
+   },
+   "properties": {
+    "poseZ": -0.5899
+   }
+  },
+  {
+   "id": "24",
+   "name": "control panel_024",
+   "gt_type": "door",
+   "gt_quality": "plausible",
+   "gt_note": "merged: glass door + fire extinguisher; door dominant — owner",
+   "poseX": -2.0269,
+   "poseY": -3.8038,
+   "dimensions": {
+    "length": 2.371,
+    "width": 0.786,
+    "height": 3.098
+   },
+   "properties": {
+    "poseZ": 0.4835
+   }
+  },
+  {
+   "id": "25",
+   "name": "clutter_025",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "gt_note": "floor noise — owner",
+   "poseX": 0.1093,
+   "poseY": -3.4063,
+   "dimensions": {
+    "length": 1.849,
+    "width": 0.599,
+    "height": 0.146
+   },
+   "properties": {
+    "poseZ": -1.0355
+   }
+  },
+  {
+   "id": "26",
+   "name": "electrical cabinet_026",
+   "gt_type": "door",
+   "gt_quality": "confirmed",
+   "gt_note": "brown door — owner",
+   "poseX": -6.7626,
+   "poseY": -2.6833,
+   "dimensions": {
+    "length": 1.159,
+    "width": 0.16,
+    "height": 2.212
+   },
+   "properties": {
+    "poseZ": 0.321
+   }
+  },
+  {
+   "id": "27",
+   "name": "ladder_027",
+   "gt_type": "ceiling remnant",
+   "gt_quality": "confirmed",
+   "gt_note": "ceiling noise — owner",
+   "poseX": -0.3634,
+   "poseY": -1.0669,
+   "dimensions": {
+    "length": 0.673,
+    "width": 0.318,
+    "height": 0.281
+   },
+   "properties": {
+    "poseZ": 2.2711
+   },
+   "structure_artifact": true
+  }
+ ],
+ "notes": [
+  "2026-08-07 owner audit via hi-res re-associated renders (gt sheet v2 + xlsx); owner corrected assistant pilot proposals in-sheet",
+  "structure artifacts: 16,27 ceiling noise; 21 wall pillar",
+  "merges: 1 (5-family row), 3/7 (sofa-dominant), 23 (table+chairs -> clutter), 24 (glass door + fire extinguisher)",
+  "sofa fragments 9-13 graded sofa (part-of-X practice, mirrors vis_n2 door part)",
+  "2026-08-07 owner: cafe floor is carpeted — rough/low-reflectance surface leaves residual tuft patches above the RANSAC floor plane, explaining the 7 floor-noise clusters (2,5,6,8,14,15,25)"
+ ]
+}

@@ -1,0 +1,424 @@
+{
+ "date": "2026-07-28",
+ "source": "owner manual labeling (xlsx upload)",
+ "category_key": {
+  "correct": "pipeline label acceptable",
+  "absorbed": "real object, clutter label (vocab gap)",
+  "wrong_label": "real object/fixture, wrong specific label",
+  "merged": "multiple real objects in one cluster",
+  "merged_wrong_label": "merge + wrong specific label",
+  "structure_noise": "wall/ceiling/outside noise, no object"
+ },
+ "objects": [
+  {
+   "id": 0,
+   "det": "clutter_000",
+   "kg": "chair_020",
+   "pipeline_type": "clutter",
+   "status": "unverified",
+   "confidence": 0.5,
+   "owner_gt": "책상+모니터",
+   "category": "merged"
+  },
+  {
+   "id": 1,
+   "det": "staircase_001",
+   "kg": "staircase_001",
+   "pipeline_type": "staircase",
+   "status": "verified_escalated",
+   "confidence": 0.69,
+   "owner_gt": "벽 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 2,
+   "det": "chair_002",
+   "kg": "chair_033",
+   "pipeline_type": "chair",
+   "status": "unverified",
+   "confidence": 0.58,
+   "owner_gt": "의자",
+   "category": "correct"
+  },
+  {
+   "id": 3,
+   "det": "clutter_003",
+   "kg": "clutter_070",
+   "pipeline_type": "clutter",
+   "status": "unverified",
+   "confidence": 0.45,
+   "owner_gt": "모바일로봇+초록박스",
+   "category": "merged"
+  },
+  {
+   "id": 4,
+   "det": "chair_004",
+   "kg": "clutter_071",
+   "pipeline_type": "chair",
+   "status": "verified_escalated",
+   "confidence": 0.68,
+   "owner_gt": "의자",
+   "category": "correct"
+  },
+  {
+   "id": 5,
+   "det": "machine_005",
+   "kg": "industrial_robot_019",
+   "pipeline_type": "machine",
+   "status": "unverified",
+   "confidence": 0.41,
+   "owner_gt": "모바일 매니픃레이터(machine)",
+   "category": "correct"
+  },
+  {
+   "id": 6,
+   "det": "monitor_006",
+   "kg": "monitor_006",
+   "pipeline_type": "monitor",
+   "status": "unverified",
+   "confidence": 0.26,
+   "owner_gt": "모니터+벽",
+   "category": "correct"
+  },
+  {
+   "id": 7,
+   "det": "clutter_007",
+   "kg": "clutter_007",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "충전기, 잡자재",
+   "category": "correct"
+  },
+  {
+   "id": 8,
+   "det": "book_008",
+   "kg": "book_008",
+   "pipeline_type": "book",
+   "status": "verified_escalated",
+   "confidence": 0.61,
+   "owner_gt": "벽 기둥",
+   "category": "structure_noise"
+  },
+  {
+   "id": 9,
+   "det": "clutter_009",
+   "kg": "clutter_009",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "가방, 잡자재",
+   "category": "correct"
+  },
+  {
+   "id": 10,
+   "det": "clutter_010",
+   "kg": "clutter_010",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "컨베이어벨트(초록)",
+   "category": "absorbed"
+  },
+  {
+   "id": 11,
+   "det": "clutter_011",
+   "kg": "clutter_011",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "벽 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 12,
+   "det": "machine_012",
+   "kg": "machine_012",
+   "pipeline_type": "machine",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "책상 위 로봇팔+모바일로봇 일부+벽 노이즈",
+   "category": "merged"
+  },
+  {
+   "id": 13,
+   "det": "pallet_013",
+   "kg": "pallet_013",
+   "pipeline_type": "pallet",
+   "status": "unverified",
+   "confidence": 0.35,
+   "owner_gt": "천장 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 14,
+   "det": "clutter_014",
+   "kg": "clutter_014",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "모바일 로봇",
+   "category": "absorbed"
+  },
+  {
+   "id": 15,
+   "det": "clutter_015",
+   "kg": "clutter_015",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "모바일 로봇 섀시",
+   "category": "absorbed"
+  },
+  {
+   "id": 16,
+   "det": "clutter_016",
+   "kg": "clutter_016",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.65,
+   "owner_gt": "방역로봇",
+   "category": "absorbed"
+  },
+  {
+   "id": 17,
+   "det": "chair_017",
+   "kg": "chair_012",
+   "pipeline_type": "chair",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "의자",
+   "category": "correct"
+  },
+  {
+   "id": 19,
+   "det": "clutter_019",
+   "kg": "pump_009",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "모바일 매니퓰레이터",
+   "category": "absorbed"
+  },
+  {
+   "id": 20,
+   "det": "clutter_020",
+   "kg": "clutter_020",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.83,
+   "owner_gt": "천장 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 26,
+   "det": "clutter_026",
+   "kg": "clutter_026",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "에어 펌프",
+   "category": "absorbed"
+  },
+  {
+   "id": 28,
+   "det": "panel_028",
+   "kg": "panel_028",
+   "pipeline_type": "panel",
+   "status": "unverified",
+   "confidence": 0.2,
+   "owner_gt": "벽 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 29,
+   "det": "clutter_029",
+   "kg": "clutter_029",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "아마 충전기? 잘 모름",
+   "category": "correct"
+  },
+  {
+   "id": 31,
+   "det": "clutter_031",
+   "kg": "clutter_031",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "모름",
+   "category": "correct"
+  },
+  {
+   "id": 35,
+   "det": "clutter_035",
+   "kg": "clutter_035",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.74,
+   "owner_gt": "의자",
+   "category": "absorbed"
+  },
+  {
+   "id": 38,
+   "det": "clutter_038",
+   "kg": "clutter_038",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "모바일로봇",
+   "category": "absorbed"
+  },
+  {
+   "id": 39,
+   "det": "clutter_039",
+   "kg": "clutter_010",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "충전스테이션",
+   "category": "absorbed"
+  },
+  {
+   "id": 40,
+   "det": "electrical_cabinet_040",
+   "kg": "clutter_000",
+   "pipeline_type": "electrical cabinet",
+   "status": "verified_escalated",
+   "confidence": 0.91,
+   "owner_gt": "모니터10대 + 책상+ 벽",
+   "category": "merged_wrong_label"
+  },
+  {
+   "id": 41,
+   "det": "clutter_041",
+   "kg": "clutter_041",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": null,
+   "category": "no_answer"
+  },
+  {
+   "id": 42,
+   "det": "ducting_042",
+   "kg": "ducting_042",
+   "pipeline_type": "ducting",
+   "status": "verified_escalated",
+   "confidence": 0.75,
+   "owner_gt": "장식장+제어기+배터리+포스터스탠드",
+   "category": "merged_wrong_label"
+  },
+  {
+   "id": 43,
+   "det": "clutter_043",
+   "kg": "clutter_043",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.68,
+   "owner_gt": "의자+ 장식장 일부",
+   "category": "absorbed"
+  },
+  {
+   "id": 44,
+   "det": "fire_extinguisher_044",
+   "kg": "fire_extinguisher_001",
+   "pipeline_type": "fire extinguisher",
+   "status": "unverified",
+   "confidence": 0.43,
+   "owner_gt": "벽 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 45,
+   "det": "clutter_045",
+   "kg": "clutter_045",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.74,
+   "owner_gt": "장식장 다리",
+   "category": "absorbed"
+  },
+  {
+   "id": 46,
+   "det": "clutter_046",
+   "kg": "clutter_046",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.93,
+   "owner_gt": "장식장 다리",
+   "category": "absorbed"
+  },
+  {
+   "id": 47,
+   "det": "keyboard_047",
+   "kg": "keyboard_047",
+   "pipeline_type": "keyboard",
+   "status": "unverified",
+   "confidence": 0.56,
+   "owner_gt": "형광등",
+   "category": "wrong_label"
+  },
+  {
+   "id": 49,
+   "det": "clutter_049",
+   "kg": "clutter_049",
+   "pipeline_type": "clutter",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "선풍기",
+   "category": "absorbed"
+  },
+  {
+   "id": 50,
+   "det": "clutter_050",
+   "kg": "clutter_050",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.72,
+   "owner_gt": "벽 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 51,
+   "det": "fire_extinguisher_051",
+   "kg": "fire_extinguisher_051",
+   "pipeline_type": "fire extinguisher",
+   "status": "verified_escalated",
+   "confidence": 0.72,
+   "owner_gt": "포스터 스탠드",
+   "category": "wrong_label"
+  },
+  {
+   "id": 64,
+   "det": "clutter_064",
+   "kg": "clutter_064",
+   "pipeline_type": "clutter",
+   "status": "verified_escalated",
+   "confidence": 0.72,
+   "owner_gt": "문 밖 노이즈",
+   "category": "structure_noise"
+  },
+  {
+   "id": 75,
+   "det": "shelf_075",
+   "kg": "shelf_075",
+   "pipeline_type": "shelf",
+   "status": "unverified",
+   "confidence": 0.42,
+   "owner_gt": "형광등 (노이즈)",
+   "category": "wrong_label"
+  },
+  {
+   "id": 78,
+   "det": "keyboard_078",
+   "kg": "keyboard_078",
+   "pipeline_type": "keyboard",
+   "status": "verified",
+   "confidence": 1,
+   "owner_gt": "형광등 (노이즈)",
+   "category": "wrong_label"
+  }
+ ]
+}

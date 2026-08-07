@@ -1,0 +1,240 @@
+{
+ "objects": [
+  {
+   "id": "0",
+   "name": "control_panel_000",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.03,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "2",
+   "name": "pipe_002",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 0.95,
+   "rev_overlap": 0.07,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "4",
+   "name": "keyboard_004",
+   "gt_type": "ladder",
+   "gt_quality": "plausible",
+   "fwd_overlap": 0.96,
+   "rev_overlap": 1.0
+  },
+  {
+   "id": "5",
+   "name": "ladder_005",
+   "gt_type": "monitor",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.88
+  },
+  {
+   "id": "6",
+   "name": "door_006",
+   "gt_type": "tv",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 0.99,
+   "rev_overlap": 0.85
+  },
+  {
+   "id": "7",
+   "name": "cabinet_007",
+   "gt_type": "junction box",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.42,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "8",
+   "name": "chair_008",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.3,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "9",
+   "name": "pump_009",
+   "gt_type": "desk",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.24,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "10",
+   "name": "door_010",
+   "gt_type": "trash can",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.17,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "11",
+   "name": "clutter_011",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.18,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "12",
+   "name": "clutter_012",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.03,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "13",
+   "name": "chair_013",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.38,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "14",
+   "name": "wheelchair_014",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 0.99,
+   "rev_overlap": 0.27,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "15",
+   "name": "machine_015",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.12,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "18",
+   "name": "chair_018",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.6
+  },
+  {
+   "id": "19",
+   "name": "industrial_robot_019",
+   "gt_type": "machine",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.63
+  },
+  {
+   "id": "20",
+   "name": "chair_020",
+   "gt_type": "chair",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.36,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "21",
+   "name": "door_021",
+   "gt_type": "handrail",
+   "gt_quality": "plausible",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.52
+  },
+  {
+   "id": "22",
+   "name": "pump_022",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.31,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "23",
+   "name": "electrical_cabinet_023",
+   "gt_type": "control panel",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.19,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "24",
+   "name": "clutter_024",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 0.98,
+   "rev_overlap": 0.98
+  },
+  {
+   "id": "26",
+   "name": "clutter_026",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.72
+  },
+  {
+   "id": "32",
+   "name": "refrigerator_032",
+   "gt_type": "handrail",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.31,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "33",
+   "name": "chair_033",
+   "gt_type": "chair",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.49,
+   "gt_note": "det cluster only partially explained by this GT object"
+  },
+  {
+   "id": "35",
+   "name": "junction_box_035",
+   "gt_type": "junction box",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.65
+  },
+  {
+   "id": "36",
+   "name": "clutter_036",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.94
+  },
+  {
+   "id": "40",
+   "name": "clutter_040",
+   "gt_type": "clutter",
+   "gt_quality": "unknown",
+   "fwd_overlap": 1.0,
+   "rev_overlap": 0.39,
+   "gt_note": "det cluster only partially explained by this GT object"
+  }
+ ],
+ "notes": [
+  "GT transferred from the 57-set audit via bidirectional point-overlap (5 cm, >=0.5 both ways; merge-suspect -> unknown)"
+ ]
+}

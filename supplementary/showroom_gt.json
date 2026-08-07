@@ -1,0 +1,1379 @@
+{
+ "objects": [
+  {
+   "id": "0",
+   "name": "junction_box_000",
+   "gt_type": "junction box",
+   "gt_quality": "confirmed",
+   "poseX": 1.0616,
+   "poseY": 3.9262,
+   "poseTheta": 3.1333,
+   "dimensions": {
+    "length": 1.11,
+    "width": 0.512,
+    "height": 1.618
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.1689
+   },
+   "isMovable": false,
+   "isKeyObject": true
+  },
+  {
+   "id": "1",
+   "name": "clutter_001",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -2.8907,
+   "poseY": 0.1443,
+   "poseTheta": 1.5511,
+   "dimensions": {
+    "length": 0.559,
+    "width": 0.336,
+    "height": 0.472
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.6784
+   }
+  },
+  {
+   "id": "2",
+   "name": "clutter_002",
+   "gt_type": "mobile robot",
+   "gt_quality": "confirmed",
+   "poseX": -5.1995,
+   "poseY": 1.5207,
+   "poseTheta": 1.004,
+   "dimensions": {
+    "length": 2.035,
+    "width": 1.311,
+    "height": 1.14
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.4135
+   },
+   "isMovable": true,
+   "isKeyObject": false
+  },
+  {
+   "id": "3",
+   "name": "clutter_003",
+   "gt_type": "mobile robot",
+   "gt_quality": "plausible",
+   "poseX": -5.5496,
+   "poseY": -0.2339,
+   "poseTheta": 1.8701,
+   "dimensions": {
+    "length": 1.413,
+    "width": 0.492,
+    "height": 0.792
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.4821
+   }
+  },
+  {
+   "id": "4",
+   "name": "machine_004",
+   "gt_type": "machine",
+   "gt_quality": "confirmed",
+   "poseX": 5.15,
+   "poseY": -0.4442,
+   "poseTheta": -3.0019,
+   "dimensions": {
+    "length": 1.491,
+    "width": 0.93,
+    "height": 1.576
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.2092
+   },
+   "isMovable": true,
+   "isKeyObject": false
+  },
+  {
+   "id": "5",
+   "name": "chair_005",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "poseX": 3.8899,
+   "poseY": -1.5373,
+   "poseTheta": -2.606,
+   "dimensions": {
+    "length": 1.277,
+    "width": 0.578,
+    "height": 0.998
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.5003
+   },
+   "isMovable": true,
+   "isKeyObject": false
+  },
+  {
+   "id": "6",
+   "name": "clutter_006",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -4.0525,
+   "poseY": -0.3994,
+   "poseTheta": 2.6282,
+   "dimensions": {
+    "length": 0.463,
+    "width": 0.394,
+    "height": 0.378
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.6272
+   }
+  },
+  {
+   "id": "7",
+   "name": "control_panel_007",
+   "gt_type": "control panel",
+   "gt_quality": "confirmed",
+   "poseX": -2.2434,
+   "poseY": -3.5383,
+   "poseTheta": 3.0289,
+   "dimensions": {
+    "length": 1.87,
+    "width": 0.433,
+    "height": 2.828
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": 1.0016
+   },
+   "isMovable": false,
+   "isKeyObject": true
+  },
+  {
+   "id": "8",
+   "name": "clutter_008",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -2.6653,
+   "poseY": -3.4082,
+   "poseTheta": 3.0127,
+   "dimensions": {
+    "length": 0.899,
+    "width": 0.349,
+    "height": 0.653
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.6712
+   }
+  },
+  {
+   "id": "9",
+   "name": "clutter_009",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -3.3013,
+   "poseY": -3.3882,
+   "poseTheta": 3.1382,
+   "dimensions": {
+    "length": 0.381,
+    "width": 0.293,
+    "height": 0.296
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.4651
+   }
+  },
+  {
+   "id": "10",
+   "name": "cabinet_010",
+   "gt_type": "cable tray",
+   "gt_quality": "confirmed",
+   "poseX": -3.2226,
+   "poseY": -3.7082,
+   "poseTheta": 3.1358,
+   "dimensions": {
+    "length": 0.912,
+    "width": 0.22,
+    "height": 1.926
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 0.8526
+   },
+   "isMovable": false,
+   "isKeyObject": true
+  },
+  {
+   "id": "11",
+   "name": "clutter_011",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -1.6013,
+   "poseY": -3.5928,
+   "poseTheta": 2.5326,
+   "dimensions": {
+    "length": 0.424,
+    "width": 0.082,
+    "height": 0.364
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.6511
+   }
+  },
+  {
+   "id": "12",
+   "name": "clutter_012",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -4.0533,
+   "poseY": -3.5438,
+   "poseTheta": 2.0499,
+   "dimensions": {
+    "length": 0.784,
+    "width": 0.7,
+    "height": 0.598
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.6585
+   }
+  },
+  {
+   "id": "13",
+   "name": "clutter_013",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 5.7471,
+   "poseY": 4.0955,
+   "poseTheta": 1.5074,
+   "dimensions": {
+    "length": 0.672,
+    "width": 0.403,
+    "height": 0.691
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.631
+   }
+  },
+  {
+   "id": "14",
+   "name": "chair_014",
+   "gt_type": "desk",
+   "gt_quality": "plausible",
+   "poseX": 1.3461,
+   "poseY": 2.4025,
+   "poseTheta": 2.7055,
+   "dimensions": {
+    "length": 1.149,
+    "width": 1.179,
+    "height": 0.333
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.8164
+   }
+  },
+  {
+   "id": "15",
+   "name": "clutter_015",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -4.0711,
+   "poseY": 1.2649,
+   "poseTheta": -2.9509,
+   "dimensions": {
+    "length": 0.914,
+    "width": 0.532,
+    "height": 0.843
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.5631
+   }
+  },
+  {
+   "id": "16",
+   "name": "control_panel_016",
+   "gt_type": "control panel",
+   "gt_quality": "confirmed",
+   "poseX": 7.7442,
+   "poseY": 4.198,
+   "poseTheta": -3.0727,
+   "dimensions": {
+    "length": 1.932,
+    "width": 0.602,
+    "height": 2.51
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": 0.876
+   },
+   "isMovable": false,
+   "isKeyObject": true
+  },
+  {
+   "id": "17",
+   "name": "chair_017",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "poseX": 4.009,
+   "poseY": 3.9877,
+   "poseTheta": -2.9963,
+   "dimensions": {
+    "length": 0.806,
+    "width": 0.659,
+    "height": 1.249
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": 0.153
+   },
+   "isMovable": true,
+   "isKeyObject": false
+  },
+  {
+   "id": "18",
+   "name": "keyboard_018",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 0.1719,
+   "poseY": 3.5,
+   "poseTheta": 1.6115,
+   "dimensions": {
+    "length": 0.695,
+    "width": 0.009,
+    "height": 0.18
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.32
+   },
+   "structure_artifact": true,
+   "isKeyObject": false,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: ladder)"
+  },
+  {
+   "id": "19",
+   "name": "keyboard_019",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 0.2005,
+   "poseY": 2.7964,
+   "poseTheta": 1.612,
+   "dimensions": {
+    "length": 0.662,
+    "width": 0.007,
+    "height": 0.186
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.3169
+   },
+   "structure_artifact": true,
+   "isKeyObject": false,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: ladder)"
+  },
+  {
+   "id": "20",
+   "name": "keyboard_020",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 0.2306,
+   "poseY": 2.091,
+   "poseTheta": 1.6114,
+   "dimensions": {
+    "length": 0.751,
+    "width": 0.009,
+    "height": 0.187
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.3148
+   },
+   "structure_artifact": true,
+   "isKeyObject": false,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: ladder)"
+  },
+  {
+   "id": "21",
+   "name": "keyboard_021",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 0.2601,
+   "poseY": 1.3552,
+   "poseTheta": 1.612,
+   "dimensions": {
+    "length": 0.722,
+    "width": 0.009,
+    "height": 0.193
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.3166
+   },
+   "structure_artifact": true,
+   "isKeyObject": false,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: shelf)"
+  },
+  {
+   "id": "22",
+   "name": "handrail_022",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 0.3746,
+   "poseY": -1.2782,
+   "poseTheta": 1.6154,
+   "dimensions": {
+    "length": 4.495,
+    "width": 0.018,
+    "height": 0.201
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.3102
+   },
+   "isMovable": false,
+   "isKeyObject": false,
+   "structure_artifact": true,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: handrail)"
+  },
+  {
+   "id": "23",
+   "name": "ladder_023",
+   "gt_type": "monitor",
+   "gt_quality": "plausible",
+   "poseX": 0.7048,
+   "poseY": 3.9222,
+   "poseTheta": 2.2239,
+   "dimensions": {
+    "length": 0.63,
+    "width": 0.047,
+    "height": 0.593
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 0.9668
+   }
+  },
+  {
+   "id": "24",
+   "name": "elevator_024",
+   "gt_type": "handrail",
+   "gt_quality": "plausible",
+   "poseX": -2.4459,
+   "poseY": 3.5716,
+   "poseTheta": -2.5791,
+   "dimensions": {
+    "length": 1.516,
+    "width": 1.293,
+    "height": 3.196
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 0.8163
+   }
+  },
+  {
+   "id": "25",
+   "name": "door_025",
+   "gt_type": "cabinet",
+   "gt_quality": "confirmed",
+   "poseX": -2.9743,
+   "poseY": 3.6958,
+   "poseTheta": 1.6058,
+   "dimensions": {
+    "length": 0.699,
+    "width": 0.206,
+    "height": 1.813
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 1.625
+   },
+   "isMovable": false,
+   "isKeyObject": true
+  },
+  {
+   "id": "26",
+   "name": "door_026",
+   "gt_type": "trash can",
+   "gt_quality": "plausible",
+   "poseX": -1.3585,
+   "poseY": 3.8566,
+   "poseTheta": 1.1822,
+   "dimensions": {
+    "length": 0.546,
+    "width": 0.021,
+    "height": 0.662
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 0.9415
+   }
+  },
+  {
+   "id": "27",
+   "name": "fire_extinguisher_027",
+   "gt_type": "stair",
+   "gt_quality": "unknown",
+   "poseX": -1.3862,
+   "poseY": 3.8388,
+   "poseTheta": 1.2474,
+   "dimensions": {
+    "length": 0.587,
+    "width": 0.094,
+    "height": 1.347
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.0938
+   }
+  },
+  {
+   "id": "28",
+   "name": "clutter_028",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -5.3315,
+   "poseY": 3.7034,
+   "poseTheta": -3.1213,
+   "dimensions": {
+    "length": 1.124,
+    "width": 0.472,
+    "height": 1.517
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 0.0778
+   }
+  },
+  {
+   "id": "29",
+   "name": "clutter_029",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 5.8769,
+   "poseY": 4.2997,
+   "poseTheta": 3.1201,
+   "dimensions": {
+    "length": 0.498,
+    "width": 0.203,
+    "height": 0.267
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.0051
+   }
+  },
+  {
+   "id": "30",
+   "name": "cabinet_030",
+   "gt_type": "handrail",
+   "gt_quality": "plausible",
+   "poseX": 0.9116,
+   "poseY": -3.5581,
+   "poseTheta": -2.5821,
+   "dimensions": {
+    "length": 0.624,
+    "width": 0.39,
+    "height": 2.256
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 0.1283
+   }
+  },
+  {
+   "id": "31",
+   "name": "clutter_031",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -5.4216,
+   "poseY": -3.6106,
+   "poseTheta": 1.9729,
+   "dimensions": {
+    "length": 0.278,
+    "width": 0.101,
+    "height": 0.718
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.0233
+   }
+  },
+  {
+   "id": "32",
+   "name": "clutter_032",
+   "gt_type": "ladder",
+   "gt_quality": "plausible",
+   "poseX": 9.0455,
+   "poseY": 2.7688,
+   "poseTheta": 1.7758,
+   "dimensions": {
+    "length": 1.14,
+    "width": 0.49,
+    "height": 0.366
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.0578
+   }
+  },
+  {
+   "id": "33",
+   "name": "clutter_033",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 9.0422,
+   "poseY": 1.1085,
+   "poseTheta": 1.8852,
+   "dimensions": {
+    "length": 0.885,
+    "width": 0.536,
+    "height": 0.949
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.3564
+   }
+  },
+  {
+   "id": "34",
+   "name": "ladder_034",
+   "gt_type": "monitor",
+   "gt_quality": "confirmed",
+   "poseX": 9.2968,
+   "poseY": -0.8941,
+   "poseTheta": 1.787,
+   "dimensions": {
+    "length": 1.088,
+    "width": 0.164,
+    "height": 0.595
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": 0.0364
+   }
+  },
+  {
+   "id": "35",
+   "name": "robotic_arm_035",
+   "gt_type": "robot arm",
+   "gt_quality": "confirmed",
+   "poseX": 1.2937,
+   "poseY": 2.4365,
+   "poseTheta": 1.5683,
+   "dimensions": {
+    "length": 0.815,
+    "width": 0.711,
+    "height": 0.837
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.0159
+   },
+   "isMovable": false,
+   "isKeyObject": false
+  },
+  {
+   "id": "36",
+   "name": "clutter_036",
+   "gt_type": "mobile robot",
+   "gt_quality": "plausible",
+   "poseX": -3.1438,
+   "poseY": 2.0851,
+   "poseTheta": 2.6729,
+   "dimensions": {
+    "length": 2.684,
+    "width": 1.354,
+    "height": 0.966
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": 0.1567
+   }
+  },
+  {
+   "id": "37",
+   "name": "clutter_037",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 7.4417,
+   "poseY": 4.171,
+   "poseTheta": 1.7213,
+   "dimensions": {
+    "length": 0.669,
+    "width": 0.443,
+    "height": 0.657
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.6575
+   }
+  },
+  {
+   "id": "38",
+   "name": "cabinet_038",
+   "gt_type": "chair",
+   "gt_quality": "plausible",
+   "poseX": 6.6194,
+   "poseY": 4.082,
+   "poseTheta": 1.8554,
+   "dimensions": {
+    "length": 0.605,
+    "width": 0.556,
+    "height": 0.725
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.6182
+   }
+  },
+  {
+   "id": "39",
+   "name": "display_039",
+   "gt_type": "tv",
+   "gt_quality": "confirmed",
+   "poseX": 8.3611,
+   "poseY": -2.2603,
+   "poseTheta": 1.0373,
+   "dimensions": {
+    "length": 2.08,
+    "width": 0.197,
+    "height": 1.119
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": 0.0259
+   },
+   "isMovable": false,
+   "isKeyObject": false
+  },
+  {
+   "id": "40",
+   "name": "chair_040",
+   "gt_type": "chair",
+   "gt_quality": "confirmed",
+   "poseX": 6.9392,
+   "poseY": -0.9683,
+   "poseTheta": 1.7767,
+   "dimensions": {
+    "length": 0.615,
+    "width": 0.526,
+    "height": 0.774
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.6112
+   },
+   "isMovable": true,
+   "isKeyObject": false
+  },
+  {
+   "id": "41",
+   "name": "chair_041",
+   "gt_type": "chair",
+   "gt_quality": "plausible",
+   "poseX": 4.6954,
+   "poseY": -2.693,
+   "poseTheta": 2.1076,
+   "dimensions": {
+    "length": 0.739,
+    "width": 0.472,
+    "height": 0.356
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.377
+   }
+  },
+  {
+   "id": "42",
+   "name": "junction_box_042",
+   "gt_type": "junction box",
+   "gt_quality": "confirmed",
+   "poseX": 1.8686,
+   "poseY": -3.0638,
+   "poseTheta": 1.0475,
+   "dimensions": {
+    "length": 0.636,
+    "width": 0.574,
+    "height": 1.3
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.348
+   },
+   "isMovable": false,
+   "isKeyObject": false
+  },
+  {
+   "id": "43",
+   "name": "clutter_043",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -4.9676,
+   "poseY": -1.524,
+   "poseTheta": 3.1113,
+   "dimensions": {
+    "length": 0.794,
+    "width": 0.539,
+    "height": 0.756
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.519
+   }
+  },
+  {
+   "id": "44",
+   "name": "clutter_044",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -2.5338,
+   "poseY": -1.2218,
+   "poseTheta": 2.22,
+   "dimensions": {
+    "length": 1.058,
+    "width": 0.839,
+    "height": 0.619
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.684
+   }
+  },
+  {
+   "id": "45",
+   "name": "clutter_045",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -4.1068,
+   "poseY": -1.1369,
+   "poseTheta": 2.2827,
+   "dimensions": {
+    "length": 0.556,
+    "width": 0.412,
+    "height": 0.43
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.6185
+   }
+  },
+  {
+   "id": "46",
+   "name": "keyboard_046",
+   "gt_type": "monitor",
+   "gt_quality": "plausible",
+   "poseX": 8.5936,
+   "poseY": 4.2162,
+   "poseTheta": 1.6671,
+   "dimensions": {
+    "length": 0.583,
+    "width": 0.064,
+    "height": 0.512
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.5767
+   }
+  },
+  {
+   "id": "47",
+   "name": "clutter_047",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -5.6678,
+   "poseY": 3.0585,
+   "poseTheta": 2.9862,
+   "dimensions": {
+    "length": 0.535,
+    "width": 0.334,
+    "height": 0.281
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.8335
+   }
+  },
+  {
+   "id": "48",
+   "name": "clutter_048",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 7.6569,
+   "poseY": 2.959,
+   "poseTheta": 1.085,
+   "dimensions": {
+    "length": 0.522,
+    "width": 0.52,
+    "height": 0.328
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.6287
+   }
+  },
+  {
+   "id": "49",
+   "name": "clutter_049",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": 5.3423,
+   "poseY": -2.0523,
+   "poseTheta": -2.6046,
+   "dimensions": {
+    "length": 0.737,
+    "width": 0.543,
+    "height": 0.359
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.4392
+   }
+  },
+  {
+   "id": "50",
+   "name": "shelf_050",
+   "gt_type": "ladder",
+   "gt_quality": "unknown",
+   "poseX": 4.6339,
+   "poseY": 4.053,
+   "poseTheta": 1.6188,
+   "dimensions": {
+    "length": 0.634,
+    "width": 0.18,
+    "height": 0.332
+   },
+   "color": "brown",
+   "properties": {
+    "poseZ": -0.8137
+   }
+  },
+  {
+   "id": "51",
+   "name": "keyboard_051",
+   "gt_type": "monitor",
+   "gt_quality": "plausible",
+   "poseX": 3.6644,
+   "poseY": 3.9911,
+   "poseTheta": 1.595,
+   "dimensions": {
+    "length": 0.59,
+    "width": 0.084,
+    "height": 0.422
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": -0.7699
+   }
+  },
+  {
+   "id": "52",
+   "name": "handrail_052",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 2.0042,
+   "poseY": -3.7357,
+   "poseTheta": -3.0976,
+   "dimensions": {
+    "length": 2.725,
+    "width": 0.008,
+    "height": 0.14
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.0415
+   },
+   "isMovable": false,
+   "isKeyObject": false,
+   "structure_artifact": true,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: handrail)"
+  },
+  {
+   "id": "53",
+   "name": "handrail_053",
+   "gt_type": "ceiling soffit",
+   "gt_quality": "confirmed",
+   "poseX": 4.4404,
+   "poseY": -3.625,
+   "poseTheta": -3.096,
+   "dimensions": {
+    "length": 1.975,
+    "width": 0.008,
+    "height": 0.143
+   },
+   "color": "gray",
+   "properties": {
+    "poseZ": 2.042
+   },
+   "isMovable": false,
+   "isKeyObject": false,
+   "structure_artifact": true,
+   "gt_note": "vertical face at a ceiling-height transition (owner-confirmed 2026-07-21); not a semantic object — excluded from object-level evaluation (was: handrail)"
+  },
+  {
+   "id": "54",
+   "name": "clutter_054",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -3.6397,
+   "poseY": 1.9478,
+   "poseTheta": 2.5041,
+   "dimensions": {
+    "length": 0.698,
+    "width": 0.391,
+    "height": 0.167
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.5307
+   }
+  },
+  {
+   "id": "55",
+   "name": "clutter_055",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -4.573,
+   "poseY": 3.2644,
+   "poseTheta": -2.9942,
+   "dimensions": {
+    "length": 0.485,
+    "width": 0.364,
+    "height": 0.171
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.8856
+   }
+  },
+  {
+   "id": "57",
+   "name": "clutter_057",
+   "gt_type": "clutter",
+   "gt_quality": "confirmed",
+   "poseX": -3.1677,
+   "poseY": 3.41,
+   "poseTheta": -2.6159,
+   "dimensions": {
+    "length": 0.489,
+    "width": 0.541,
+    "height": 0.16
+   },
+   "color": "black",
+   "properties": {
+    "poseZ": -0.8314
+   }
+  }
+ ],
+ "relations": [
+  [
+   "junction_box_000",
+   "isNextTo",
+   "chair_014"
+  ],
+  [
+   "junction_box_000",
+   "isNextTo",
+   "robotic_arm_035"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_003"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_015"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_028"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_036"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_047"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_054"
+  ],
+  [
+   "clutter_002",
+   "isNextTo",
+   "clutter_055"
+  ],
+  [
+   "clutter_003",
+   "isNextTo",
+   "clutter_043"
+  ],
+  [
+   "machine_004",
+   "isNextTo",
+   "chair_005"
+  ],
+  [
+   "machine_004",
+   "isNextTo",
+   "clutter_049"
+  ],
+  [
+   "chair_005",
+   "isNextTo",
+   "chair_041"
+  ],
+  [
+   "chair_005",
+   "isNextTo",
+   "clutter_049"
+  ],
+  [
+   "clutter_006",
+   "isNextTo",
+   "clutter_045"
+  ],
+  [
+   "control_panel_007",
+   "isOn",
+   "clutter_008"
+  ],
+  [
+   "control_panel_007",
+   "isOn",
+   "clutter_009"
+  ],
+  [
+   "control_panel_007",
+   "isOn",
+   "clutter_011"
+  ],
+  [
+   "control_panel_007",
+   "isNextTo",
+   "clutter_008"
+  ],
+  [
+   "control_panel_007",
+   "isNextTo",
+   "clutter_009"
+  ],
+  [
+   "control_panel_007",
+   "isNextTo",
+   "cabinet_010"
+  ],
+  [
+   "control_panel_007",
+   "isNextTo",
+   "clutter_012"
+  ],
+  [
+   "clutter_008",
+   "isNextTo",
+   "clutter_009"
+  ],
+  [
+   "clutter_008",
+   "isNextTo",
+   "clutter_011"
+  ],
+  [
+   "clutter_008",
+   "isNextTo",
+   "clutter_012"
+  ],
+  [
+   "clutter_009",
+   "isNextTo",
+   "clutter_012"
+  ],
+  [
+   "cabinet_010",
+   "isAboveOf",
+   "clutter_012"
+  ],
+  [
+   "clutter_013",
+   "isNextTo",
+   "cabinet_038"
+  ],
+  [
+   "clutter_013",
+   "isNextTo",
+   "shelf_050"
+  ],
+  [
+   "clutter_015",
+   "isNextTo",
+   "clutter_036"
+  ],
+  [
+   "clutter_015",
+   "isNextTo",
+   "clutter_054"
+  ],
+  [
+   "control_panel_016",
+   "isOn",
+   "clutter_037"
+  ],
+  [
+   "control_panel_016",
+   "isOn",
+   "cabinet_038"
+  ],
+  [
+   "control_panel_016",
+   "isOn",
+   "keyboard_046"
+  ],
+  [
+   "control_panel_016",
+   "isNextTo",
+   "clutter_032"
+  ],
+  [
+   "control_panel_016",
+   "isNextTo",
+   "clutter_037"
+  ],
+  [
+   "control_panel_016",
+   "isNextTo",
+   "cabinet_038"
+  ],
+  [
+   "control_panel_016",
+   "isNextTo",
+   "keyboard_046"
+  ],
+  [
+   "chair_017",
+   "isOn",
+   "keyboard_051"
+  ],
+  [
+   "ladder_023",
+   "isOn",
+   "junction_box_000"
+  ],
+  [
+   "elevator_024",
+   "isOn",
+   "clutter_057"
+  ],
+  [
+   "elevator_024",
+   "isNextTo",
+   "door_025"
+  ],
+  [
+   "elevator_024",
+   "isNextTo",
+   "door_026"
+  ],
+  [
+   "elevator_024",
+   "isNextTo",
+   "fire_extinguisher_027"
+  ],
+  [
+   "elevator_024",
+   "isNextTo",
+   "clutter_036"
+  ],
+  [
+   "elevator_024",
+   "isNextTo",
+   "clutter_057"
+  ],
+  [
+   "door_025",
+   "isAboveOf",
+   "clutter_057"
+  ],
+  [
+   "door_026",
+   "isOn",
+   "fire_extinguisher_027"
+  ],
+  [
+   "clutter_029",
+   "isOn",
+   "clutter_013"
+  ],
+  [
+   "cabinet_030",
+   "isNextTo",
+   "junction_box_042"
+  ],
+  [
+   "ladder_034",
+   "isNextTo",
+   "display_039"
+  ],
+  [
+   "robotic_arm_035",
+   "isAboveOf",
+   "chair_014"
+  ],
+  [
+   "clutter_036",
+   "isOn",
+   "clutter_054"
+  ],
+  [
+   "clutter_037",
+   "isNextTo",
+   "cabinet_038"
+  ],
+  [
+   "chair_041",
+   "isNextTo",
+   "clutter_049"
+  ],
+  [
+   "clutter_043",
+   "isNextTo",
+   "clutter_045"
+  ],
+  [
+   "shelf_050",
+   "isNextTo",
+   "keyboard_051"
+  ]
+ ],
+ "structure_artifacts": [
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "52",
+  "53"
+ ],
+ "notes": [
+  "2026-07-21: ids 18-22,52,53 identified as ceiling-soffit structure remnants (multi-level ceiling at z=2.48/2.18/1.95); now filtered at Stage A (structure_filter.py)"
+ ]
+}
