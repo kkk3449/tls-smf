@@ -161,7 +161,7 @@ def pad_to_aspect(img, labels, aspect):
 PHANTOM_TYPES = {"keyboard"}   # verified labels the owner refuted (no such
                                # object exists in either scene)
 GATED_CALLOUT = {"door", "motor", "robotic arm", "tv", "machine",
-                 "control panel"}   # gated clusters worth naming by their
+                 "control panel", "plant"}   # gated clusters worth naming by their
                                     # own (withheld) top vote
 
 
@@ -244,6 +244,9 @@ def panel_b():
     img, lab = render(geoms, labels3d, azim=-35, elev=50, zoom=0.80,
                       size=(2400, 2000),
                       floor_idx=frozenset(range(len(places))))
+    nudge = {"gated:plant": (150, -55)}
+    lab = [(x + nudge.get(t, (0, 0))[0], y + nudge.get(t, (0, 0))[1], t)
+           for x, y, t in lab]
     return img, used, lab
 
 
