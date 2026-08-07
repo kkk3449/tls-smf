@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """fig19: TOSM semantic-map visualization (paper Sec. 3) — place-layer
-floor polygons + per-object class-colored segmented point clouds, in the
-style of the lineage's explicit-model maps but with real TLS points.
+floor + per-object class-colored segmented point clouds, with place-name
+labels rendered on the map and per-panel legends.
 
-(a) robot hall: SLIC place regions (pastel floor meshes) + room-scoped
-    clusters colored by verified class (unverified = gray)
-(b) cafeteria: class-colored clusters over a faint structure cloud
+(a) robot hall: SLIC place polygons + room-scoped clusters
+(b) cafeteria: SLIC place cells (synthesized grid) + clusters
 
   .venv/bin/python scripts/semantic_map_fig.py
 """
@@ -23,7 +22,7 @@ from matplotlib.patches import Patch
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
-from render_instances import _autocrop, _orbit_camera, _pc_mat  # noqa: E402
+from render_instances import _orbit_camera, _pc_mat  # noqa: E402
 import open3d.visualization.rendering as rendering  # noqa: E402
 
 FIGS = os.environ.get(
@@ -31,7 +30,6 @@ FIGS = os.environ.get(
     "/home/caselab/blk360_ros2_ws/docs/electronics2026/figs")
 OUT = os.path.join(ROOT, "outputs", "paper_figs")
 
-# fixed class palette (shared across panels; text tokens stay neutral)
 CLASS_COLORS = {
     "chair": (0.17, 0.42, 0.69), "door": (0.55, 0.27, 0.07),
     "shelf": (0.55, 0.43, 0.78), "stair": (0.80, 0.47, 0.13),
@@ -51,8 +49,8 @@ UNVERIFIED = (0.55, 0.55, 0.55)
 
 
 def load_lf(path):
-    d = json.load(open(path))
-    return {o["id"]: o for o in d["semanticObjects"]}
+    return {o["id"]: o
+            for o in json.load(open(path))["semanticObjects"]}
 
 
 def cls_color(o):
@@ -67,8 +65,7 @@ def cls_color(o):
 
 def poly_mesh(poly, z, color):
     v = np.array([[x, y, z] for x, y in poly], float)
-    c = v.mean(0)
-    verts = np.vstack([v, c])
+    verts = np.vstack([v, v.mean(0)])
     tris = [[i, (i + 1) % len(v), len(v)] for i in range(len(v))]
     m = o3d.geometry.TriangleMesh(
         o3d.utility.Vector3dVector(verts),
@@ -78,42 +75,86 @@ def poly_mesh(poly, z, color):
     return m
 
 
+def pc(xyz, color=None):
+    p = o3d.geometry.PointCloud()
+    p.points = o3d.utility.Vector3dVector(np.asarray(xyz, float))
+    if color is not None:
+        p.paint_uniform_color(color)
+    return p
+
+
 def crop_bg(img, pad=14, tol=6):
     corner = img[2, 2, :3].astype(int)
     mask = (np.abs(img[:, :, :3].astype(int) - corner) > tol).any(2)
     if not mask.any():
-        return img
+        return img, (0, 0)
     ys, xs = np.where(mask)
     y0, y1 = max(ys.min() - pad, 0), min(ys.max() + pad, img.shape[0])
     x0, x1 = max(xs.min() - pad, 0), min(xs.max() + pad, img.shape[1])
-    return img[y0:y1, x0:x1]
+    return img[y0:y1, x0:x1], (y0, x0)
 
 
-def render(geoms, size=(2400, 1600), azim=-120, elev=38, zoom=0.75):
+def render(geoms, labels3d, size=(2400, 1600), azim=-120, elev=38,
+           zoom=0.78, fov=42, floor_idx=frozenset()):
     r = rendering.OffscreenRenderer(*size)
     r.scene.set_background([1, 1, 1, 1])
     pts = np.vstack([np.asarray(g.points) for g in geoms
                      if isinstance(g, o3d.geometry.PointCloud)])
     for i, g in enumerate(geoms):
-        mat = _pc_mat(2.8)
+        mat = _pc_mat(7.5 if i in floor_idx else 2.8)
         if isinstance(g, o3d.geometry.TriangleMesh):
             mat = rendering.MaterialRecord()
             mat.shader = "defaultUnlit"
         r.scene.add_geometry(f"g{i}", g, mat)
     lo, hi = pts.min(0), pts.max(0)
-    _orbit_camera(r, (lo + hi) / 2, hi - lo, azim, elev, fov=42, zoom=zoom)
+    center, extent = (lo + hi) / 2, hi - lo
+    _orbit_camera(r, center, extent, azim, elev, fov=fov, zoom=zoom)
     img = np.asarray(r.render_to_image())
-    return crop_bg(img)
+    img, (oy, ox) = crop_bg(img)
+
+    # replicate the camera to project 3D label anchors to pixels
+    az, el = np.radians(azim), np.radians(elev)
+    eye = center + float(np.linalg.norm(extent)) * zoom * np.array(
+        [np.cos(el) * np.cos(az), np.cos(el) * np.sin(az), np.sin(el)])
+    f = center - eye
+    f = f / np.linalg.norm(f)
+    right = np.cross(f, [0, 0, 1.0])
+    right /= np.linalg.norm(right)
+    up2 = np.cross(right, f)
+    W, H = size
+    t = np.tan(np.radians(fov) / 2)
+    out = []
+    for (x, y, z, txt) in labels3d:
+        d = np.array([x, y, z]) - eye
+        zc = d @ f
+        px = (d @ right / zc) / (t * W / H)
+        py = (d @ up2 / zc) / t
+        out.append(((px + 1) / 2 * W - ox, (1 - (py + 1) / 2) * H - oy, txt))
+    return img, out
 
 
-def pc(xyz, color=None, colors=None):
-    p = o3d.geometry.PointCloud()
-    p.points = o3d.utility.Vector3dVector(xyz)
-    if colors is not None:
-        p.colors = o3d.utility.Vector3dVector(colors)
-    elif color is not None:
-        p.paint_uniform_color(color)
-    return p
+def flat_cells(cells, z, color):
+    return pc(np.array([[x, y, z] for x, y in cells]), color)
+
+
+def load_objs(lf, objdir, ids=None):
+    geoms, used, zs = [], {}, []
+    for i, o in lf.items():
+        if ids is not None and i not in ids:
+            continue
+        f = os.path.join(objdir, f"obj_{int(i):04d}.ply")
+        if not os.path.exists(f):
+            continue
+        q = o3d.io.read_point_cloud(f)
+        if len(q.points) == 0:
+            continue
+        col, label = cls_color(o)
+        q.paint_uniform_color(col)
+        geoms.append(q)
+        zs.append(np.asarray(q.points)[:, 2].min())
+        if label and label != "clutter":
+            used[label] = CLASS_COLORS.get(label, CLUTTER)
+    return geoms, used, zs
 
 
 def panel_a():
@@ -123,86 +164,70 @@ def panel_a():
         ROOT, "outputs", "vis_n2_hires_select.txt")).read().split(",")
     src = json.load(open(os.path.join(
         ROOT, "outputs", "vis_n2_det_run1", "semanticObjects.json")))
-    name2id = {o["name"]: o["id"] for o in src["semanticObjects"]}
-    geoms, used = [], {}
-    zs = []
-    for nm in sel:
-        i = name2id[nm]
-        f = os.path.join(ROOT, "outputs", "vis_n2_det_hires_objs",
-                         f"obj_{int(i):04d}.ply")
-        if not os.path.exists(f):
-            continue
-        q = o3d.io.read_point_cloud(f)
-        if len(q.points) == 0:
-            continue
-        col, label = cls_color(lf[i])
-        q.paint_uniform_color(col)
-        geoms.append(q)
-        zs.append(np.asarray(q.points)[:, 2].min())
-        if label:
-            used[label] = CLASS_COLORS.get(label, CLUTTER)
+    ids = {o["id"] for o in src["semanticObjects"] if o["name"] in sel}
+    geoms, used, zs = load_objs(
+        lf, os.path.join(ROOT, "outputs", "vis_n2_det_hires_objs"), ids)
     floor_z = float(np.percentile(zs, 10)) - 0.06
     places = json.load(open(os.path.join(
         ROOT, "outputs", "place_layer_T2_places.json")))["semanticPlaces"]
-    pcolors = plt.get_cmap("Pastel1")
-    pleg = []
+    pal = plt.get_cmap("Pastel1")
+    labels3d = []
     for k, plc in enumerate(places):
-        col = pcolors(k % 9)[:3]
-        geoms.insert(0, poly_mesh(plc["polygon"], floor_z, col))
-        pleg.append((plc["name"], col))
-    return render(geoms, azim=-115, elev=40, zoom=0.80), used, pleg
+        geoms.insert(0, poly_mesh(plc["polygon"], floor_z, pal(k % 9)[:3]))
+        cx, cy = plc["centroid"]
+        labels3d.append((cx, cy, floor_z, plc["name"]))
+    img, lab = render(geoms, labels3d, azim=-115, elev=40, zoom=0.80)
+    return img, used, lab
 
 
 def panel_b():
     lf = load_lf(os.path.join(
         ROOT, "outputs", "cafe8f_objects", "semanticObjects.lf_esc.json"))
-    geoms, used = [], {}
-    env = o3d.io.read_point_cloud(os.path.join(
-        ROOT, "outputs", "cafe8f_scope", "cafe_env_gamma.ply"))
-    exyz = np.asarray(env.points)
-    m = exyz[:, 2] < np.percentile(exyz[:, 2], 4)      # floor band only
-    geoms.append(pc(exyz[m], color=(0.88, 0.87, 0.85)))
-    for i, o in lf.items():
-        f = os.path.join(ROOT, "outputs", "cafe8f_hires_objs",
-                         f"obj_{int(i):04d}.ply")
-        q = o3d.io.read_point_cloud(f)
-        if len(q.points) == 0:
-            continue
-        col, label = cls_color(o)
-        q.paint_uniform_color(col)
-        geoms.append(q)
-        if label:
-            used[label] = CLASS_COLORS.get(label, CLUTTER)
-    return render(geoms, azim=-60, elev=42, zoom=0.66), used
+    geoms, used, zs = load_objs(
+        lf, os.path.join(ROOT, "outputs", "cafe8f_hires_objs"))
+    floor_z = float(np.percentile(zs, 10)) - 0.06
+    places = json.load(open(os.path.join(
+        ROOT, "outputs", "place_layer_CAFE_places.json")))["semanticPlaces"]
+    pal = plt.get_cmap("Pastel1")
+    labels3d = []
+    for k, plc in enumerate(places):
+        geoms.insert(0, flat_cells(plc["cells"], floor_z, pal(k % 9)[:3]))
+        cx, cy = plc["centroid"]
+        labels3d.append((cx, cy, floor_z, plc["name"]))
+    img, lab = render(geoms, labels3d, azim=-60, elev=42, zoom=0.70,
+                      floor_idx=frozenset(range(len(places))))
+    return img, used, lab
+
+
+def draw_panel(ax, img, labels, used, title):
+    ax.imshow(img)
+    ax.axis("off")
+    ax.set_title(title, fontsize=11.5, loc="left", pad=30)
+    for x, y, txt in labels:
+        if 0 <= x <= img.shape[1] and 0 <= y <= img.shape[0]:
+            ax.annotate(txt, (x, y), ha="center", fontsize=8.6,
+                        style="italic", color="#333333",
+                        bbox=dict(boxstyle="round,pad=0.18", fc="white",
+                                  ec="#999999", lw=0.5, alpha=0.85))
+    handles = [Patch(fc=c, label=t) for t, c in sorted(used.items())]
+    handles += [Patch(fc=CLUTTER, label="clutter (verified)"),
+                Patch(fc=UNVERIFIED, label="unverified (gated)")]
+    ax.legend(handles=handles, loc="lower left",
+              bbox_to_anchor=(0.0, 1.005), ncol=4, fontsize=7.8,
+              frameon=False, borderaxespad=0, handlelength=1.2,
+              columnspacing=0.9)
 
 
 def main():
-    img_a, used_a, pleg = panel_a()
-    img_b, used_b = panel_b()
-    fig = plt.figure(figsize=(13.6, 7.0))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.15, 1.0], wspace=0.03,
-                          left=0.005, right=0.995, top=0.93, bottom=0.24)
-    for k, (img, title) in enumerate(
-            [(img_a, "(a) robot hall: place layer + verified objects"),
-             (img_b, "(b) cafeteria: verified objects over floor points")]):
-        ax = fig.add_subplot(gs[0, k])
-        ax.imshow(img)
-        ax.axis("off")
-        ax.set_title(title, fontsize=11.5, loc="left")
-    # legends: objects (union of panels) + places
-    allc = dict(sorted({**used_a, **used_b}.items()))
-    allc.pop("clutter", None)
-    handles = [Patch(fc=c, label=t) for t, c in allc.items()]
-    handles += [Patch(fc=CLUTTER, label="clutter (verified)"),
-                Patch(fc=UNVERIFIED, label="unverified (gated)")]
-    leg1 = fig.legend(handles=handles, loc="lower left",
-                      bbox_to_anchor=(0.01, 0.075), ncol=8, fontsize=8.2,
-                      frameon=True, title="Objects", title_fontsize=9)
-    ph = [Patch(fc=c, label=n) for n, c in pleg]
-    fig.legend(handles=ph, loc="lower left", bbox_to_anchor=(0.01, -0.008),
-               ncol=7, fontsize=8.2, frameon=True, title="Places (a)",
-               title_fontsize=9)
-    fig.add_artist(leg1)
+    img_a, used_a, lab_a = panel_a()
+    img_b, used_b, lab_b = panel_b()
+    fig = plt.figure(figsize=(13.8, 6.4))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.12, 1.0], wspace=0.02,
+                          left=0.004, right=0.996, top=0.86, bottom=0.01)
+    draw_panel(fig.add_subplot(gs[0, 0]), img_a, lab_a, used_a,
+               "(a) robot hall: place layer + verified objects")
+    draw_panel(fig.add_subplot(gs[0, 1]), img_b, lab_b, used_b,
+               "(b) cafeteria: place layer + verified objects")
     for d in (OUT, FIGS):
         os.makedirs(d, exist_ok=True)
         p = os.path.join(d, "fig19_semantic_map.png")
