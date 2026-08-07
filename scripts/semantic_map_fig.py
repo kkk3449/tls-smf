@@ -156,8 +156,12 @@ def pad_to_aspect(img, labels, aspect):
     return canvas, labels
 
 
+PHANTOM_TYPES = {"keyboard"}   # verified labels the owner refuted (no such
+                               # object exists in either scene)
+
+
 def load_objs(lf, objdir, ids=None):
-    geoms, used, zs = [], {}, []
+    geoms, used, zs, phantoms = [], {}, [], []
     for i, o in lf.items():
         if ids is not None and i not in ids:
             continue
@@ -170,10 +174,15 @@ def load_objs(lf, objdir, ids=None):
         col, label = cls_color(o)
         q.paint_uniform_color(col)
         geoms.append(q)
-        zs.append(np.asarray(q.points)[:, 2].min())
+        pts = np.asarray(q.points)
+        zs.append(pts[:, 2].min())
+        if label in PHANTOM_TYPES:
+            c = pts.mean(0)
+            phantoms.append((c[0], c[1], pts[:, 2].max() + 0.15, "phantom"))
         if label and label != "clutter":
-            used[label] = CLASS_COLORS.get(label, CLUTTER)
-    return geoms, used, zs
+            key = f"{label} (phantom)" if label in PHANTOM_TYPES else label
+            used[key] = CLASS_COLORS.get(label, CLUTTER)
+    return geoms, used, zs, phantoms
 
 
 def panel_a():
@@ -184,7 +193,7 @@ def panel_a():
     src = json.load(open(os.path.join(
         ROOT, "outputs", "vis_n2_det_run1", "semanticObjects.json")))
     ids = {o["id"] for o in src["semanticObjects"] if o["name"] in sel}
-    geoms, used, zs = load_objs(
+    geoms, used, zs, phantoms = load_objs(
         lf, os.path.join(ROOT, "outputs", "vis_n2_det_hires_objs"), ids)
     floor_z = float(np.percentile(zs, 10)) - 0.06
     places = json.load(open(os.path.join(
@@ -195,6 +204,7 @@ def panel_a():
         geoms.insert(0, poly_mesh(plc["polygon"], floor_z, pal(k % 9)[:3]))
         cx, cy = plc["centroid"]
         labels3d.append((cx, cy, floor_z, plc["name"]))
+    labels3d += phantoms
     img, lab = render(geoms, labels3d, azim=-115, elev=40, zoom=0.80)
     nudge = {"displaying_section_003": (-300, 6),
              "tv_section_005": (70, 14),
@@ -207,7 +217,7 @@ def panel_a():
 def panel_b():
     lf = load_lf(os.path.join(
         ROOT, "outputs", "cafe8f_objects", "semanticObjects.lf_esc.json"))
-    geoms, used, zs = load_objs(
+    geoms, used, zs, phantoms = load_objs(
         lf, os.path.join(ROOT, "outputs", "cafe8f_hires_objs"))
     floor_z = float(np.percentile(zs, 10)) - 0.06
     places = json.load(open(os.path.join(
@@ -218,6 +228,7 @@ def panel_b():
         geoms.insert(0, flat_cells(plc["cells"], floor_z, pal(k % 9)[:3]))
         cx, cy = plc["centroid"]
         labels3d.append((cx, cy, floor_z, plc["name"]))
+    labels3d += phantoms
     img, lab = render(geoms, labels3d, azim=-35, elev=50, zoom=0.80,
                       size=(2400, 2000),
                       floor_idx=frozenset(range(len(places))))
@@ -227,20 +238,25 @@ def panel_b():
 def draw_panel(ax, img, labels, used, title):
     ax.imshow(img)
     ax.axis("off")
-    ax.set_title(title, fontsize=15, loc="left", pad=44)
+    ax.set_title(title, fontsize=16.5, loc="left", pad=86)
     for x, y, txt in labels:
-        if 0 <= x <= img.shape[1] and 0 <= y <= img.shape[0]:
-            ax.annotate(txt, (x, y), ha="center", fontsize=11.5,
-                        style="italic", color="#333333",
-                        bbox=dict(boxstyle="round,pad=0.18", fc="white",
-                                  ec="#999999", lw=0.5, alpha=0.85))
+        if not (0 <= x <= img.shape[1] and 0 <= y <= img.shape[0]):
+            continue
+        if txt == "phantom":
+            ax.annotate("$\\times$", (x, y), ha="center", va="center",
+                        fontsize=17, fontweight="bold", color="#c53030")
+            continue
+        ax.annotate(txt, (x, y), ha="center", fontsize=12.5,
+                    style="italic", color="#333333",
+                    bbox=dict(boxstyle="round,pad=0.18", fc="white",
+                              ec="#999999", lw=0.5, alpha=0.85))
     handles = [Patch(fc=c, label=t) for t, c in sorted(used.items())]
     handles += [Patch(fc=CLUTTER, label="clutter (verified)"),
                 Patch(fc=UNVERIFIED, label="unverified (gated)")]
     ax.legend(handles=handles, loc="lower left",
-              bbox_to_anchor=(0.0, 1.005), ncol=4, fontsize=10.5,
-              frameon=False, borderaxespad=0, handlelength=1.2,
-              columnspacing=0.9)
+              bbox_to_anchor=(0.0, 1.005), ncol=3, fontsize=12.5,
+              frameon=False, borderaxespad=0, handlelength=1.1,
+              columnspacing=0.8, handletextpad=0.5)
 
 
 def main():
@@ -253,10 +269,10 @@ def main():
     target = max(asp_a, asp_b)
     img_a, lab_a = pad_to_aspect(img_a, lab_a, target)
     img_b, lab_b = pad_to_aspect(img_b, lab_b, target)
-    fig = plt.figure(figsize=(13.8, 13.8 / 2 / target + 1.0))
+    fig = plt.figure(figsize=(13.8, 13.8 / 2 / target + 1.45))
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 1], wspace=0.02,
                           left=0.004, right=0.996,
-                          top=1 - 0.9 / (13.8 / 2 / target + 1.0),
+                          top=1 - 1.32 / (13.8 / 2 / target + 1.45),
                           bottom=0.01)
     for k, (img, lab, used, title) in enumerate(
             [(img_a, lab_a, used_a,
