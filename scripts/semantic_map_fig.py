@@ -178,7 +178,8 @@ def load_objs(lf, objdir, ids=None):
         zs.append(pts[:, 2].min())
         if label in PHANTOM_TYPES:
             c = pts.mean(0)
-            phantoms.append((c[0], c[1], pts[:, 2].max() + 0.15, "phantom"))
+            phantoms.append((c[0], c[1], pts[:, 2].max() + 0.15,
+                             f"phantom:{label}"))
         if label and label != "clutter":
             key = f"{label} (phantom)" if label in PHANTOM_TYPES else label
             used[key] = CLASS_COLORS.get(label, CLUTTER)
@@ -208,7 +209,8 @@ def panel_a():
     img, lab = render(geoms, labels3d, azim=-115, elev=40, zoom=0.80)
     nudge = {"displaying_section_003": (-300, 6),
              "tv_section_005": (70, 14),
-             "hardware_section_004": (30, -30)}
+             "hardware_section_004": (30, -30),
+             "phantom:keyboard": (40, -62)}
     lab = [(x + nudge.get(t, (0, 0))[0], y + nudge.get(t, (0, 0))[1], t)
            for x, y, t in lab]
     return img, used, lab
@@ -232,19 +234,34 @@ def panel_b():
     img, lab = render(geoms, labels3d, azim=-35, elev=50, zoom=0.80,
                       size=(2400, 2000),
                       floor_idx=frozenset(range(len(places))))
+    nudge = {"control_console_area_003": (-300, 64)}
+    lab = [(x + nudge.get(t, (0, 0))[0], y + nudge.get(t, (0, 0))[1], t)
+           for x, y, t in lab]
     return img, used, lab
 
 
 def draw_panel(ax, img, labels, used, title):
     ax.imshow(img)
+    placed = []
+    def declash(x, y):
+        for px, py in placed:
+            if abs(x - px) < 260 and abs(y - py) < 46:
+                y = py + 54
+                x = px + 34
+        placed.append((x, y))
+        return x, y
     ax.axis("off")
     ax.set_title(title, fontsize=16.5, loc="left", pad=86)
     for x, y, txt in labels:
         if not (0 <= x <= img.shape[1] and 0 <= y <= img.shape[0]):
             continue
-        if txt == "phantom":
-            ax.annotate("$\\times$", (x, y), ha="center", va="center",
-                        fontsize=17, fontweight="bold", color="#c53030")
+        if txt.startswith("phantom:"):
+            x, y = declash(x, y)
+            ax.annotate(f"$\\times$ {txt[8:]}", (x, y), ha="center",
+                        va="center", fontsize=11.5, style="italic",
+                        fontweight="bold", color="#c53030",
+                        bbox=dict(boxstyle="round,pad=0.18", fc="white",
+                                  ec="#c53030", lw=0.8, alpha=0.9))
             continue
         ax.annotate(txt, (x, y), ha="center", fontsize=12.5,
                     style="italic", color="#333333",
