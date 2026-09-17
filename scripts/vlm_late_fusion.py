@@ -59,8 +59,11 @@ def fuse(votes):
     return top, round(share, 3), unanimous, {k: round(v, 3) for k, v in score.items()}
 
 
-def classify_view(vlm, obj, img, az, zoom, floor_z=None):
-    r = vlm.verify_symbolic(obj, [img], floor_z=floor_z)
+def classify_view(vlm, obj, img, az, zoom, floor_z=None, blind=False,
+                  candidates=None, height_level=False):
+    hl = obj.get("properties", {}).get("heightLevel") if height_level else None
+    r = vlm.verify_symbolic(obj, [img], allowed_types=candidates,
+                            floor_z=floor_z, blind=blind, height_level=hl)
     return {"azimuth": az, "zoom": bool(zoom),
             "type": r["corrected_type"],
             "confidence": round(float(r["confidence"]), 3),
@@ -85,6 +88,14 @@ def main():
     ap.add_argument("--floor-z", type=float, default=None,
                     help="scene floor height in the record frame; enables "
                          "mounting-height context in the symbolic prompt")
+    ap.add_argument("--no-provisional", action="store_true",
+                    help="ablation: hide the Stage-A provisional (uni3d) "
+                         "label from the verifier entirely")
+    ap.add_argument("--candidates", default=None,
+                    help="comma-separated scene-level candidate vocabulary "
+                         "passed to every symbolic call (overhead pass)")
+    ap.add_argument("--height-level", action="store_true",
+                    help="inject properties.heightLevel as a hard prior")
     ap.add_argument("--workers", type=int, default=1,
                     help="objects processed in parallel (each object's own "
                          "calls stay sequential); one VLM client per worker")
@@ -165,7 +176,10 @@ def main():
                  and v.get("azimuth") in BASE_AZIMS][:4]
         if len(votes) != 4:
             votes = [classify_view(vlm, obj, p, az, False,
-                                   floor_z=args.floor_z)
+                                   floor_z=args.floor_z,
+                                   candidates=args.candidates,
+                                   height_level=args.height_level,
+                                   blind=args.no_provisional)
                      for az, p in zip(BASE_AZIMS, base_imgs)]
             calls["base"] = 4
 
@@ -184,7 +198,10 @@ def main():
                               file=sys.stderr)
                         continue
                     votes.append(classify_view(vlm, obj, p, az, zoom,
-                                               floor_z=args.floor_z))
+                                               floor_z=args.floor_z,
+                                   candidates=args.candidates,
+                                   height_level=args.height_level,
+                                               blind=args.no_provisional))
                     calls["escalation"] += 1
                 ftype, share, unanimous, score = fuse(votes)
                 status = ("verified_escalated" if share >= args.resolve_share
@@ -243,6 +260,7 @@ def main():
                "stage_calls": stage_calls, "objects": tallies["done"],
                "escalated": tallies["esc"], "unverified": tallies["unres"],
                "resolve_share": args.resolve_share, "model": args.model,
+               "no_provisional": args.no_provisional,
                "workers": args.workers}
     json.dump(summary, open(args.out.replace(".json", "") + ".usage.json", "w"),
               indent=1)

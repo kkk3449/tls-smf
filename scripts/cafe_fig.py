@@ -40,8 +40,20 @@ LABELS = {26: "door", 24: "glass door +\nfire ext.", 1: "vending row",
 
 
 def summary(name):
+    """Per metric: (value %, n).  esc accuracy over confirmed GT (n=20);
+    unanimous precision over that run's unanimous set (n varies)."""
     s = json.load(open(os.path.join(ROOT, "outputs", name)))["summary"]
-    return (100 * s["esc_acc_strict"][0], 100 * s["unanimity"]["acc"])
+    return ((100 * s["esc_acc_strict"][0], s["esc_acc_strict"][1]),
+            (100 * s["unanimity"]["acc"], s["unanimity"]["n"]))
+
+
+def wilson95(p, n):
+    """95% Wilson score interval for a proportion p (0..1), in percent."""
+    z = 1.959964
+    d = 1.0 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return 100 * (c - h), 100 * (c + h)
 
 
 def main():
@@ -128,13 +140,27 @@ def main():
     for gi, gname in enumerate(groups):
         for bi, (name, vals, col, alpha) in enumerate(cells):
             x = gi * 1.15 + bi * 0.2
-            v = vals[gi]
+            v, n = vals[gi]
+            lo, hi = wilson95(v / 100.0, n)
             axc.bar(x, v, width=0.16, color=col, alpha=alpha)
-            axc.text(x, v + 1.5, f"{v:.0f}", ha="center", fontsize=8.7,
+            axc.errorbar(x, v, yerr=[[v - lo], [hi - v]], fmt="none",
+                         ecolor="#444444", elinewidth=1.0, capsize=2.5,
+                         capthick=1.0, zorder=4)
+            axc.text(x, hi + 1.5, f"{v:.0f}", ha="center", fontsize=8.7,
                      color="#333333")
+            axc.text(x, 1.8, f"n={n}", rotation=90, ha="center",
+                     va="bottom", fontsize=7.5,
+                     color="white" if alpha == 1.0 else "#1a202c",
+                     zorder=5)
     axc.set_xticks([0.3 + i * 1.15 for i in range(2)])
     axc.set_xticklabels(groups, fontsize=10.3)
-    axc.set_ylim(0, 100)
+    axc.set_ylim(0, 113)
+    axc.set_yticks([0, 20, 40, 60, 80, 100])
+    axc.text(0.99, 0.99, "error bars: 95% Wilson CI\n"
+             "escalated: n = 20 confirmed GT\n"
+             "unanimous precision: n per bar",
+             transform=axc.transAxes, ha="right", va="top",
+             fontsize=8.0, color="#444444")
     axc.set_ylabel("% (confirmed GT)", fontsize=10.3)
     axc.spines[["top", "right"]].set_visible(False)
     axc.grid(axis="y", lw=0.3, alpha=0.4)

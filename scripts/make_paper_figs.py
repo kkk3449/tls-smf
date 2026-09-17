@@ -360,15 +360,28 @@ def fig6(out):
         acc_e = s["esc_acc_strict"][0] * 100
         ax.plot([base_calls / n, esc_calls / n], [acc_b, acc_e], "-o",
                 color=color, label=f"{scene} (n={s['base4_acc_strict'][1]} confirmed GT)")
+        # per-scene label offsets so the two "4-view" labels (points nearly
+        # coincide) and the escalation labels never overlap the lines/legend
+        if scene == "Showroom":
+            off_b, off_e, va_e = (6, -14), (-10, -16), "top"
+        else:
+            off_b, off_e, va_e = (6, 7), (-10, 9), "bottom"
         ax.annotate("4-view", (base_calls / n, acc_b), textcoords="offset points",
-                    xytext=(4, -12), fontsize=8.5, color=color)
-        ax.annotate(f"+escalation ({s['trigger_rate']*100:.0f}% trigger)",
-                    (esc_calls / n, acc_e), textcoords="offset points",
-                    xytext=(-8, 8), fontsize=8.5, color=color, ha="right")
+                    xytext=off_b, fontsize=8.5, color=color)
+        if scene == "Showroom":
+            ax.annotate(f"+escalation ({s['trigger_rate']*100:.0f}% trigger)",
+                        (esc_calls / n, acc_e), textcoords="offset points",
+                        xytext=off_e, fontsize=8.5, color=color, ha="right", va=va_e)
+        else:  # label the robot-hall line at its midpoint, below the line (clear region)
+            ax.annotate(f"+escalation ({s['trigger_rate']*100:.0f}% trigger)",
+                        ((base_calls + esc_calls) / (2 * n), (acc_b + acc_e) / 2),
+                        textcoords="offset points", xytext=(0, -14), fontsize=8.5,
+                        color=color, ha="center", va="top")
+    ax.margins(x=0.10, y=0.15)
     ax.set_xlabel("VLM calls per object")
     ax.set_ylabel("top-1 label accuracy [%] (confirmed GT)")
     ax.grid(alpha=0.3)
-    ax.legend(fontsize=8.6)
+    ax.legend(fontsize=8.6, loc="upper left")
     _save(fig, out, "fig6_escalation_cost.png")
 
 
@@ -1237,6 +1250,23 @@ def fig16(out):
     ag = node(0.675, y4, 0.14, "AdvanceGoal\n(per-goal loop)", DEL, fs=7.0)
     drop(*me, [wf, rg, ng, ag], DEL)
 
+    # highlight the nodes where the verified KG actually changes behavior:
+    # ResolveSemanticGoal (gated resolve refuses phantom/unverified goals,
+    # primary) and NavigateToGoal (consumes the resolved pose, secondary).
+    ACC = "#805ad5"
+    def hl(cx, y0, w, lw=2.4, glow=True):
+        if glow:
+            for pad, a, glw in ((0.017, 0.14, 5.0), (0.012, 0.28, 3.0)):
+                ax.add_patch(FancyBboxPatch(
+                    (cx - w / 2, y0), w, BH,
+                    boxstyle=f"round,pad={pad}", fc="none", ec=ACC,
+                    lw=glw, alpha=a))
+        ax.add_patch(FancyBboxPatch((cx - w / 2, y0), w, BH,
+                                    boxstyle="round,pad=0.009",
+                                    fc="none", ec=ACC, lw=lw))
+    hl(0.30, y4, 0.185)                     # ResolveSemanticGoal (primary)
+    hl(0.50, y4, 0.15, lw=1.5, glow=False)  # NavigateToGoal (resolved pose)
+
     # knowledge graph feeding both resolvers (dashed green, orthogonal
     # routes that stay clear of the tree connectors)
     kg = node(0.875, yME - 0.01, 0.225,
@@ -1259,6 +1289,8 @@ def fig16(out):
     ax.plot([], [], color=REA, lw=3, label="reactive layer (every tick)")
     ax.plot([], [], color=DEL, lw=3, label="deliberative mission execution")
     ax.plot([], [], color=KGC, lw=3, label="semantic mediator / knowledge graph")
+    ax.plot([], [], color=ACC, lw=3,
+            label="highlighted: decisions driven by the verified knowledge graph")
     ax.legend(loc="upper left", fontsize=7.6, frameon=False,
               bbox_to_anchor=(0.0, 1.0))
     ax.set_xlim(-0.012, 1); ax.set_ylim(-0.04, 1)

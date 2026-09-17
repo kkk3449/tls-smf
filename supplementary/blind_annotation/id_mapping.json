@@ -1,0 +1,256 @@
+{
+ "created": "2026-09-01",
+ "purpose": "blind third-party annotation kit; NEVER show to annotator",
+ "seed": 20260901,
+ "epoch": "T3 (vis_sota scan)",
+ "record": "outputs/vis_sota_det/semanticObjects.lf_esc.visn2frame.room.json",
+ "render_source": "outputs/blind_kit/t3_hires_views (768px, full-res re-association of outputs/vis_sota_det clusters from /home/caselab/Downloads/DataSend/vis_sota 1.e57, radius 0.045 m, cap 400k pts)",
+ "mapping": {
+  "T3-01": {
+   "internal_id": 44,
+   "obj_file": "obj_0044.ply",
+   "pipeline_name": "fire_extinguisher_044",
+   "pipeline_type": "fire extinguisher"
+  },
+  "T3-02": {
+   "internal_id": 31,
+   "obj_file": "obj_0031.ply",
+   "pipeline_name": "clutter_031",
+   "pipeline_type": "clutter"
+  },
+  "T3-03": {
+   "internal_id": 16,
+   "obj_file": "obj_0016.ply",
+   "pipeline_name": "clutter_016",
+   "pipeline_type": "clutter"
+  },
+  "T3-04": {
+   "internal_id": 39,
+   "obj_file": "obj_0039.ply",
+   "pipeline_name": "clutter_039",
+   "pipeline_type": "clutter"
+  },
+  "T3-05": {
+   "internal_id": 5,
+   "obj_file": "obj_0005.ply",
+   "pipeline_name": "machine_005",
+   "pipeline_type": "machine"
+  },
+  "T3-06": {
+   "internal_id": 64,
+   "obj_file": "obj_0064.ply",
+   "pipeline_name": "clutter_064",
+   "pipeline_type": "clutter"
+  },
+  "T3-07": {
+   "internal_id": 4,
+   "obj_file": "obj_0004.ply",
+   "pipeline_name": "chair_004",
+   "pipeline_type": "chair"
+  },
+  "T3-08": {
+   "internal_id": 40,
+   "obj_file": "obj_0040.ply",
+   "pipeline_name": "electrical_cabinet_040",
+   "pipeline_type": "electrical cabinet"
+  },
+  "T3-09": {
+   "internal_id": 7,
+   "obj_file": "obj_0007.ply",
+   "pipeline_name": "clutter_007",
+   "pipeline_type": "clutter"
+  },
+  "T3-10": {
+   "internal_id": 75,
+   "obj_file": "obj_0075.ply",
+   "pipeline_name": "shelf_075",
+   "pipeline_type": "shelf"
+  },
+  "T3-11": {
+   "internal_id": 17,
+   "obj_file": "obj_0017.ply",
+   "pipeline_name": "chair_017",
+   "pipeline_type": "chair"
+  },
+  "T3-12": {
+   "internal_id": 9,
+   "obj_file": "obj_0009.ply",
+   "pipeline_name": "clutter_009",
+   "pipeline_type": "clutter"
+  },
+  "T3-13": {
+   "internal_id": 51,
+   "obj_file": "obj_0051.ply",
+   "pipeline_name": "fire_extinguisher_051",
+   "pipeline_type": "fire extinguisher"
+  },
+  "T3-14": {
+   "internal_id": 29,
+   "obj_file": "obj_0029.ply",
+   "pipeline_name": "clutter_029",
+   "pipeline_type": "clutter"
+  },
+  "T3-15": {
+   "internal_id": 14,
+   "obj_file": "obj_0014.ply",
+   "pipeline_name": "clutter_014",
+   "pipeline_type": "clutter"
+  },
+  "T3-16": {
+   "internal_id": 35,
+   "obj_file": "obj_0035.ply",
+   "pipeline_name": "clutter_035",
+   "pipeline_type": "clutter"
+  },
+  "T3-17": {
+   "internal_id": 2,
+   "obj_file": "obj_0002.ply",
+   "pipeline_name": "chair_002",
+   "pipeline_type": "chair"
+  },
+  "T3-18": {
+   "internal_id": 0,
+   "obj_file": "obj_0000.ply",
+   "pipeline_name": "clutter_000",
+   "pipeline_type": "clutter"
+  },
+  "T3-19": {
+   "internal_id": 15,
+   "obj_file": "obj_0015.ply",
+   "pipeline_name": "clutter_015",
+   "pipeline_type": "clutter"
+  },
+  "T3-20": {
+   "internal_id": 78,
+   "obj_file": "obj_0078.ply",
+   "pipeline_name": "keyboard_078",
+   "pipeline_type": "keyboard"
+  },
+  "T3-21": {
+   "internal_id": 6,
+   "obj_file": "obj_0006.ply",
+   "pipeline_name": "monitor_006",
+   "pipeline_type": "monitor"
+  },
+  "T3-22": {
+   "internal_id": 50,
+   "obj_file": "obj_0050.ply",
+   "pipeline_name": "clutter_050",
+   "pipeline_type": "clutter"
+  },
+  "T3-23": {
+   "internal_id": 12,
+   "obj_file": "obj_0012.ply",
+   "pipeline_name": "machine_012",
+   "pipeline_type": "machine"
+  },
+  "T3-24": {
+   "internal_id": 41,
+   "obj_file": "obj_0041.ply",
+   "pipeline_name": "clutter_041",
+   "pipeline_type": "clutter"
+  },
+  "T3-25": {
+   "internal_id": 13,
+   "obj_file": "obj_0013.ply",
+   "pipeline_name": "pallet_013",
+   "pipeline_type": "pallet"
+  },
+  "T3-26": {
+   "internal_id": 49,
+   "obj_file": "obj_0049.ply",
+   "pipeline_name": "clutter_049",
+   "pipeline_type": "clutter"
+  },
+  "T3-27": {
+   "internal_id": 43,
+   "obj_file": "obj_0043.ply",
+   "pipeline_name": "clutter_043",
+   "pipeline_type": "clutter"
+  },
+  "T3-28": {
+   "internal_id": 10,
+   "obj_file": "obj_0010.ply",
+   "pipeline_name": "clutter_010",
+   "pipeline_type": "clutter"
+  },
+  "T3-29": {
+   "internal_id": 46,
+   "obj_file": "obj_0046.ply",
+   "pipeline_name": "clutter_046",
+   "pipeline_type": "clutter"
+  },
+  "T3-30": {
+   "internal_id": 3,
+   "obj_file": "obj_0003.ply",
+   "pipeline_name": "clutter_003",
+   "pipeline_type": "clutter"
+  },
+  "T3-31": {
+   "internal_id": 8,
+   "obj_file": "obj_0008.ply",
+   "pipeline_name": "book_008",
+   "pipeline_type": "book"
+  },
+  "T3-32": {
+   "internal_id": 28,
+   "obj_file": "obj_0028.ply",
+   "pipeline_name": "panel_028",
+   "pipeline_type": "panel"
+  },
+  "T3-33": {
+   "internal_id": 38,
+   "obj_file": "obj_0038.ply",
+   "pipeline_name": "clutter_038",
+   "pipeline_type": "clutter"
+  },
+  "T3-34": {
+   "internal_id": 11,
+   "obj_file": "obj_0011.ply",
+   "pipeline_name": "clutter_011",
+   "pipeline_type": "clutter"
+  },
+  "T3-35": {
+   "internal_id": 26,
+   "obj_file": "obj_0026.ply",
+   "pipeline_name": "clutter_026",
+   "pipeline_type": "clutter"
+  },
+  "T3-36": {
+   "internal_id": 19,
+   "obj_file": "obj_0019.ply",
+   "pipeline_name": "clutter_019",
+   "pipeline_type": "clutter"
+  },
+  "T3-37": {
+   "internal_id": 20,
+   "obj_file": "obj_0020.ply",
+   "pipeline_name": "clutter_020",
+   "pipeline_type": "clutter"
+  },
+  "T3-38": {
+   "internal_id": 47,
+   "obj_file": "obj_0047.ply",
+   "pipeline_name": "keyboard_047",
+   "pipeline_type": "keyboard"
+  },
+  "T3-39": {
+   "internal_id": 45,
+   "obj_file": "obj_0045.ply",
+   "pipeline_name": "clutter_045",
+   "pipeline_type": "clutter"
+  },
+  "T3-40": {
+   "internal_id": 1,
+   "obj_file": "obj_0001.ply",
+   "pipeline_name": "staircase_001",
+   "pipeline_type": "staircase"
+  },
+  "T3-41": {
+   "internal_id": 42,
+   "obj_file": "obj_0042.ply",
+   "pipeline_name": "ducting_042",
+   "pipeline_type": "ducting"
+  }
+ }
+}

@@ -111,6 +111,66 @@ _SYS_SYMBOLIC = (
     "- Respond ONLY via the report_symbolic tool."
 )
 
+SYMBOLIC_TOOL_BLIND = {
+    "name": "report_symbolic",
+    "description": "Name the object's type from the images and measured dimensions alone.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "corrected_type": {"type": "string",
+                               "description": "The single most accurate common-noun label for the object."},
+            "changed": {"type": "boolean",
+                        "description": "Always set true (no prior label is provided in this mode)."},
+            "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0,
+                           "description": "Confidence in corrected_type, 0..1."},
+            "reason": {"type": "string",
+                       "description": "<=1 sentence: why this type."},
+        },
+        "required": ["corrected_type", "changed", "confidence", "reason"],
+    },
+}
+
+# Ablation variant: identical perceptual guardrails, but NO provisional
+# (uni3d_type) label is shown and no keep/correct rule references one.
+_SYS_SYMBOLIC_BLIND = (
+    "You are a semantic-mapping verifier for an indoor mobile robot (AGV). You are "
+    "shown rendered image(s) of ONE segmented 3D object (a point cloud with a red 3D "
+    "bounding box) and its measured dimensions. No prior label is provided.\n\n"
+    "DECISION RULE (follow exactly): name the object with the single most accurate "
+    "common-noun label (open-vocabulary). Never output 'unknown'.\n"
+    "- SIZE SANITY CHECK: the measured `dimensions` (metres, length x width x "
+    "height) are a HARD constraint. Pick a label whose typical real-world size is "
+    "consistent with the measured dimensions. NEVER assign a single-instance class "
+    "to a cluster whose measured dimensions exceed that class's plausible envelope "
+    "(a 1.6 m-tall box is not a chair, even if part of it resembles one): when the "
+    "cluster is bigger than any plausible single object, it is probably several "
+    "merged objects --- label the DOMINANT visible structure, or 'clutter' if none "
+    "dominates.\n"
+    "- SPARSE-RENDER CAUTION: the images are renders of a SPARSE laser point "
+    "cloud, not photographs. Surfaces appear as dot patterns, oblique views can "
+    "look like random speckle, and parts are often missing. NEVER claim to see a "
+    "part (seat, backrest, legs, screen, rungs) unless its shape is clearly "
+    "outlined by the points.\n"
+    "- MULTI-VIEW CONSISTENCY (when several views are given): the views show the "
+    "SAME object from azimuths 90 degrees apart. Form a hypothesis from the "
+    "clearest, most point-dense view and then check that NO other view "
+    "contradicts it; do not average vague impressions across views. A correct "
+    "label must be consistent with every view AND with the dimensions.\n"
+    "- PANEL DISAMBIGUATION: a flat rectangular object thinner than ~0.05 m is "
+    "panel-like, NOT a ladder (a ladder needs two rails plus visible rungs) and "
+    "not a chair. Decide WHICH panel it is from the face view: a regular grid "
+    "of small square bumps = keyboard; a mostly uniform dark/glossy face = "
+    "display (monitor if < ~1 m, TV if larger); a bare featureless plate = "
+    "shelf/panel. Do NOT default every panel to monitor. A large (>1 m) flat "
+    "dark panel is a display even when tilted.\n"
+    "- CHAIR GATE: choose 'chair' ONLY if a horizontal seat pan roughly "
+    "0.3-0.6 m above the floor AND a backrest are both clearly outlined by "
+    "points. A tall box, shelf, or cabinet silhouette is never a chair.\n"
+    "- IF UNCERTAIN: use the most generic fitting label (e.g. 'clutter') rather "
+    "than guessing a specific class.\n"
+    "- Respond ONLY via the report_symbolic tool."
+)
+
 _SYS_IMPLICIT = (
     "You infer implicit robot-task (affordance) properties of ONE indoor object from "
     "its multi-view images and confirmed type, for AGV planning.\n"
@@ -273,8 +333,11 @@ class SemanticVLM:
         }
 
     def build_symbolic_request(self, obj, image_paths, allowed_types=None,
-                               floor_z=None, height_level=None):
-        ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}
+                               floor_z=None, height_level=None, blind=False):
+        if blind:
+            ctx = {"dimensions": obj.get("dimensions")}
+        else:
+            ctx = {"uni3d_type": obj.get("type"), "dimensions": obj.get("dimensions")}
         # Semantic height level (low/mid/high): measured from the scan, so it
         # is a physical constraint the isolated render cannot convey — a
         # "keyboard" cannot be at ceiling level, a fluorescent lamp cannot
@@ -304,7 +367,10 @@ class SemanticVLM:
                              "elevated above the floor" if bottom > 0.5 else
                              "on or near the floor"),
                 }
-        if allowed_types:
+        if blind:
+            vocab = ("No prior label is provided. Name the object with the most "
+                     "accurate open-vocabulary label.")
+        elif allowed_types:
             vocab = (f"User candidate classes (try these FIRST): {allowed_types}\n"
                      f"If uni3d_type ('{obj.get('type')}') is correct, keep it. "
                      f"If it is wrong, prefer a candidate that fits; if none of the "
@@ -325,9 +391,13 @@ class SemanticVLM:
         return content
 
     def verify_symbolic(self, obj, image_paths, allowed_types=None,
-                        floor_z=None):
+                        floor_z=None, blind=False, height_level=None):
         content = self.build_symbolic_request(obj, image_paths, allowed_types,
-                                              floor_z=floor_z)
+                                              floor_z=floor_z,
+                                              height_level=height_level,
+                                              blind=blind)
+        if blind:
+            return self._call(_SYS_SYMBOLIC_BLIND, content, SYMBOLIC_TOOL_BLIND)
         return self._call(_SYS_SYMBOLIC, content, SYMBOLIC_TOOL)
 
     def infer_implicit(self, obj_type, image_paths):
