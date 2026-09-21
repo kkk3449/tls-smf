@@ -268,8 +268,8 @@ def fig4(out):
                 .get(ver, ver)),
                ("voteShare", str(pr.get("voteShare", "—")))]
         dm = o["dimensions"]
-        exp = [("pose", f"x {o['poseX']:.2f}  y {o['poseY']:.2f}  z "
-                        f"{pr.get('poseZ', 0.0):.2f} m  (map)"),
+        exp = [("pose (map)", f"x {o['poseX']:.2f}  y {o['poseY']:.2f}  z "
+                        f"{pr.get('poseZ', 0.0):.2f} m"),
                ("theta", f"{o.get('poseTheta', 0.0):.2f} rad"),
                ("dims", f"{dm['length']:.2f} x {dm['width']:.2f} x "
                         f"{dm['height']:.2f} m"),
@@ -290,7 +290,7 @@ def fig4(out):
             axi.imshow(Image.open(fp))
         axi.axis("off")
         axi.set_title(title, fontsize=12.1, color=col, loc="left")
-        axt = fig.add_axes([0.215 + ci * 0.5, 0.02, 0.27, 0.88])
+        axt = fig.add_axes([0.212 + ci * 0.5, 0.02, 0.285, 0.88])
         axt.axis("off")
         y = 0.98
         for section, rows in fields(o):
@@ -298,9 +298,9 @@ def fig4(out):
                      style="italic", weight="bold", va="top")
             y -= 0.085
             for k, v in rows:
-                axt.text(0.06, y, k, fontsize=9.9, color="#333333",
+                axt.text(0.04, y, k, fontsize=9.4, color="#333333",
                          family="monospace", va="top")
-                axt.text(0.34, y, v, fontsize=9.9, color="#111111",
+                axt.text(0.36, y, v, fontsize=9.4, color="#111111",
                          family="monospace", va="top", wrap=True)
                 y -= 0.072
             y -= 0.030
@@ -403,11 +403,12 @@ def fig7(out):
             ax.text(i, max(acc[i], hal[i]) + 2.5,
                     f"traps {t['correct']}/{t['n']}", ha="center", fontsize=9.7)
         ax.set_xticks(x, labels, fontsize=9.9)
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 112)
+        ax.set_yticks(range(0, 101, 20))
         ax.set_ylabel("[%]")
         ax.set_title(f"{scene} (n={s[conds[0]]['n']} queries)", fontsize=12.1)
         ax.grid(axis="y", alpha=0.3)
-        ax.legend(fontsize=9.7)
+        ax.legend(fontsize=9.7, loc="upper left", ncol=2, framealpha=0.95)
     _save(fig, out, "fig7_query_benchmark.png")
 
 
@@ -591,10 +592,10 @@ def fig8(out):
                    linewidths=0, zorder=6)
     note(ax, (toolbox["poseX"] + 0.3, toolbox["poseY"] - 0.2),
          "gone → marked absent\n(node kept in graph, flagged)",
-         (0.80, 0.34), BAD)
+         (0.79, 0.16), BAD)
     note(ax, (ins["poseX"], ins["poseY"] + 0.4),
          "new → inserted, new ID\n(only this cluster re-verified: $0.23)",
-         (0.26, 0.63), OK)
+         (0.24, 0.85), OK)
     verdict(ax, "diff exact: 1 absent + 1 inserted  ·  53 carried",
             OK, "#f0f9f4")
 
@@ -650,7 +651,7 @@ def fig11(out):
         names = {}
     # object markers from the KG's current revision, so owner-refuted
     # phantoms drop out and corrected/recovered labels appear
-    _g = json.load(open(O("testroom_epochs_kg.json")))
+    _g = json.load(open(os.environ.get("EPOCHS_KG", O("testroom_epochs_kg.json"))))
     t3 = [{"poseX": n["pose"]["x"], "poseY": n["pose"]["y"],
            "type": n["type"],
            "properties": {"verificationStatus": n.get("status", "")}}
@@ -712,9 +713,11 @@ def fig11(out):
                linewidths=3.2, zorder=3)
 
     stroke = [pe.withStroke(linewidth=2.2, foreground="black")]
+    pcent = []
     for p in places:
         nm = names.get(p["name"], {}).get("name", p["name"])
         cx, cy = p["centroid"]
+        pcent.append((cx, cy))
         ax.text(cx, cy, nm.replace("_", "\n"), fontsize=9.4, ha="center",
                 va="center", color="white", weight="bold", zorder=6,
                 path_effects=stroke)
@@ -725,8 +728,15 @@ def fig11(out):
             ax.plot(x, y, "o", ms=5.5, color="#ffd400",
                     mec="black", mew=0.6, zorder=5)
             if o["type"] not in ("clutter", "unknown"):
+                near = [(cx, cy) for cx, cy in pcent
+                        if abs(x - cx) < 1.4 and abs(y - cy) < 1.0]
+                off, ha = (4, 4), "left"
+                if near:
+                    cx, cy = near[0]
+                    ha = "left" if x >= cx else "right"
+                    off = (5 if x >= cx else -5, 4 if y >= cy else -12)
                 ax.annotate(o["type"], (x, y), textcoords="offset points",
-                            xytext=(4, 4), fontsize=6.2, color="white",
+                            xytext=off, ha=ha, fontsize=6.2, color="white",
                             zorder=6, path_effects=stroke)
         else:
             ax.plot(x, y, "o", ms=4.5, color="#4da3ff",
@@ -760,7 +770,7 @@ def fig12(out):
         names = nb.get("T3_slic_rev4") or nb["T3_slic"]
     except KeyError:
         names = {}
-    g = json.load(open(O("testroom_epochs_kg.json")))
+    g = json.load(open(os.environ.get("EPOCHS_KG", O("testroom_epochs_kg.json"))))
     rev = g["revision"]
     nodes = {n["id"]: n for n in g["nodes"] if n.get("presence") != "absent"}
     edges = [e for e in g["edges"] if e.get("revision") == rev
@@ -809,14 +819,25 @@ def fig12(out):
     ax.contour(gx, gy, room.astype(float), levels=[0.5], colors="black",
                linewidths=2.6, zorder=2)
     stroke = [pe.withStroke(linewidth=2.0, foreground="white")]
+    sc = json.load(open(O("t3_place_scoped_relations.json")))
+    _byname0 = {n["name"]: n for n in nodes.values()}
+    _side = {"above": ((0, 7), "center", "bottom"),
+             "below": ((0, -7), "center", "top"),
+             "right": ((9, 0), "left", "center"),
+             "left": ((-9, 0), "right", "center")}
+    _override = {"region_002": "right", "region_003": "below"}
     for p in places:
         nm = names.get(p["name"], {}).get("name", p["name"])
         cx, cy = p["centroid"]
-        ax.text(cx, cy, nm.replace("_", "\n"), fontsize=7.8, ha="center",
-                va="center", color="#444444", style="italic", zorder=3,
-                path_effects=stroke)
+        k = sc["keyObjects"].get(p["name"])
+        dy = (_byname0[k]["pose"]["y"] - cy) if k in _byname0 else -1.0
+        side = _override.get(p["name"], "below" if dy > 0.3 else "above")
+        off, ha, va = _side[side]
+        ax.annotate(nm.replace("_", "\n"), (cx, cy), textcoords="offset points",
+                    xytext=off, fontsize=7.8, ha=ha, va=va,
+                    color="#444444", style="italic", zorder=3,
+                    path_effects=stroke)
 
-    sc = json.load(open(O("t3_place_scoped_relations.json")))
     colors = {"isNextTo": "#5b7ba6", "isOn": "#dd6b20", "isAboveOf": "#7c3aed"}
     widths = {"isNextTo": 1.1, "isOn": 2.4, "isAboveOf": 2.4}
     for e in sc["edges_intra_nextTo"] + sc["edges_vertical"]:
@@ -869,8 +890,12 @@ def fig12(out):
             n = byname[nm]
             ax.plot(n["pose"]["x"], n["pose"]["y"], "*", ms=15,
                     color="#f2c200", mec="#b91c1c", mew=1.3, zorder=7)
+            _pl = next((pn for pn, kk in sc["keyObjects"].items() if kk == nm), None)
+            _left = _pl is not None and (n["pose"]["x"] - cent[_pl][0]) < -0.5
             ax.annotate(nm, (n["pose"]["x"], n["pose"]["y"]),
-                        textcoords="offset points", xytext=(6, -11),
+                        textcoords="offset points",
+                        xytext=(-6, -11) if _left else (6, -11),
+                        ha="right" if _left else "left",
                         fontsize=6.8, color="#b91c1c", weight="bold",
                         zorder=8, path_effects=stroke)
     for pred, c in colors.items():
@@ -1103,7 +1128,7 @@ def fig9(out):
     test-room boundary. Overlay: yaw-rotated node footprints colored by the
     diff state, with node names on the specific-type objects.
     """
-    g = json.load(open(O("testroom_epochs_kg.json")))
+    g = json.load(open(os.environ.get("EPOCHS_KG", O("testroom_epochs_kg.json"))))
     b = json.load(open(O("vis_n2_room_bounds.json")))
     t3 = json.load(open(O("vis_sota_det",
                           "semanticObjects.lf_esc.visn2frame.room.json")))["semanticObjects"]
@@ -1148,7 +1173,7 @@ def fig9(out):
             rbox(n["pose"]["x"], n["pose"]["y"], d, th, OK, 1.3)
             if n["name"] == "machine_012":
                 ax.text(n["pose"]["x"], n["pose"]["y"],
-                        "machine_012\n(merged mega-cluster, Sec. 5.6)",
+                        "machine_012\n(merged mega-cluster, Section 5.8)",
                         fontsize=5.8, color="#1e5e40", ha="center",
                         va="center", style="italic", zorder=7)
             else:
@@ -1176,10 +1201,10 @@ def fig9(out):
             _label(ax, o_lbl, fs=5.4, color="#7a5f14")
             counts["updated"] += 1
     for c, ls, lbl in [
-            ("#b08c2e", "-", f"matched in place ({counts['updated']})"),
-            (DET, "-", f"moved, ID preserved ({counts['moved']})"),
-            (OK, "-", f"inserted ({counts['inserted']})"),
-            (BAD, "--", f"absent, kept in graph ({counts['absent']})")]:
+            ("#b08c2e", "-", f"matched in place (n = {counts['updated']})"),
+            (DET, "-", f"moved, ID preserved (n = {counts['moved']})"),
+            (OK, "-", f"inserted (n = {counts['inserted']})"),
+            (BAD, "--", f"absent, kept in graph (n = {counts['absent']})")]:
         ax.plot([], [], color=c, ls=ls, label=lbl)
     ax.scatter([], [], s=12, color=_pastel(4),
                label="segmented clusters (T3 scan)")
